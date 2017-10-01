@@ -2,6 +2,103 @@
 <Configuration>
     <ViewDefinitions>
         <View>
+            <Name>NewGuy.PoshSpotify.CurrentPlayingItem</Name>
+            <ViewSelectedBy>
+                <TypeName>NewGuy.PoshSpotify.CurrentPlayingItem</TypeName>
+            </ViewSelectedBy>
+            <ListControl>
+                <ListEntries>
+                    <ListEntry>
+                        <ListItems>
+                            <ListItem>
+                                <PropertyName>Track</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <Label>Artists</Label>
+                                <ItemSelectionCondition>
+                                    <ScriptBlock> $_.Track.Artists -ne $null </ScriptBlock>
+                                </ItemSelectionCondition>
+                                <ScriptBlock> If ($_.Track.Artists.Count -gt 5) { ($_.Track.Artists | Select-Object Name -First 5) + ' ...' } Else { $_.Track.Artists } </ScriptBlock>
+                            </ListItem>
+                            <ListItem>
+                                <Label>Album</Label>
+                                <ItemSelectionCondition>
+                                    <ScriptBlock> $_.Track.Album -ne $null </ScriptBlock>
+                                </ItemSelectionCondition>
+                                <ScriptBlock> $_.Track.Album </ScriptBlock>
+                            </ListItem>
+                            <ListItem>
+                                <Label>Progress</Label>
+                                <ScriptBlock>
+                                    If ($_.Progress -ne $null) {
+                                        '{0:D2} : {1:D2} : {2:D2} / {3:D2} : {4:D2} : {5:D2}' -f $_.Progress.Hours, $_.Progress.Minutes, $_.Progress.Seconds, $_.Track.Duration.Hours, $_.Track.Duration.Minutes, $_.Track.Duration.Seconds
+                                    } Else {
+                                        ' -- : -- : -- / {0:D2} : {1:D2} : {2:D2}' -f $_.Track.Duration.Hours, $_.Track.Duration.Minutes, $_.Track.Duration.Seconds
+                                    }
+                                </ScriptBlock>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>IsPlaying</PropertyName>
+                            </ListItem>
+                        </ListItems>
+                    </ListEntry>
+                </ListEntries>
+            </ListControl>
+        </View>
+        <View>
+            <Name>Table</Name>
+            <ViewSelectedBy>
+                <TypeName>NewGuy.PoshSpotify.CurrentPlayingItem</TypeName>
+            </ViewSelectedBy>
+            <TableControl>
+                <TableHeaders>
+                    <TableColumnHeader>
+                        <Width>35</Width>
+                        <Alignment>Center</Alignment>
+                    </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Label>Album</Label>
+                        <Width>35</Width>
+                        <Alignment>Center</Alignment>
+                    </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Label>Progress</Label>
+                        <Width>30</Width>
+                        <Alignment>Center</Alignment>
+                    </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Width>10</Width>
+                        <Alignment>Center</Alignment>
+                    </TableColumnHeader>
+                </TableHeaders>
+                <TableRowEntries>
+                    <TableRowEntry>
+                        <TableColumnItems>
+                            <TableColumnItem>
+                                <PropertyName>Track</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <ScriptBlock> $_.Track.Album </ScriptBlock>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <ScriptBlock>
+                                    If ($_.Progress -ne $null) {
+                                        '{0:D2} : {1:D2} : {2:D2} / {3:D2} : {4:D2} : {5:D2}' -f $_.Progress.Hours, $_.Progress.Minutes, $_.Progress.Seconds, $_.Track.Duration.Hours, $_.Track.Duration.Minutes, $_.Track.Duration.Seconds
+                                    } Else {
+                                        ' -- : -- : -- / {0:D2} : {1:D2} : {2:D2}' -f $_.Track.Duration.Hours, $_.Track.Duration.Minutes, $_.Track.Duration.Seconds
+                                    }
+                                </ScriptBlock>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>IsPlaying</PropertyName>
+                            </TableColumnItem>
+                        </TableColumnItems>
+                    </TableRowEntry>
+                </TableRowEntries>
+            </TableControl>
+        </View>
+
+        <View>
             <Name>NewGuy.PoshSpotify.Player</Name>
             <ViewSelectedBy>
                 <TypeName>NewGuy.PoshSpotify.Player</TypeName>
@@ -17,13 +114,23 @@
                                 <PropertyName>Track</PropertyName>
                             </ListItem>
                             <ListItem>
+                                <Label>Progress</Label>
+                                <ScriptBlock>
+                                    If ($_.Progress -ne $null) {
+                                        '{0:D2} : {1:D2} : {2:D2} / {3:D2} : {4:D2} : {5:D2}' -f $_.Progress.Hours, $_.Progress.Minutes, $_.Progress.Seconds, $_.Track.Duration.Hours, $_.Track.Duration.Minutes, $_.Track.Duration.Seconds
+                                    } Else {
+                                        ' -- : -- : -- / {0:D2} : {1:D2} : {2:D2}' -f $_.Track.Duration.Hours, $_.Track.Duration.Minutes, $_.Track.Duration.Seconds
+                                    }
+                                </ScriptBlock>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>IsPlaying</PropertyName>
+                            </ListItem>
+                            <ListItem>
                                 <PropertyName>Context</PropertyName>
                             </ListItem>
                             <ListItem>
                                 <PropertyName>PlayerFetchedOn</PropertyName>
-                            </ListItem>
-                            <ListItem>
-                                <PropertyName>IsPlaying</PropertyName>
                             </ListItem>
                         </ListItems>
                     </ListEntry>
@@ -39,11 +146,20 @@
                 <TableHeaders>
                     <TableColumnHeader>
                         <Width>25</Width>
-                        <Alignment>Left</Alignment>
+                        <Alignment>Center</Alignment>
                     </TableColumnHeader>
                     <TableColumnHeader>
                         <Width>25</Width>
-                        <Alignment>Left</Alignment>
+                        <Alignment>Center</Alignment>
+                    </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Label>Progress</Label>
+                        <Width>30</Width>
+                        <Alignment>Center</Alignment>
+                    </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Width>10</Width>
+                        <Alignment>Center</Alignment>
                     </TableColumnHeader>
                     <TableColumnHeader>
                         <Width>15</Width>
@@ -58,6 +174,18 @@
                             </TableColumnItem>
                             <TableColumnItem>
                                 <PropertyName>Track</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <ScriptBlock>
+                                    If ($_.Progress -ne $null) {
+                                        '{0:D2} : {1:D2} : {2:D2} / {3:D2} : {4:D2} : {5:D2}' -f $_.Progress.Hours, $_.Progress.Minutes, $_.Progress.Seconds, $_.Track.Duration.Hours, $_.Track.Duration.Minutes, $_.Track.Duration.Seconds
+                                    } Else {
+                                        ' -- : -- : -- / {0:D2} : {1:D2} : {2:D2}' -f $_.Track.Duration.Hours, $_.Track.Duration.Minutes, $_.Track.Duration.Seconds
+                                    }
+                                </ScriptBlock>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>IsPlaying</PropertyName>
                             </TableColumnItem>
                             <TableColumnItem>
                                 <PropertyName>Context</PropertyName>
