@@ -57,9 +57,15 @@ Function Get-SpotifyPlayerDevice {
     Param([ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
 
+    $Devices = @()
+
     $result = Invoke-SpotifyRequest -Method 'GET' -Path '/v1/me/player/devices' -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv
 
-    Return $result
+    Foreach ($device In $result.devices) {
+        $Devices += [NewGuy.PoshSpotify.Device]::new($device)
+    }
+
+    Return $Devices
 
 }
 
