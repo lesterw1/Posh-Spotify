@@ -140,13 +140,26 @@ Function Save-SpotifyEnvironmentInfo {
 
             The path to save the environment information with Spotify to.
 
+        .PARAMETER NoTimestampAppend
+
+            By default this command appends the current date and time onto the filename of the save. This switch will prevent the appending of the
+            timestamp.
+
     #>
 
     [CmdletBinding()]
 
-    Param([ValidateScript({ Test-Path -IsValid -Path $_ })] [string]$FilePath = ".\$($env:USERNAME)_SpotifyEnvironmentInfo_$(Get-Date -Format 'HH.MM.ss_MMM.dd').txt")
+    Param([string]$FilePath = ($script:SpotifyDefaultEnvironmentInfoSaveLocation + '\' + $script:SpotifyDefaultEnvironmentInfoSaveFilename),
+          [switch]$NoTimestampAppend)
+
+        If (-not $NoTimestampAppend) {
+            $ext = [IO.Path]::GetExtension($FilePath)
+            $FilePath = $FilePath -replace "$ext$","_$(Get-Date -Format 'HH.MM.ss_MMM.dd')$ext"
+        }
 
     $script:SpotifyDefaultEnv, $script:SpotifyEnvironmentInfo | ConvertTo-Json | Out-File $FilePath
+
+    Write-Host "`nEnvironmentInfo saved to: $FilePath" -ForegroundColor Cyan
 
 }
 
@@ -181,10 +194,22 @@ Function Import-SpotifyEnvironmentInfo {
 
     [CmdletBinding()]
 
-    Param([ValidateScript({ Test-Path -Path $_ })] [string]$FilePath = ".\$($env:USERNAME)_SpotifyEnvironmentInfo_*.txt")
+    Param([string]$FilePath)
 
     # Throw all errors to stop the script.
     $ErrorActionPreference = 'Stop'
+
+    # If FilePath was not provided build a default one. This only works if it was saved with default path and appended timestamp.
+    # An * will be added as a wildcard for the date/time part of the filename.
+    If (($FilePath -eq $null) -or ($FilePath -eq '')) {
+        $FilePath = ($script:SpotifyDefaultEnvironmentInfoSaveLocation + '\' + $script:SpotifyDefaultEnvironmentInfoSaveFilename)
+        $ext = [IO.Path]::GetExtension($FilePath)
+        $FilePath = $FilePath -replace "$ext$","_*$ext"
+        Write-Verbose "No path specified. Searching in following path : $FilePath"
+    }
+
+    # Verify we have a valid file now.
+    If (-not (Test-Path $FilePath)) { Throw "Invalid file path : $FilePath" }
 
     # If there are multiple matches on FilePath, sort by name and pick the last one.
     # Assuming the files end in a date, it should be the newest file. If not then who knows what the user is looking for.
