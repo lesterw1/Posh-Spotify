@@ -53,6 +53,7 @@ Function Get-SpotifyPlayerDevice {
     #>
 
     [CmdletBinding()]
+    [OutputType('NewGuy.PoshSpotify.Device')]
 
     Param([ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
@@ -120,6 +121,7 @@ Function Get-SpotifyPlayer {
     #>
 
     [CmdletBinding()]
+    [OutputType('NewGuy.PoshSpotify.Player')]
 
     Param([ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
           [string]$Market,
@@ -193,6 +195,7 @@ Function Get-SpotifyCurrentlyPlaying {
     #>
 
     [CmdletBinding()]
+    [OutputType('NewGuy.PoshSpotify.CurrentPlayingItem')]
 
     Param([ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
           [string]$Market,
