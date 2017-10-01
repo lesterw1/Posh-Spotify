@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Configuration>
+    <ViewDefinitions>
+        <View>
+            <Name>NewGuy.PoshSpotify.Album</Name>
+            <ViewSelectedBy>
+                <TypeName>NewGuy.PoshSpotify.Album</TypeName>
+            </ViewSelectedBy>
+            <ListControl>
+                <ListEntries>
+                    <ListEntry>
+                        <ListItems>
+                            <ListItem>
+                                <PropertyName>Name</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <ItemSelectionCondition>
+                                    <ScriptBlock> $_.Artists -ne $null </ScriptBlock>
+                                </ItemSelectionCondition>
+                                <Label>Artists</Label>
+                                <ScriptBlock> If ($_.Artists.Count -gt 5) { ($_.Artists | Select-Object Name -First 5) + ' ...' } Else { $_.Artists }</ScriptBlock>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>Id</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>Uri</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>FullDetailUri</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>Genres</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>Popularity</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>Images</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>ReleaseDate</PropertyName>
+                                <FormatString>{0:MMM} {0:dd} {0:yyyy}</FormatString>
+                            </ListItem>
+                            <ListItem>
+                                <ItemSelectionCondition>
+                                    <ScriptBlock> $_.Tracks -ne $null </ScriptBlock>
+                                </ItemSelectionCondition>
+                                <Label>Tracks</Label>
+                                <ScriptBlock> If ($_.Tracks.Count -gt 5) { ($_.Tracks | Select-Object -First 5) + ' ...' } Else { $_.Tracks }</ScriptBlock>
+                            </ListItem>
+                        </ListItems>
+                    </ListEntry>
+                </ListEntries>
+            </ListControl>
+        </View>
+        <View>
+            <Name>Table</Name>
+            <ViewSelectedBy>
+                <TypeName>NewGuy.PoshSpotify.Album</TypeName>
+            </ViewSelectedBy>
+            <TableControl>
+                <TableHeaders>
+                    <TableColumnHeader>
+                        <Width>25</Width>
+                        <Alignment>Left</Alignment>
+                    </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Width>25</Width>
+                        <Alignment>Left</Alignment>
+                    </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Width>25</Width>
+                        <Alignment>Left</Alignment>
+                    </TableColumnHeader>
+                </TableHeaders>
+                <TableRowEntries>
+                    <TableRowEntry>
+                        <TableColumnItems>
+                            <TableColumnItem>
+                                <PropertyName>Name</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>Id</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>Genres</PropertyName>
+                            </TableColumnItem>
+                        </TableColumnItems>
+                    </TableRowEntry>
+                </TableRowEntries>
+            </TableControl>
+        </View>
+    </ViewDefinitions>
+</Configuration>
