@@ -15,43 +15,73 @@ namespace NewGuy.PoshSpotify {
     public enum PlayerRepeatState { Off, Track, Context }
     public enum DeviceType { Computer, Smartphone, Speaker}
 
+    /*============================*/
+    /*== Current Playing Object ==*/
+    /*============================*/
+
+    // Current playing object
+
+    public class CurrentPlayingItem {
+
+        public Context Context { get; set; }
+        public bool IsPlaying { get; set; }
+        public DateTime PlayerFetchedOn { get; set; }
+        public TimeSpan Progress { get; set; }
+        public Track Track { get; set; }
+
+        public CurrentPlayingItem() {
+            this.Context = new Context();
+            this.IsPlaying = false;
+            this.PlayerFetchedOn = DateTime.Now.ToLocalTime();
+            this.Progress = new TimeSpan(0);
+            this.Track = null;
+        }
+
+        public CurrentPlayingItem(PSObject Object) : this() {
+
+            if (Object != null) {
+
+                this.Context = (Object.Properties["context"] != null && Object.Properties["context"].Value != null) ? new Context((PSObject)Object.Properties["context"].Value) : new Context();
+                this.IsPlaying = Object.Properties["is_playing"] != null ? (bool)Object.Properties["is_playing"].Value : false;
+                this.PlayerFetchedOn = Object.Properties["timestamp"] != null ? (DateTimeOffset.FromUnixTimeMilliseconds((long)Object.Properties["timestamp"].Value)).DateTime.ToLocalTime() : DateTime.Now.ToLocalTime();
+                this.Progress = Object.Properties["progress_ms"] != null ? (new TimeSpan(TimeSpan.TicksPerMillisecond * (int)Object.Properties["progress_ms"].Value)) : new TimeSpan(0);
+                this.Track = (Object.Properties["item"] != null && Object.Properties["item"].Value != null) ? new Track((PSObject)Object.Properties["item"].Value) : null;
+
+            }
+
+        }
+
+        // Methods.
+
+        public override string ToString() {
+            return this.Track.Name.ToString();
+        }
+
+    }
+
     /*===================*/
     /*== Player Object ==*/
     /*===================*/
 
     // Player object
 
-    public class Player {
+    public class Player : CurrentPlayingItem {
 
-        public Context Context { get; set; }
         public Device Device { get; set; }
-        public bool IsPlaying { get; set; }
-        public DateTime PlayerFetchedOn { get; set; }
-        public TimeSpan Progress { get; set; }
         public PlayerRepeatState RepeatState { get; set; }
         public bool ShuffleState { get; set; }
-        public Track Track { get; set; }
 
-        public Player() {
-            this.Context = new Context();
+        public Player() : base() {
             this.Device = null;
-            this.IsPlaying = false;
-            this.PlayerFetchedOn = DateTime.Now.ToLocalTime();
-            this.Progress = new TimeSpan(0);
             this.RepeatState = PlayerRepeatState.Off;
             this.ShuffleState = false;
-            this.Track = null;
         }
 
-        public Player(PSObject Object) : this() {
+        public Player(PSObject Object) : base(Object) {
 
             if (Object != null) {
 
-                this.Context = (Object.Properties["context"] != null && Object.Properties["context"].Value != null) ? new Context((PSObject)Object.Properties["context"].Value) : new Context();
                 this.Device = Object.Properties["device"] != null ? new Device((PSObject)Object.Properties["device"].Value) : null;
-                this.IsPlaying = Object.Properties["is_playing"] != null ? (bool)Object.Properties["is_playing"].Value : false;
-                this.PlayerFetchedOn = Object.Properties["timestamp"] != null ? (DateTimeOffset.FromUnixTimeMilliseconds((long)Object.Properties["timestamp"].Value)).DateTime.ToLocalTime() : DateTime.Now.ToLocalTime();
-                this.Progress = Object.Properties["progress_ms"] != null ? (new TimeSpan(TimeSpan.TicksPerMillisecond * (int)Object.Properties["progress_ms"].Value)) : new TimeSpan(0);
 
                 if (Object.Properties["repeat_state"] != null) {
                     if ((string)Object.Properties["repeat_state"].Value == "off") {
@@ -64,7 +94,6 @@ namespace NewGuy.PoshSpotify {
                 }
 
                 this.ShuffleState = Object.Properties["shuffle_state"] != null ? (bool)Object.Properties["shuffle_state"].Value : false;
-                this.Track = (Object.Properties["item"] != null && Object.Properties["item"].Value != null) ? new Track((PSObject)Object.Properties["item"].Value) : null;
 
             }
 

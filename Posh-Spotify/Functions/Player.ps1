@@ -203,7 +203,9 @@ Function Get-SpotifyCurrentlyPlaying {
 
     $result = Invoke-SpotifyRequest @splat
 
-    Return $result
+    $currPlaying = [NewGuy.PoshSpotify.CurrentPlayingItem]::new($result)
+
+    Return $currPlaying
 
 }
 
