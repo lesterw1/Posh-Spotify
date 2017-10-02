@@ -178,21 +178,25 @@ namespace NewGuy.PoshSpotify {
 
         public Device(PSObject Object) : this() {
 
-            if (Object.Properties["type"] != null) {
-                if ((string)Object.Properties["type"].Value == "Computer") {
-                    this.DeviceType = NewGuy.PoshSpotify.DeviceType.Computer;
-                } else if ((string)Object.Properties["type"].Value == "Smartphone") {
-                    this.DeviceType = NewGuy.PoshSpotify.DeviceType.Smartphone;
-                } else if ((string)Object.Properties["type"].Value == "Speaker") {
-                    this.DeviceType = NewGuy.PoshSpotify.DeviceType.Speaker;
-                }
-            }
+            if (Object != null) {
 
-            this.Id = Object.Properties["id"] != null ? (string)Object.Properties["id"].Value : null;
-            this.IsActive = Object.Properties["is_active"] != null ? (bool)Object.Properties["is_active"].Value : false;
-            this.IsRestricted = Object.Properties["is_restricted"] != null ? (bool)Object.Properties["is_restricted"].Value : false;
-            this.Name = Object.Properties["name"] != null ? (string)Object.Properties["name"].Value : "";
-            this.Volume = Object.Properties["volume_percent"] != null ? (int)Object.Properties["volume_percent"].Value : 0;
+                if (Object.Properties["type"] != null) {
+                    if ((string)Object.Properties["type"].Value == "Computer") {
+                        this.DeviceType = NewGuy.PoshSpotify.DeviceType.Computer;
+                    } else if ((string)Object.Properties["type"].Value == "Smartphone") {
+                        this.DeviceType = NewGuy.PoshSpotify.DeviceType.Smartphone;
+                    } else if ((string)Object.Properties["type"].Value == "Speaker") {
+                        this.DeviceType = NewGuy.PoshSpotify.DeviceType.Speaker;
+                    }
+                }
+
+                this.Id = Object.Properties["id"] != null ? (string)Object.Properties["id"].Value : null;
+                this.IsActive = Object.Properties["is_active"] != null ? (bool)Object.Properties["is_active"].Value : false;
+                this.IsRestricted = Object.Properties["is_restricted"] != null ? (bool)Object.Properties["is_restricted"].Value : false;
+                this.Name = Object.Properties["name"] != null ? (string)Object.Properties["name"].Value : "";
+                this.Volume = (Object.Properties["volume_percent"] != null && Object.Properties["volume_percent"].Value != null) ? (int)Object.Properties["volume_percent"].Value : 0;
+
+            }
 
         }
 
