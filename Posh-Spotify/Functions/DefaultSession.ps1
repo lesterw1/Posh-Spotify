@@ -147,7 +147,7 @@ Function Initialize-SpotifyDefaultSession {
     Else { $authObj = Initialize-SpotifyAuthorizationCodeFlow }
 
     # Keep previously recorded scopes if new authorization object doesn't contain any.
-    If (($script:SpotifyDefaultAuthenticationToken.Scopes.Length -gt 0) -and ($authObj.Scopes.Length -eq 0)) {
+    If (($script:SpotifyDefaultAuthenticationToken.Scopes.Count -gt 0) -and ($authObj.Scopes.Count -eq 0)) {
         $authObj.Scopes = $script:SpotifyDefaultAuthenticationToken.Scopes
     }
 
@@ -272,7 +272,7 @@ Function Import-SpotifyDefaultSession {
     $jsonObj = (Get-Content $file | ConvertFrom-Json)
 
     # Make sure we got something back.
-    If (($jsonObj -eq $null) -or ($jsonObj -eq '')) { Throw "Failed to retrieve information from provided file path : $FilePath" }
+    If (($null -eq $jsonObj) -or ($jsonObj -eq '')) { Throw "Failed to retrieve information from provided file path : $FilePath" }
 
     # Calculate the remaining time left on the access token.
     $expiresOn = $jsonObj.ExpiresOn.ToLocalTime()

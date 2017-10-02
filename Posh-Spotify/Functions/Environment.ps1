@@ -215,11 +215,11 @@ Function Import-SpotifyEnvironmentInfo {
     # Assuming the files end in a date, it should be the newest file. If not then who knows what the user is looking for.
     $file = Get-ChildItem $FilePath | Sort-Object Name | Select-Object -Last 1
 
-    # Grab from disk the saved information.
+    # Grab from disk the saved information. This comes back as an array.
     $jsonObjs = (Get-Content $file | ConvertFrom-Json)
 
     # Make sure we got something back.
-    If (($jsonObj -eq $null) -or ($jsonObj -eq '')) { Throw "Failed to retrieve information from provided file path : $FilePath" }
+    If (($null -eq $jsonObj) -or ($jsonObj.Count -eq 0)) { Throw "Failed to retrieve information from provided file path : $FilePath" }
 
     # First object should be a string representing the default environment info.
     $defaultEnvInfo = $jsonObjs[0]
