@@ -203,7 +203,7 @@ Function Save-SpotifyDefaultSession {
 
     If (-not $NoTimestampAppend) {
         $ext = [IO.Path]::GetExtension($FilePath)
-        $FilePath = $FilePath -replace "$ext$","_$(Get-Date -Format 'HH.MM.ss_MMM.dd')$ext"
+        $FilePath = $FilePath -replace "$ext$","_$(Get-Date -Format 'HH.mm.ss_MMM.dd')$ext"
     }
 
     $script:SpotifyDefaultAuthenticationToken | ConvertTo-Json | Out-File $FilePath
