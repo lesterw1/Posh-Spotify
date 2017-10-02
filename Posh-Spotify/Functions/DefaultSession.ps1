@@ -271,6 +271,9 @@ Function Import-SpotifyDefaultSession {
     # Grab from disk the saved information.
     $jsonObj = (Get-Content $file | ConvertFrom-Json)
 
+    # Make sure we got something back.
+    If (($jsonObj -eq $null) -or ($jsonObj -eq '')) { Throw "Failed to retrieve information from provided file path : $FilePath" }
+
     # Calculate the remaining time left on the access token.
     $expiresOn = $jsonObj.ExpiresOn.ToLocalTime()
     $expiresInSec = [int]($expiresOn - (Get-Date)).TotalSeconds
