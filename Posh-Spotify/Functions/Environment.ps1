@@ -219,7 +219,7 @@ Function Import-SpotifyEnvironmentInfo {
     $jsonObjs = (Get-Content $file | ConvertFrom-Json)
 
     # Make sure we got something back.
-    If (($null -eq $jsonObj) -or ($jsonObj.Count -eq 0)) { Throw "Failed to retrieve information from provided file path : $FilePath" }
+    If (($null -eq $jsonObjs) -or ($jsonObjs.Count -eq 0)) { Throw "Failed to retrieve information from provided file path : $FilePath" }
 
     # First object should be a string representing the default environment info.
     $defaultEnvInfo = $jsonObjs[0]
