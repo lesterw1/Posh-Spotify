@@ -137,7 +137,7 @@ namespace NewGuy.PoshSpotify {
             if (Object != null) {
                 this.ExternalUrl = Object.Properties["external_urls"] != null ? new ExternalUrl((PSObject)Object.Properties["external_urls"].Value) : new ExternalUrl();
                 this.FullDetailUri = Object.Properties["href"] != null ? (string)Object.Properties["href"].Value : "";
-                this.type = Object.Properties["type"] != null ? (ItemType)Object.Properties["type"].Value : ItemType.Album;
+                this.type = Object.Properties["type"] != null ? (ItemType)Enum.Parse(typeof(ItemType), ((string)Object.Properties["type"].Value), true) : ItemType.Album;
                 this.Uri = Object.Properties["uri"] != null ? (string)Object.Properties["uri"].Value : "";
             }
         }
