@@ -15,13 +15,13 @@
 #region Spotify Player API Functions
 
 #====================================================================================================================================================
-#############################
-## Get-SpotifyPlayerDevice ##
-#############################
+#######################
+## Get-SpotifyDevice ##
+#######################
 
-#region Get-SpotifyPlayerDevice
+#region Get-SpotifyDevice
 
-Function Get-SpotifyPlayerDevice {
+Function Get-SpotifyDevice {
 
     <#
 
@@ -70,9 +70,9 @@ Function Get-SpotifyPlayerDevice {
 
 }
 
-Export-ModuleMember -Function 'Get-SpotifyPlayerDevice'
+Export-ModuleMember -Function 'Get-SpotifyDevice'
 
-#endregion Get-SpotifyPlayerDevice
+#endregion Get-SpotifyDevice
 
 #====================================================================================================================================================
 #######################
@@ -251,6 +251,11 @@ Function Set-SpotifyPlayer {
 
             Currently Spotify API only supports one device ID.
 
+        .PARAMETER Device
+
+            The Device on which playback should be started/transferred. This parameter accepts either Device objects returned from Get-SpotifyDevice
+            or Player objects returned from Get-SpotifyPlayer (Player objects contain a Device object).
+
         .PARAMETER Play
 
             If switch is provided, ensures playback happens on new device. If not provided keeps the current playback state.
@@ -336,6 +341,11 @@ Function Start-SpotifyPlayback {
 
             The id of the device this command is targeting. If not supplied, the user's currently active device is the target.
 
+        .PARAMETER Device
+
+            The Device on which playback should be started/transferred. This parameter accepts either Device objects returned from Get-SpotifyDevice
+            or Player objects returned from Get-SpotifyPlayer (Player objects contain a Device object).
+
         .PARAMETER ContextUri
 
             Spotify URI of the context to play. Valid contexts are albums, artists & playlists.
@@ -381,41 +391,48 @@ Function Start-SpotifyPlayback {
     [CmdletBinding(DefaultParameterSetName = 'Default')]
     ## [OutputType('NewGuy.PoshSpotify.Player[]')]
 
-    Param([Parameter(ValueFromPipeline, ValueFromPipelineByPropertyName)] [string]$DeviceId,
+    Param([Parameter(Mandatory, ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
+          [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'DeviceObj')] [NewGuy.PoshSpotify.Device[]]$Device,
           [Parameter(ParameterSetName = 'ContextUri')] [string]$ContextUri,
           [Parameter(ParameterSetName = 'Tracks')] [string[]]$Tracks,
           [Parameter(ParameterSetName = 'ContextUri')][Parameter(ParameterSetName = 'Tracks')] [string]$Offset,
           [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
 
-    $bodyParams = $null
+    Process {
 
-    If ($PSCmdlet.ParameterSetName -eq 'ContextUri') { $bodyParams = @{ 'context_uri' = $ContextUri } }
-    ElseIf ($PSCmdlet.ParameterSetName -eq 'Tracks') { $bodyParams = @{ 'uris' = $Tracks } }
+        If ($PSCmdlet.ParameterSetName -eq 'DeviceObj') { $DeviceId = $Device.Id }
 
-    If ($Offset) {
-        $parsedOffset = $null
-        If ([int]::TryParse($Offset, [ref]$parsedOffset)) {
-            $bodyParams['offset'] = @{ position = $parsedOffset }
-        } Else {
-            $bodyParams['offset'] = @{ uri = $Offset }
+        $bodyParams = $null
+
+        If ($PSCmdlet.ParameterSetName -eq 'ContextUri') { $bodyParams = @{ 'context_uri' = $ContextUri } }
+        ElseIf ($PSCmdlet.ParameterSetName -eq 'Tracks') { $bodyParams = @{ 'uris' = $Tracks } }
+
+        If ($Offset) {
+            $parsedOffset = $null
+            If ([int]::TryParse($Offset, [ref]$parsedOffset)) {
+                $bodyParams['offset'] = @{ position = $parsedOffset }
+            } Else {
+                $bodyParams['offset'] = @{ uri = $Offset }
+            }
         }
+
+        $splat = @{
+            Method = 'PUT'
+            Path = '/v1/me/player/play'
+            AccessToken = $AccessToken
+            Encoding = 'JSON'
+            SpotifyEnv = $SpotifyEnv
+        }
+
+        If ($DeviceId) { $splat['QueryParameters'] = @{ device_id = $DeviceId } }
+        If ($bodyParams) { $splat['RequestBodyParameters'] = $bodyParams }
+
+        $result = Invoke-SpotifyRequest @splat
+
+        Return $result
+
     }
-
-    $splat = @{
-        Method = 'PUT'
-        Path = '/v1/me/player/play'
-        AccessToken = $AccessToken
-        Encoding = 'JSON'
-        SpotifyEnv = $SpotifyEnv
-    }
-
-    If ($DeviceId) { $splat['QueryParameters'] = @{ device_id = $DeviceId } }
-    If ($bodyParams) { $splat['RequestBodyParameters'] = $bodyParams }
-
-    $result = Invoke-SpotifyRequest @splat
-
-    Return $result
 
 }
 
