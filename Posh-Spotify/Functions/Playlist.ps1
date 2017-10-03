@@ -37,13 +37,7 @@ Function Get-SpotifyPlaylist {
                 Spotify Web API : https://developer.spotify.com/web-api/get-a-list-of-current-users-playlists/
                                   https://developer.spotify.com/web-api/get-list-users-playlists/
 
-        .PARAMETER AccessToken
-
-            The Access Token provided during the authorization process.
-
-            The Access Token must have the "playlist-read-collaborative" and "playlist-read-private" scope authorized in order to read information.
-
-        .PARAMETER User
+        .PARAMETER Id
 
             The user's Spotify Id used to retrieve playlist information. If none is provided the current user will be used.
 
@@ -76,6 +70,12 @@ Function Get-SpotifyPlaylist {
 
                 https://developer.spotify.com/web-api/user-guide/#rate-limiting
 
+        .PARAMETER AccessToken
+
+            The Access Token provided during the authorization process.
+
+            The Access Token must have the "playlist-read-collaborative" and "playlist-read-private" scope authorized in order to read information.
+
         .PARAMETER SpotifyEnv
 
             A string matching a key in the Spotify environment configuration hashtable to be used when making Spotify API calls. If this parameter is
@@ -88,48 +88,60 @@ Function Get-SpotifyPlaylist {
     [CmdletBinding()]
     [OutputType('NewGuy.PoshSpotify.Playlist[]')]
 
-    Param([ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
-          [string]$User,
+    Param([Parameter(ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias('Username')] [string]$Id,
           [switch]$PageResults,
           [int]$Limit = 20,
           [int]$Offset = 0,
           [switch]$SkipTrackRetrieval,
+          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
 
-    $PlaylistList = @()
+    Begin {
 
-    $path = '/v1/me/playlists'
+        $PlaylistList = @()
 
-    If ($User.Length -gt 0) { $path = "/v1/users/$User/playlists" }
-
-    $splat = @{ Path = $path }
-
-    If ($PageResults) {
-        $splat.Limit = $Limit
-        $splat.Offset = $Offset
-    } Else {
-        $splat.Limit = 50
-        $splat.Offset = 0
     }
 
-    $pagingObject = New-SpotifyPage @splat
+    Process {
 
-    # Get requested playlists.
-    If ($PageResults) {
-        $PlaylistList += (Get-SpotifyPage -PagingInfo $pagingObject -RetrieveMode NextPage -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv).Items
-    } Else {
-        $PlaylistList += (Get-SpotifyPage -PagingInfo $pagingObject -RetrieveMode AllPages -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv).Items
-    }
+        $path = '/v1/me/playlists'
 
-    # Get all Tracks if not otherwise requested.
-    If (-not $SkipTrackRetrieval) {
-        Foreach ($playlist In $PlaylistList) {
-            $newPageInfo = Get-SpotifyPage -PagingInfo $playlist.TrackPagingInfo -RetrieveMode AllPages -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv
-            $newPageInfo.Items | ForEach-Object { $playlist.Tracks.Add($_) }
+        If ($Username.Length -gt 0) { $path = "/v1/users/$Username/playlists" }
+
+        $splat = @{ Path = $path }
+
+        If ($PageResults) {
+            $splat.Limit = $Limit
+            $splat.Offset = $Offset
+        } Else {
+            $splat.Limit = 50
+            $splat.Offset = 0
         }
+
+        $pagingObject = New-SpotifyPage @splat
+
+        # Get requested playlists.
+        If ($PageResults) {
+            $PlaylistList += (Get-SpotifyPage -PagingInfo $pagingObject -RetrieveMode NextPage -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv).Items
+        } Else {
+            $PlaylistList += (Get-SpotifyPage -PagingInfo $pagingObject -RetrieveMode AllPages -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv).Items
+        }
+
+        # Get all Tracks if not otherwise requested.
+        If (-not $SkipTrackRetrieval) {
+            Foreach ($playlist In $PlaylistList) {
+                $newPageInfo = Get-SpotifyPage -PagingInfo $playlist.TrackPagingInfo -RetrieveMode AllPages -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv
+                $newPageInfo.Items | ForEach-Object { $playlist.Tracks.Add($_) }
+            }
+        }
+
     }
 
-    Return $PlaylistList
+    End {
+
+        Return $PlaylistList
+
+    }
 
 }
 

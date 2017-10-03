@@ -23,7 +23,7 @@ InModuleScope Posh-Spotify {
 
         It 'Get Spotify artist.' {
 
-            $artists = Get-SpotifyArtist -Ids '53XhwfbYqKCa1cC15pYq2q', '1moxjboGR7GNWYIMWsRjgG'
+            $artists = Get-SpotifyArtist -Id '53XhwfbYqKCa1cC15pYq2q', '1moxjboGR7GNWYIMWsRjgG'
 
             $artists.Count | Should Be 2
             $artists[0] | Should BeOfType NewGuy.PoshSpotify.Artist

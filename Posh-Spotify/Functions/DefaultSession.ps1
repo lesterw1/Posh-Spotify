@@ -79,11 +79,15 @@ Function Set-SpotifyDefaultSession {
 
             The current Access Token for making Spotify API calls.
 
+        .PARAMETER AuthenticationToken
+
+            An AuthenticationToken object. The default AuthenticationObject will be the same object as the one provided.
+
     #>
 
     [CmdletBinding(DefaultParameterSetName = 'Parameters')]
 
-    Param([Parameter(ParameterSetName = 'Parameters', Position = 0)]
+    Param([Parameter(ParameterSetName = 'Parameters', ValueFromPipeline, Position = 0)]
           [string]$RefreshToken,
 
           [Parameter(ParameterSetName = 'Parameters', Position = 1)]
@@ -92,18 +96,22 @@ Function Set-SpotifyDefaultSession {
           [Parameter(ParameterSetName = 'Parameters', Position = 2)]
           [DateTime]$ExpiresOn,
 
-          [Parameter(ParameterSetName = 'AuthenticationToken', Position = 0)]
+          [Parameter(ParameterSetName = 'AuthenticationToken', ValueFromPipeline, Position = 0)]
           [NewGuy.PoshSpotify.AuthenticationToken]$AuthenticationToken,
 
           [hashtable]$SpotifyEnvironment)
 
-    If ($script:SpotifyDefaultAuthenticationToken -eq $null) { $script:SpotifyDefaultAuthenticationToken = [NewGuy.PoshSpotify.AuthenticationToken]::new() }
+    Process {
 
-    If ($AuthenticationToken) { $script:SpotifyDefaultAuthenticationToken = $AuthenticationToken }
-    Else {
-        If ($RefreshToken) { $script:SpotifyDefaultAuthenticationToken.RefreshToken = $RefreshToken }
-        If ($AccessToken) { $script:SpotifyDefaultAuthenticationToken.AccessToken = $AccessToken }
-        If ($ExpiresOn) { $script:SpotifyDefaultAuthenticationToken.ExpiresOn = $ExpiresOn }
+        If ($script:SpotifyDefaultAuthenticationToken -eq $null) { $script:SpotifyDefaultAuthenticationToken = [NewGuy.PoshSpotify.AuthenticationToken]::new() }
+
+        If ($AuthenticationToken) { $script:SpotifyDefaultAuthenticationToken = $AuthenticationToken }
+        Else {
+            If ($RefreshToken) { $script:SpotifyDefaultAuthenticationToken.RefreshToken = $RefreshToken }
+            If ($AccessToken) { $script:SpotifyDefaultAuthenticationToken.AccessToken = $AccessToken }
+            If ($ExpiresOn) { $script:SpotifyDefaultAuthenticationToken.ExpiresOn = $ExpiresOn }
+        }
+
     }
 
 }
@@ -359,7 +367,9 @@ Function Add-SpotifyCommandAlias {
                 Play - Starts playback of music on the current player device.
                 Pause - Pauses playback of music on the current player device.
                 Skip - Skips to the next track.
+                NextTrack - Skips to the next track.
                 SkipBack - Skips back to the previous track.
+                PreviousTrack - Skips back to the previous track.
 
     #>
 
@@ -368,12 +378,16 @@ Function Add-SpotifyCommandAlias {
     Param([ValidateSet('Play',
                        'Pause',
                        'Skip',
-                       'SkipBack')] [string[]]$Aliases)
+                       'NextTrack',
+                       'SkipBack',
+                       'PreviousTrack')] [string[]]$Aliases)
 
     If (($Aliases.Count -eq 0) -or ($Aliases -contains 'Play')) { Set-Alias -Name Play -Value Start-SpotifyPlayback -Scope Global }
     If (($Aliases.Count -eq 0) -or ($Aliases -contains 'Pause')) { Set-Alias -Name Pause -Value Stop-SpotifyPlayback -Scope Global }
     If (($Aliases.Count -eq 0) -or ($Aliases -contains 'Skip')) { Set-Alias -Name Skip -Value Skip-SpotifyNextTrack -Scope Global }
+    If (($Aliases.Count -eq 0) -or ($Aliases -contains 'NextTrack')) { Set-Alias -Name NextTrack -Value Skip-SpotifyNextTrack -Scope Global }
     If (($Aliases.Count -eq 0) -or ($Aliases -contains 'SkipBack')) { Set-Alias -Name SkipBack -Value Skip-SpotifyPreviousTrack -Scope Global }
+    If (($Aliases.Count -eq 0) -or ($Aliases -contains 'PreviousTrack')) { Set-Alias -Name PreviousTrack -Value Skip-SpotifyPreviousTrack -Scope Global }
 
 }
 

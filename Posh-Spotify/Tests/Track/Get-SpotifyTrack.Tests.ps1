@@ -23,7 +23,7 @@ InModuleScope Posh-Spotify {
 
         It 'Get Spotify track.' {
 
-            $tracks = Get-SpotifyTrack -Ids '05KfyCEE6otdlT1pp2VIjP', '6eN9yBWv9zFVZFXGsPrMxj'
+            $tracks = Get-SpotifyTrack -Id '05KfyCEE6otdlT1pp2VIjP', '6eN9yBWv9zFVZFXGsPrMxj'
 
             $tracks.Count | Should Be 2
             $tracks[0] | Should BeOfType NewGuy.PoshSpotify.Track

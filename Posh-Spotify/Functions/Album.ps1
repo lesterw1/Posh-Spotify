@@ -35,13 +35,9 @@ Function Get-SpotifyAlbum {
 
                 Spotify Web API : https://developer.spotify.com/web-api/get-several-albums/
 
-        .PARAMETER AccessToken
+        .PARAMETER Id
 
-            The Access Token provided during the authorization process.
-
-        .PARAMETER Ids
-
-            An array of Spotify Ids of the albums to get information for. Maximum: 50 IDs.
+            The Spotify Id of the album(s) to get information for. Maximum: 20 IDs.
 
         .PARAMETER Market
 
@@ -49,6 +45,10 @@ Function Get-SpotifyAlbum {
             code of the user associated with the gieven Access Token.
 
             https://developer.spotify.com/web-api/track-relinking-guide/
+
+        .PARAMETER AccessToken
+
+            The Access Token provided during the authorization process.
 
         .PARAMETER SpotifyEnv
 
@@ -62,29 +62,41 @@ Function Get-SpotifyAlbum {
     [CmdletBinding()]
     [OutputType('NewGuy.PoshSpotify.Album[]')]
 
-    Param([ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
-          [Parameter(Mandatory)] [string[]]$Ids,
+    Param([Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)] [string[]]$Id,
           [Alias('Country')] [string]$Market,
+          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
 
-    # Maximum of 50 albums per request.
-    If ($Ids.Count -gt 50) { Throw "Only 50 albums per request allowed."}
+    Begin {
 
-    $AlbumList = @()
+        $AlbumList = @()
 
-    $params = @{
-        ids = $Ids -join ','
     }
 
-    If ($Market) { $params['market'] = $Market }
+    Process {
 
-    $result = Invoke-SpotifyRequest -Method 'GET' -Path '/v1/albums' -AccessToken $AccessToken -QueryParameters $params -SpotifyEnv $SpotifyEnv
+        # Maximum of 20 albums per request.
+        If ($Id.Count -gt 20) { Throw "Only 20 albums per request allowed."}
 
-    Foreach ($album In $result.albums) {
-        $AlbumList += [NewGuy.PoshSpotify.Album]::new($album)
+        $params = @{
+            ids = $Id -join ','
+        }
+
+        If ($Market) { $params['market'] = $Market }
+Write-Host "Id = $Id"
+        $result = Invoke-SpotifyRequest -Method 'GET' -Path '/v1/albums' -AccessToken $AccessToken -QueryParameters $params -SpotifyEnv $SpotifyEnv
+
+        Foreach ($album In $result.albums) {
+            $AlbumList += [NewGuy.PoshSpotify.Album]::new($album)
+        }
+
     }
 
-    Return $AlbumList
+    End {
+
+        Return $AlbumList
+
+    }
 
 }
 

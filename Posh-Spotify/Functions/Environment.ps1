@@ -36,6 +36,7 @@ Function Get-SpotifyEnvironmentInfo {
     #>
 
     [CmdletBinding()]
+    [OutputType('hashtable')]
 
     Param()
 
@@ -193,6 +194,7 @@ Function Import-SpotifyEnvironmentInfo {
     #>
 
     [CmdletBinding()]
+    [OutputType('hashtable')]
 
     Param([string]$FilePath)
 

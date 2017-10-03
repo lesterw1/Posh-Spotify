@@ -35,13 +35,9 @@ Function Get-SpotifyTrack {
 
                 Spotify Web API : https://developer.spotify.com/web-api/get-several-tracks/
 
-        .PARAMETER AccessToken
+        .PARAMETER Id
 
-            The Access Token provided during the authorization process.
-
-        .PARAMETER Ids
-
-            An array of Spotify Ids of the tracks to get information for. Maximum: 50 IDs.
+            The Spotify Ids of the track(s) to get information for. Maximum: 50 IDs.
 
         .PARAMETER Market
 
@@ -49,6 +45,10 @@ Function Get-SpotifyTrack {
             code of the user associated with the gieven Access Token.
 
             https://developer.spotify.com/web-api/track-relinking-guide/
+
+        .PARAMETER AccessToken
+
+            The Access Token provided during the authorization process.
 
         .PARAMETER SpotifyEnv
 
@@ -62,29 +62,41 @@ Function Get-SpotifyTrack {
     [CmdletBinding()]
     [OutputType('NewGuy.PoshSpotify.Track[]')]
 
-    Param([ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
-          [Parameter(Mandatory)] [string[]]$Ids,
+    Param([Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)] [string[]]$Id,
           [Alias('Country')] [string]$Market,
+          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
 
-    # Maximum of 50 tracks per request.
-    If ($Ids.Count -gt 50) { Throw "Only 50 tracks per request allowed."}
+    Begin {
 
-    $TrackList = @()
+        $TrackList = @()
 
-    $params = @{
-        ids = $Ids -join ','
     }
 
-    If ($Market) { $params['market'] = $Market }
+    Process {
 
-    $result = Invoke-SpotifyRequest -Method 'GET' -Path '/v1/tracks' -AccessToken $AccessToken -QueryParameters $params -SpotifyEnv $SpotifyEnv
+        # Maximum of 50 tracks per request.
+        If ($Id.Count -gt 50) { Throw "Only 50 tracks per request allowed."}
 
-    Foreach ($track In $result.tracks) {
-        $TrackList += [NewGuy.PoshSpotify.Track]::new($track)
+        $params = @{
+            ids = $Id -join ','
+        }
+
+        If ($Market) { $params['market'] = $Market }
+
+        $result = Invoke-SpotifyRequest -Method 'GET' -Path '/v1/tracks' -AccessToken $AccessToken -QueryParameters $params -SpotifyEnv $SpotifyEnv
+
+        Foreach ($track In $result.tracks) {
+            $TrackList += [NewGuy.PoshSpotify.Track]::new($track)
+        }
+
     }
 
-    Return $TrackList
+    End {
+
+        Return $TrackList
+
+    }
 
 }
 

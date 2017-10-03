@@ -35,13 +35,9 @@ Function Get-SpotifyArtist {
 
                 Spotify Web API : https://developer.spotify.com/web-api/get-several-artists/
 
-        .PARAMETER AccessToken
+        .PARAMETER Id
 
-            The Access Token provided during the authorization process.
-
-        .PARAMETER Ids
-
-            An array of Spotify Ids of the artists to get information for. Maximum: 50 IDs.
+            The Spotify Ids of the artist(s) to get information for. Maximum: 50 IDs.
 
         .PARAMETER Market
 
@@ -49,6 +45,10 @@ Function Get-SpotifyArtist {
             code of the user associated with the gieven Access Token.
 
             https://developer.spotify.com/web-api/track-relinking-guide/
+
+        .PARAMETER AccessToken
+
+            The Access Token provided during the authorization process.
 
         .PARAMETER SpotifyEnv
 
@@ -62,26 +62,38 @@ Function Get-SpotifyArtist {
     [CmdletBinding()]
     [OutputType('NewGuy.PoshSpotify.Artist[]')]
 
-    Param([ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
-          [Parameter(Mandatory)] [string[]]$Ids,
+    Param([Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)] [string[]]$Id,
+          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
 
-    # Maximum of 20 artists per request.
-    If ($Ids.Count -gt 20) { Throw "Only 20 artists per request allowed."}
+    Begin {
 
-    $ArtistList = @()
+        $ArtistList = @()
 
-    $params = @{
-        ids = $Ids -join ','
     }
 
-    $result = Invoke-SpotifyRequest -Method 'GET' -Path '/v1/artists' -AccessToken $AccessToken -QueryParameters $params -SpotifyEnv $SpotifyEnv
+    Process {
 
-    Foreach ($artist In $result.artists) {
-        $ArtistList += [NewGuy.PoshSpotify.Artist]::new($artist)
+        # Maximum of 50 artists per request.
+        If ($Id.Count -gt 50) { Throw "Only 50 artists per request allowed." }
+
+        $params = @{
+            ids = $Id -join ','
+        }
+
+        $result = Invoke-SpotifyRequest -Method 'GET' -Path '/v1/artists' -AccessToken $AccessToken -QueryParameters $params -SpotifyEnv $SpotifyEnv
+
+        Foreach ($artist In $result.artists) {
+            $ArtistList += [NewGuy.PoshSpotify.Artist]::new($artist)
+        }
+
     }
 
-    Return $ArtistList
+    End {
+
+        Return $ArtistList
+
+    }
 
 }
 

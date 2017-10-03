@@ -38,10 +38,6 @@ Function Get-SpotifyPage {
 
                 Spotify Web API : https://developer.spotify.com/web-api/object-model/#paging-object
 
-        .PARAMETER AccessToken
-
-            The Access Token provided during the authorization process.
-
         .PARAMETER PagingInfo
 
             The PagingInfo object from which to retrieve more items.
@@ -49,6 +45,10 @@ Function Get-SpotifyPage {
         .PARAMETER RetrieveMode
 
             The page to retrieve. Valid values are NextPage, PreviousPage, AllPages. Default is NextPage.
+
+        .PARAMETER AccessToken
+
+            The Access Token provided during the authorization process.
 
         .PARAMETER SpotifyEnv
 
@@ -62,48 +62,52 @@ Function Get-SpotifyPage {
     [CmdletBinding()]
     [OutputType('NewGuy.PoshSpotify.PagingInfo')]
 
-    Param([ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
-          [Parameter(Mandatory)] [NewGuy.PoshSpotify.PagingInfo]$PagingInfo,
+    Param([Parameter(Mandatory, ValueFromPipeline)] [NewGuy.PoshSpotify.PagingInfo]$PagingInfo,
           [ValidateSet('NextPage', 'PreviousPage', 'AllPages')] [string]$RetrieveMode = 'NextPage',
+          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
 
-    If ($RetrieveMode -eq 'NextPage') {
+    Process {
 
-        If (($PagingInfo.NextPage -eq '') -or ($PagingInfo.NextPage -eq $null)) { $path = $PagingInfo.FullDetailUri }
-        Else { $path = $PagingInfo.NextPage }
+        If ($RetrieveMode -eq 'NextPage') {
 
-        $result = Invoke-SpotifyRequest -Method 'GET' -Path $path -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv
+            If (($PagingInfo.NextPage -eq '') -or ($PagingInfo.NextPage -eq $null)) { $path = $PagingInfo.FullDetailUri }
+            Else { $path = $PagingInfo.NextPage }
 
-        $pagingObject = [NewGuy.PoshSpotify.PagingInfo]::new($result)
+            $result = Invoke-SpotifyRequest -Method 'GET' -Path $path -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv
 
-    } ElseIf ($RetrieveMode -eq 'PreviousPage') {
+            $pagingObject = [NewGuy.PoshSpotify.PagingInfo]::new($result)
 
-        If (($PagingInfo.PreviousPage -eq '') -or ($PagingInfo.PreviousPage -eq $null)) { $path = $PagingInfo.FullDetailUri }
-        Else { $path = $PagingInfo.PreviousPage }
+        } ElseIf ($RetrieveMode -eq 'PreviousPage') {
 
-        $result = Invoke-SpotifyRequest -Method 'GET' -Path $path -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv
+            If (($PagingInfo.PreviousPage -eq '') -or ($PagingInfo.PreviousPage -eq $null)) { $path = $PagingInfo.FullDetailUri }
+            Else { $path = $PagingInfo.PreviousPage }
 
-        $pagingObject = [NewGuy.PoshSpotify.PagingInfo]::new($result)
+            $result = Invoke-SpotifyRequest -Method 'GET' -Path $path -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv
 
-    } ElseIf ($RetrieveMode -eq 'AllPages') {
+            $pagingObject = [NewGuy.PoshSpotify.PagingInfo]::new($result)
 
-        # We always start with a fresh paging object on the first page.
-        $pagingObject = [NewGuy.PoshSpotify.PagingInfo]::new()
-        $pagingObject.FullDetailUri = $PagingInfo.FullDetailUri
-        $pagingObject.Total = $PagingInfo.Total
-        $newPage = $pagingObject
+        } ElseIf ($RetrieveMode -eq 'AllPages') {
 
-        # TODO : Find away to determine type based max limits and use maximum limit on calls to reduce number of calls to Spotify API.
+            # We always start with a fresh paging object on the first page.
+            $pagingObject = [NewGuy.PoshSpotify.PagingInfo]::new()
+            $pagingObject.FullDetailUri = $PagingInfo.FullDetailUri
+            $pagingObject.Total = $PagingInfo.Total
+            $newPage = $pagingObject
 
-        Do {
-            $currPage = $newPage
-            $newPage = Get-SpotifyPage -PagingInfo $currPage -RetrieveMode NextPage -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv
-            $pagingObject.Items += $newPage.Items
-        } While ($newPage.NextPage.Length -gt 0)
+            # TODO : Find away to determine type based max limits and use maximum limit on calls to reduce number of calls to Spotify API.
+
+            Do {
+                $currPage = $newPage
+                $newPage = Get-SpotifyPage -PagingInfo $currPage -RetrieveMode NextPage -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv
+                $pagingObject.Items += $newPage.Items
+            } While ($newPage.NextPage.Length -gt 0)
+
+        }
+
+        Return $pagingObject
 
     }
-
-    Return $pagingObject
 
 }
 
@@ -160,50 +164,54 @@ Function New-SpotifyPage {
     [CmdletBinding(DefaultParameterSetName = 'Path')]
     [OutputType('NewGuy.PoshSpotify.PagingInfo')]
 
-    Param([Parameter(Mandatory, ParameterSetName = 'PagingInfo')] [NewGuy.PoshSpotify.PagingInfo]$PagingInfo,
-          [Parameter(Mandatory, ParameterSetName = 'Path')][ValidateNotNullOrEmpty()] [string]$Path,
+    Param([Parameter(Mandatory, ValueFromPipeline, ParameterSetName = 'PagingInfo')] [NewGuy.PoshSpotify.PagingInfo]$PagingInfo,
+          [Parameter(Mandatory, ValueFromPipeline, ParameterSetName = 'Path')][ValidateNotNullOrEmpty()] [string]$Path,
           [Parameter(ParameterSetName = 'Path')] [int]$Limit,
           [Parameter(ParameterSetName = 'Path')] [int]$Offset)
 
-    # Clone the given PagingInfo object.
-    If ($PSCmdlet.ParameterSetName -eq 'PagingInfo') {
+    Process {
 
-        $pagingObject = [NewGuy.PoshSpotify.PagingInfo]::new()
-        $pagingObject.FullDetailUri = $PagingInfo.FullDetailUri
-        $pagingObject.Limit = $PagingInfo.Limit
-        $pagingObject.Offset = $PagingInfo.Offset
-        $pagingObject.Total = $PagingInfo.Total
-        $pagingObject.NextPage = $PagingInfo.NextPage
-        $pagingObject.PreviousPage = $PagingInfo.PreviousPage
-        ## TODO : Would need a deep clone to copy Items property.
+        # Clone the given PagingInfo object.
+        If ($PSCmdlet.ParameterSetName -eq 'PagingInfo') {
 
-    # Build a new PagingInfo object from the given parameters.
-    } Else {
+            $pagingObject = [NewGuy.PoshSpotify.PagingInfo]::new()
+            $pagingObject.FullDetailUri = $PagingInfo.FullDetailUri
+            $pagingObject.Limit = $PagingInfo.Limit
+            $pagingObject.Offset = $PagingInfo.Offset
+            $pagingObject.Total = $PagingInfo.Total
+            $pagingObject.NextPage = $PagingInfo.NextPage
+            $pagingObject.PreviousPage = $PagingInfo.PreviousPage
+            ## TODO : Would need a deep clone to copy Items property.
 
-        $pagingObject = [NewGuy.PoshSpotify.PagingInfo]::new()
-        $params = @{}
-        $queryStr = ''
+        # Build a new PagingInfo object from the given parameters.
+        } Else {
 
-        # Build FullDetailUri property from path and parameters.
-        If ($PSBoundParameters['Limit']) { $params['limit'] = $Limit }
-        If ($PSBoundParameters['Offset']) { $params['offset'] = $Offset }
+            $pagingObject = [NewGuy.PoshSpotify.PagingInfo]::new()
+            $params = @{}
+            $queryStr = ''
 
-        If ($params.Count -gt 0) {
-            $queryParams = Get-SpotifyEncodedParameter -RequestParameters $params -Encoding UrlEncoding
-            $queryStr = '?' + $queryParams
+            # Build FullDetailUri property from path and parameters.
+            If ($PSBoundParameters['Limit']) { $params['limit'] = $Limit }
+            If ($PSBoundParameters['Offset']) { $params['offset'] = $Offset }
+
+            If ($params.Count -gt 0) {
+                $queryParams = Get-SpotifyEncodedParameter -RequestParameters $params -Encoding UrlEncoding
+                $queryStr = '?' + $queryParams
+            }
+
+            # Add a leading slash to the path if not present unless it's full URL.
+            If (($Path -notmatch '^/') -and ($Path -notmatch '^https?://')) { $Path = '/' + $Path }
+
+            $pagingObject.FullDetailUri = 'https://' + $script:SpotifyWebApiHostname + $Path + $queryStr
+
+            If ($PSBoundParameters['Limit']) { $pagingObject.Limit = $Limit }
+            If ($PSBoundParameters['Offset']) { $pagingObject.Offset = $Offset }
+
         }
 
-        # Add a leading slash to the path if not present unless it's full URL.
-        If (($Path -notmatch '^/') -and ($Path -notmatch '^https?://')) { $Path = '/' + $Path }
-
-        $pagingObject.FullDetailUri = 'https://' + $script:SpotifyWebApiHostname + $Path + $queryStr
-
-        If ($PSBoundParameters['Limit']) { $pagingObject.Limit = $Limit }
-        If ($PSBoundParameters['Offset']) { $pagingObject.Offset = $Offset }
+        Return $pagingObject
 
     }
-
-    Return $pagingObject
 
 }
 

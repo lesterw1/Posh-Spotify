@@ -23,7 +23,7 @@ InModuleScope Posh-Spotify {
 
         It 'Get Spotify album.' {
 
-            $albums = Get-SpotifyAlbum -Ids '3d74p8E8jFhgKogypxpZAd', '6hs55qjerNNOi4ZT5bOhxV'
+            $albums = Get-SpotifyAlbum -Id '3d74p8E8jFhgKogypxpZAd', '6hs55qjerNNOi4ZT5bOhxV'
 
             $albums.Count | Should Be 2
             $albums[0] | Should BeOfType NewGuy.PoshSpotify.Album
