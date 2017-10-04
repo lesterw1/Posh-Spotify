@@ -397,8 +397,6 @@ Function Start-SpotifyPlayback {
 
     #>
 
-    [CmdletBinding(DefaultParameterSetName = 'Default')]
-
     Param([Parameter(ParameterSetName = 'ContextUriId')]
           [Parameter(ParameterSetName = 'ContextUriObj')]
           [string]$ContextUri,
@@ -413,11 +411,13 @@ Function Start-SpotifyPlayback {
           [Parameter(ParameterSetName = 'TracksObj')]
           [string]$Offset,
 
-          [Parameter(Mandatory, ValueFromPipeline, ParameterSetName = 'ContextUriId')]
+          [Parameter(Mandatory, ValueFromPipeline, ParameterSetName = 'DefaultId')]
+          [Parameter(ParameterSetName = 'ContextUriId')]
           [Parameter(ParameterSetName = 'TracksId')]
           [string[]]$DeviceId,
 
-          [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'ContextUriObj')]
+          [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'DefaultObj')]
+          [Parameter(ParameterSetName = 'ContextUriObj')]
           [Parameter(ParameterSetName = 'TracksObj')]
           [NewGuy.PoshSpotify.Device[]]$Device,
 
