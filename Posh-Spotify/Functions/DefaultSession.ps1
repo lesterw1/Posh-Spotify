@@ -370,6 +370,7 @@ Function Add-SpotifyCommandAlias {
                 NextTrack - Skips to the next track.
                 SkipBack - Skips back to the previous track.
                 PreviousTrack - Skips back to the previous track.
+                Player - Returns the currently active player.
 
     #>
 
@@ -380,7 +381,8 @@ Function Add-SpotifyCommandAlias {
                        'Skip',
                        'NextTrack',
                        'SkipBack',
-                       'PreviousTrack')] [string[]]$Aliases)
+                       'PreviousTrack',
+                       'Player')] [string[]]$Aliases)
 
     If (($Aliases.Count -eq 0) -or ($Aliases -contains 'Play')) { Set-Alias -Name Play -Value Start-SpotifyPlayback -Scope Global }
     If (($Aliases.Count -eq 0) -or ($Aliases -contains 'Pause')) { Set-Alias -Name Pause -Value Stop-SpotifyPlayback -Scope Global }
@@ -388,6 +390,7 @@ Function Add-SpotifyCommandAlias {
     If (($Aliases.Count -eq 0) -or ($Aliases -contains 'NextTrack')) { Set-Alias -Name NextTrack -Value Skip-SpotifyNextTrack -Scope Global }
     If (($Aliases.Count -eq 0) -or ($Aliases -contains 'SkipBack')) { Set-Alias -Name SkipBack -Value Skip-SpotifyPreviousTrack -Scope Global }
     If (($Aliases.Count -eq 0) -or ($Aliases -contains 'PreviousTrack')) { Set-Alias -Name PreviousTrack -Value Skip-SpotifyPreviousTrack -Scope Global }
+    If (($Aliases.Count -eq 0) -or ($Aliases -contains 'Player')) { Set-Alias -Name Player -Value Get-SpotifyPlayer -Scope Global }
 
 }
 
