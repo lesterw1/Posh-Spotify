@@ -245,21 +245,24 @@ Function Set-SpotifyPlayer {
 
                 Spotify Web API : https://developer.spotify.com/web-api/transfer-a-users-playback/
 
+        .PARAMETER Play
+
+            If switch is provided, ensures playback happens on new device. If not provided keeps the current playback state.
+
         .PARAMETER DeviceId
 
-            The ID of the devices on which playback should be started/transferred.
+            The device for which this command targets. If neither DeviceId nor Device parameters are given then the currently active device of the
+            current user will be used.
 
             Currently Spotify API only supports one device ID.
 
         .PARAMETER Device
 
-            The Device on which playback should be started/transferred. This parameter accepts either Device objects returned from Get-SpotifyDevice
-            or Player objects returned from Get-SpotifyPlayer (Player objects contain a Device object).
+            The device for which this command targets. If neither DeviceId nor Device parameters are given then the currently active device of the
+            current user will be used. This parameter accepts either Device objects returned from Get-SpotifyDevice or Player objects returned from
+            Get-SpotifyPlayer (Player objects contain a Device object).
 
-        .PARAMETER Play
-
-            If switch is provided, ensures playback happens on new device. If not provided keeps the current playback state.
-
+            Currently Spotify API only supports one device ID.
 
         .PARAMETER AccessToken
 
@@ -278,9 +281,9 @@ Function Set-SpotifyPlayer {
 
     [CmdletBinding()]
 
-    Param([Parameter(Mandatory, ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
+    Param([switch]$Play,
+          [Parameter(Mandatory, ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
           [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'DeviceObj')] [NewGuy.PoshSpotify.Device[]]$Device,
-          [switch]$Play,
           [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
 
@@ -337,15 +340,6 @@ Function Start-SpotifyPlayback {
 
                 Spotify Web API : https://developer.spotify.com/web-api/start-a-users-playback/
 
-        .PARAMETER DeviceId
-
-            The id of the device this command is targeting. If not supplied, the user's currently active device is the target.
-
-        .PARAMETER Device
-
-            The Device on which playback should be started/transferred. This parameter accepts either Device objects returned from Get-SpotifyDevice
-            or Player objects returned from Get-SpotifyPlayer (Player objects contain a Device object).
-
         .PARAMETER ContextUri
 
             Spotify URI of the context to play. Valid contexts are albums, artists & playlists.
@@ -373,6 +367,21 @@ Function Start-SpotifyPlayback {
 
                 -Offset "spotify:track:1301WleyT98MSxVHPZCA6M"
 
+        .PARAMETER DeviceId
+
+            The device for which this command targets. If neither DeviceId nor Device parameters are given then the currently active device of the
+            current user will be used.
+
+            Currently Spotify API only supports one device ID.
+
+        .PARAMETER Device
+
+            The device for which this command targets. If neither DeviceId nor Device parameters are given then the currently active device of the
+            current user will be used. This parameter accepts either Device objects returned from Get-SpotifyDevice or Player objects returned from
+            Get-SpotifyPlayer (Player objects contain a Device object).
+
+            Currently Spotify API only supports one device ID.
+
         .PARAMETER AccessToken
 
             The Access Token provided during the authorization process.
@@ -389,24 +398,40 @@ Function Start-SpotifyPlayback {
     #>
 
     [CmdletBinding(DefaultParameterSetName = 'Default')]
-    ## [OutputType('NewGuy.PoshSpotify.Player[]')]
 
-    Param([Parameter(Mandatory, ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
-          [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'DeviceObj')] [NewGuy.PoshSpotify.Device[]]$Device,
-          [Parameter(ParameterSetName = 'ContextUri')] [string]$ContextUri,
-          [Parameter(ParameterSetName = 'Tracks')] [string[]]$Tracks,
-          [Parameter(ParameterSetName = 'ContextUri')][Parameter(ParameterSetName = 'Tracks')] [string]$Offset,
+    Param([Parameter(ParameterSetName = 'ContextUriId')]
+          [Parameter(ParameterSetName = 'ContextUriObj')]
+          [string]$ContextUri,
+
+          [Parameter(ParameterSetName = 'TracksId')]
+          [Parameter(ParameterSetName = 'TracksObj')]
+          [string[]]$Tracks,
+
+          [Parameter(ParameterSetName = 'ContextUriId')]
+          [Parameter(ParameterSetName = 'TracksId')]
+          [Parameter(ParameterSetName = 'ContextUriObj')]
+          [Parameter(ParameterSetName = 'TracksObj')]
+          [string]$Offset,
+
+          [Parameter(Mandatory, ValueFromPipeline, ParameterSetName = 'ContextUriId')]
+          [Parameter(ParameterSetName = 'TracksId')]
+          [string[]]$DeviceId,
+
+          [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'ContextUriObj')]
+          [Parameter(ParameterSetName = 'TracksObj')]
+          [NewGuy.PoshSpotify.Device[]]$Device,
+
           [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
 
     Process {
 
-        If ($PSCmdlet.ParameterSetName -eq 'DeviceObj') { $DeviceId = $Device.Id }
+        If ($PSCmdlet.ParameterSetName -match 'Obj') { $DeviceId = $Device.Id }
 
         $bodyParams = $null
 
-        If ($PSCmdlet.ParameterSetName -eq 'ContextUri') { $bodyParams = @{ 'context_uri' = $ContextUri } }
-        ElseIf ($PSCmdlet.ParameterSetName -eq 'Tracks') { $bodyParams = @{ 'uris' = $Tracks } }
+        If ($PSCmdlet.ParameterSetName -match 'Context') { $bodyParams = @{ 'context_uri' = $ContextUri } }
+        ElseIf ($PSCmdlet.ParameterSetName -match 'Tracks') { $bodyParams = @{ 'uris' = $Tracks } }
 
         If ($Offset) {
             $parsedOffset = $null
@@ -463,15 +488,26 @@ Function Stop-SpotifyPlayback {
 
                 Spotify Web API : https://developer.spotify.com/web-api/pause-a-users-playback/
 
+        .PARAMETER DeviceId
+
+            The device for which this command targets. If neither DeviceId nor Device parameters are given then the currently active device of the
+            current user will be used.
+
+            Currently Spotify API only supports one device ID.
+
+        .PARAMETER Device
+
+            The device for which this command targets. If neither DeviceId nor Device parameters are given then the currently active device of the
+            current user will be used. This parameter accepts either Device objects returned from Get-SpotifyDevice or Player objects returned from
+            Get-SpotifyPlayer (Player objects contain a Device object).
+
+            Currently Spotify API only supports one device ID.
+
         .PARAMETER AccessToken
 
             The Access Token provided during the authorization process.
 
             The Access Token must have the "user-modify-playback-state" scope authorized in order to read information.
-
-        .PARAMETER DeviceId
-
-            The id of the device this command is targeting. If not supplied, the user's currently active device is the target.
 
         .PARAMETER SpotifyEnv
 
@@ -484,22 +520,29 @@ Function Stop-SpotifyPlayback {
 
     [CmdletBinding()]
 
-    Param([ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
-          [string]$DeviceId,
+    Param([Parameter(Mandatory, ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
+          [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'DeviceObj')] [NewGuy.PoshSpotify.Device[]]$Device,
+          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
 
-    $splat = @{
-        Method = 'PUT'
-        Path = '/v1/me/player/pause'
-        AccessToken = $AccessToken
-        SpotifyEnv = $SpotifyEnv
+    Process {
+
+        If ($PSCmdlet.ParameterSetName -eq 'DeviceObj') { $DeviceId = $Device.Id }
+
+        $splat = @{
+            Method = 'PUT'
+            Path = '/v1/me/player/pause'
+            AccessToken = $AccessToken
+            SpotifyEnv = $SpotifyEnv
+        }
+
+        If ($DeviceId) { $splat['QueryParameters'] = @{ device_id = $DeviceId } }
+
+        $result = Invoke-SpotifyRequest @splat
+
+        Return $result
+
     }
-
-    If ($DeviceId) { $splat['QueryParameters'] = @{ device_id = $DeviceId } }
-
-    $result = Invoke-SpotifyRequest @splat
-
-    Return $result
 
 }
 
@@ -530,15 +573,26 @@ Function Skip-SpotifyNextTrack {
 
                 Spotify Web API : https://developer.spotify.com/web-api/skip-users-playback-to-next-track/
 
+        .PARAMETER DeviceId
+
+            The device for which this command targets. If neither DeviceId nor Device parameters are given then the currently active device of the
+            current user will be used.
+
+            Currently Spotify API only supports one device ID.
+
+        .PARAMETER Device
+
+            The device for which this command targets. If neither DeviceId nor Device parameters are given then the currently active device of the
+            current user will be used. This parameter accepts either Device objects returned from Get-SpotifyDevice or Player objects returned from
+            Get-SpotifyPlayer (Player objects contain a Device object).
+
+            Currently Spotify API only supports one device ID.
+
         .PARAMETER AccessToken
 
             The Access Token provided during the authorization process.
 
             The Access Token must have the "user-modify-playback-state" scope authorized in order to read information.
-
-        .PARAMETER DeviceId
-
-            The id of the device this command is targeting. If not supplied, the user's currently active device is the target.
 
         .PARAMETER SpotifyEnv
 
@@ -551,22 +605,29 @@ Function Skip-SpotifyNextTrack {
 
     [CmdletBinding()]
 
-    Param([ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
-          [string]$DeviceId,
+    Param([Parameter(Mandatory, ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
+          [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'DeviceObj')] [NewGuy.PoshSpotify.Device[]]$Device,
+          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
 
-    $splat = @{
-        Method = 'POST'
-        Path = '/v1/me/player/next'
-        AccessToken = $AccessToken
-        SpotifyEnv = $SpotifyEnv
+    Process {
+
+        If ($PSCmdlet.ParameterSetName -eq 'DeviceObj') { $DeviceId = $Device.Id }
+
+        $splat = @{
+            Method = 'POST'
+            Path = '/v1/me/player/next'
+            AccessToken = $AccessToken
+            SpotifyEnv = $SpotifyEnv
+        }
+
+        If ($DeviceId) { $splat['QueryParameters'] = @{ device_id = $DeviceId } }
+
+        $result = Invoke-SpotifyRequest @splat
+
+        Return $result
+
     }
-
-    If ($DeviceId) { $splat['QueryParameters'] = @{ device_id = $DeviceId } }
-
-    $result = Invoke-SpotifyRequest @splat
-
-    Return $result
 
 }
 
@@ -600,15 +661,26 @@ Function Skip-SpotifyPreviousTrack {
 
                 Spotify Web API : https://developer.spotify.com/web-api/skip-users-playback-to-previous-track/
 
+        .PARAMETER DeviceId
+
+            The device for which this command targets. If neither DeviceId nor Device parameters are given then the currently active device of the
+            current user will be used.
+
+            Currently Spotify API only supports one device ID.
+
+        .PARAMETER Device
+
+            The device for which this command targets. If neither DeviceId nor Device parameters are given then the currently active device of the
+            current user will be used. This parameter accepts either Device objects returned from Get-SpotifyDevice or Player objects returned from
+            Get-SpotifyPlayer (Player objects contain a Device object).
+
+            Currently Spotify API only supports one device ID.
+
         .PARAMETER AccessToken
 
             The Access Token provided during the authorization process.
 
             The Access Token must have the "user-modify-playback-state" scope authorized in order to read information.
-
-        .PARAMETER DeviceId
-
-            The id of the device this command is targeting. If not supplied, the user's currently active device is the target.
 
         .PARAMETER SpotifyEnv
 
@@ -621,22 +693,29 @@ Function Skip-SpotifyPreviousTrack {
 
     [CmdletBinding()]
 
-    Param([ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
-          [string]$DeviceId,
+    Param([Parameter(Mandatory, ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
+          [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'DeviceObj')] [NewGuy.PoshSpotify.Device[]]$Device,
+          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
 
-    $splat = @{
-        Method = 'POST'
-        Path = '/v1/me/player/previous'
-        AccessToken = $AccessToken
-        SpotifyEnv = $SpotifyEnv
+    Process {
+
+        If ($PSCmdlet.ParameterSetName -eq 'DeviceObj') { $DeviceId = $Device.Id }
+
+        $splat = @{
+            Method = 'POST'
+            Path = '/v1/me/player/previous'
+            AccessToken = $AccessToken
+            SpotifyEnv = $SpotifyEnv
+        }
+
+        If ($DeviceId) { $splat['QueryParameters'] = @{ device_id = $DeviceId } }
+
+        $result = Invoke-SpotifyRequest @splat
+
+        Return $result
+
     }
-
-    If ($DeviceId) { $splat['QueryParameters'] = @{ device_id = $DeviceId } }
-
-    $result = Invoke-SpotifyRequest @splat
-
-    Return $result
 
 }
 
@@ -667,12 +746,6 @@ Function Set-SpotifyTrackSeek {
 
                 Spotify Web API : https://developer.spotify.com/web-api/seek-to-position-in-currently-playing-track/
 
-        .PARAMETER AccessToken
-
-            The Access Token provided during the authorization process.
-
-            The Access Token must have the "user-modify-playback-state" scope authorized in order to read information.
-
         .PARAMETER Minutes
 
             The position in minutes to seek to. Must be a positive number. Passing in a position that is greater than the length of the track
@@ -700,7 +773,24 @@ Function Set-SpotifyTrackSeek {
 
         .PARAMETER DeviceId
 
-            The id of the device this command is targeting. If not supplied, the user's currently active device is the target.
+            The device for which this command targets. If neither DeviceId nor Device parameters are given then the currently active device of the
+            current user will be used.
+
+            Currently Spotify API only supports one device ID.
+
+        .PARAMETER Device
+
+            The device for which this command targets. If neither DeviceId nor Device parameters are given then the currently active device of the
+            current user will be used. This parameter accepts either Device objects returned from Get-SpotifyDevice or Player objects returned from
+            Get-SpotifyPlayer (Player objects contain a Device object).
+
+            Currently Spotify API only supports one device ID.
+
+        .PARAMETER AccessToken
+
+            The Access Token provided during the authorization process.
+
+            The Access Token must have the "user-modify-playback-state" scope authorized in order to read information.
 
         .PARAMETER SpotifyEnv
 
@@ -713,34 +803,41 @@ Function Set-SpotifyTrackSeek {
 
     [CmdletBinding()]
 
-    Param([ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
-          [int]$Minutes = 0,
+    Param([int]$Minutes = 0,
           [int]$Seconds = 0,
           [int]$Milliseconds = 0,
-          [string]$DeviceId,
+          [Parameter(Mandatory, ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
+          [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'DeviceObj')] [NewGuy.PoshSpotify.Device[]]$Device,
+          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
 
-    $total = 0
-    $total += $Minutes * 60 * 1000
-    $total += $Seconds * 1000
-    $total += $Milliseconds
+    Process {
 
-    # Seek 10s by default.
-    If ($total -eq 0) { $total = 10000 }
+        If ($PSCmdlet.ParameterSetName -eq 'DeviceObj') { $DeviceId = $Device.Id }
 
-    $splat = @{
-        Method = 'PUT'
-        Path = '/v1/me/player/seek'
-        AccessToken = $AccessToken
-        QueryParameters = @{ position_ms = $total }
-        SpotifyEnv = $SpotifyEnv
+        $total = 0
+        $total += $Minutes * 60 * 1000
+        $total += $Seconds * 1000
+        $total += $Milliseconds
+
+        # Seek 10s by default.
+        If ($total -eq 0) { $total = 10000 }
+
+        $splat = @{
+            Method = 'PUT'
+            Path = '/v1/me/player/seek'
+            AccessToken = $AccessToken
+            QueryParameters = @{ position_ms = $total }
+            SpotifyEnv = $SpotifyEnv
+        }
+
+        If ($DeviceId) { $splat['QueryParameters']['device_id'] = $DeviceId }
+
+        $result = Invoke-SpotifyRequest @splat
+
+        Return $result
+
     }
-
-    If ($DeviceId) { $splat['QueryParameters']['device_id'] = $DeviceId }
-
-    $result = Invoke-SpotifyRequest @splat
-
-    Return $result
 
 }
 
@@ -771,12 +868,6 @@ Function Set-SpotifyPlayerVolume {
 
                 Spotify Web API : https://developer.spotify.com/web-api/set-volume-for-users-playback/
 
-        .PARAMETER AccessToken
-
-            The Access Token provided during the authorization process.
-
-            The Access Token must have the "user-modify-playback-state" scope authorized in order to read information.
-
         .PARAMETER Volume
 
             The volume to set. Must be a value from 0 to 100 inclusive.
@@ -785,7 +876,24 @@ Function Set-SpotifyPlayerVolume {
 
         .PARAMETER DeviceId
 
-            The id of the device this command is targeting. If not supplied, the user's currently active device is the target.
+            The device for which this command targets. If neither DeviceId nor Device parameters are given then the currently active device of the
+            current user will be used.
+
+            Currently Spotify API only supports one device ID.
+
+        .PARAMETER Device
+
+            The device for which this command targets. If neither DeviceId nor Device parameters are given then the currently active device of the
+            current user will be used. This parameter accepts either Device objects returned from Get-SpotifyDevice or Player objects returned from
+            Get-SpotifyPlayer (Player objects contain a Device object).
+
+            Currently Spotify API only supports one device ID.
+
+        .PARAMETER AccessToken
+
+            The Access Token provided during the authorization process.
+
+            The Access Token must have the "user-modify-playback-state" scope authorized in order to read information.
 
         .PARAMETER SpotifyEnv
 
@@ -798,28 +906,33 @@ Function Set-SpotifyPlayerVolume {
 
     [CmdletBinding()]
 
-    Param([ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
-          [Parameter(Mandatory)] [ValidateScript({ ($_ -ge 0) -and ($_ -le 100) })] [int]$Volume,
-          [string]$DeviceId,
+    Param([Parameter(Mandatory)] [ValidateScript({ ($_ -ge 0) -and ($_ -le 100) })] [int]$Volume,
+          [Parameter(Mandatory, ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
+          [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'DeviceObj')] [NewGuy.PoshSpotify.Device[]]$Device,
+          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
 
+    Process {
 
+        If ($PSCmdlet.ParameterSetName -eq 'DeviceObj') { $DeviceId = $Device.Id }
 
-    $splat = @{
-        Method = 'PUT'
-        Path = '/v1/me/player/volume'
-        AccessToken = $AccessToken
-        QueryParameters = @{ volume_percent = $Volume }
-        SpotifyEnv = $SpotifyEnv
+        $splat = @{
+            Method = 'PUT'
+            Path = '/v1/me/player/volume'
+            AccessToken = $AccessToken
+            QueryParameters = @{ volume_percent = $Volume }
+            SpotifyEnv = $SpotifyEnv
+        }
+
+        If ($DeviceId) { $splat['QueryParameters']['device_id'] = $DeviceId }
+
+        $result = Invoke-SpotifyRequest @splat
+
+        # TODO : Maybe use the Write-Progress command to animate the turning up of the volume.
+
+        Return $result
+
     }
-
-    If ($DeviceId) { $splat['QueryParameters']['device_id'] = $DeviceId }
-
-    $result = Invoke-SpotifyRequest @splat
-
-    # TODO : Maybe use the Write-Progress command to animate the turning up of the volume.
-
-    Return $result
 
 }
 
@@ -850,12 +963,6 @@ Function Set-SpotifyPlayerRepeatMode {
 
                 Spotify Web API : https://developer.spotify.com/web-api/set-repeat-mode-on-users-playback/
 
-        .PARAMETER AccessToken
-
-            The Access Token provided during the authorization process.
-
-            The Access Token must have the "user-modify-playback-state" scope authorized in order to read information.
-
         .PARAMETER State
 
             The state of the Repeat feature. Possible values include :
@@ -870,7 +977,24 @@ Function Set-SpotifyPlayerRepeatMode {
 
         .PARAMETER DeviceId
 
-            The id of the device this command is targeting. If not supplied, the user's currently active device is the target.
+            The device for which this command targets. If neither DeviceId nor Device parameters are given then the currently active device of the
+            current user will be used.
+
+            Currently Spotify API only supports one device ID.
+
+        .PARAMETER Device
+
+            The device for which this command targets. If neither DeviceId nor Device parameters are given then the currently active device of the
+            current user will be used. This parameter accepts either Device objects returned from Get-SpotifyDevice or Player objects returned from
+            Get-SpotifyPlayer (Player objects contain a Device object).
+
+            Currently Spotify API only supports one device ID.
+
+        .PARAMETER AccessToken
+
+            The Access Token provided during the authorization process.
+
+            The Access Token must have the "user-modify-playback-state" scope authorized in order to read information.
 
         .PARAMETER SpotifyEnv
 
@@ -883,26 +1007,31 @@ Function Set-SpotifyPlayerRepeatMode {
 
     [CmdletBinding()]
 
-    Param([ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
-          [Parameter(Mandatory)] [ValidateSet('Track', 'Context', 'Off')] [string]$State = 'Track',
-          [string]$DeviceId,
+    Param([Parameter(Mandatory)] [ValidateSet('Track', 'Context', 'Off')] [string]$State = 'Track',
+          [Parameter(Mandatory, ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
+          [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'DeviceObj')] [NewGuy.PoshSpotify.Device[]]$Device,
+          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
 
+    Process {
 
+        If ($PSCmdlet.ParameterSetName -eq 'DeviceObj') { $DeviceId = $Device.Id }
 
-    $splat = @{
-        Method = 'PUT'
-        Path = '/v1/me/player/repeat'
-        AccessToken = $AccessToken
-        QueryParameters = @{ state = $State.ToLower() }
-        SpotifyEnv = $SpotifyEnv
+        $splat = @{
+            Method = 'PUT'
+            Path = '/v1/me/player/repeat'
+            AccessToken = $AccessToken
+            QueryParameters = @{ state = $State.ToLower() }
+            SpotifyEnv = $SpotifyEnv
+        }
+
+        If ($DeviceId) { $splat['QueryParameters']['device_id'] = $DeviceId }
+
+        $result = Invoke-SpotifyRequest @splat
+
+        Return $result
+
     }
-
-    If ($DeviceId) { $splat['QueryParameters']['device_id'] = $DeviceId }
-
-    $result = Invoke-SpotifyRequest @splat
-
-    Return $result
 
 }
 
@@ -933,12 +1062,6 @@ Function Set-SpotifyPlayerShuffleMode {
 
                 Spotify Web API : https://developer.spotify.com/web-api/toggle-shuffle-for-users-playback/
 
-        .PARAMETER AccessToken
-
-            The Access Token provided during the authorization process.
-
-            The Access Token must have the "user-modify-playback-state" scope authorized in order to read information.
-
         .PARAMETER State
 
             The state of the Shuffle feature. Possible values include :
@@ -952,7 +1075,24 @@ Function Set-SpotifyPlayerShuffleMode {
 
         .PARAMETER DeviceId
 
-            The id of the device this command is targeting. If not supplied, the user's currently active device is the target.
+            The device for which this command targets. If neither DeviceId nor Device parameters are given then the currently active device of the
+            current user will be used.
+
+            Currently Spotify API only supports one device ID.
+
+        .PARAMETER Device
+
+            The device for which this command targets. If neither DeviceId nor Device parameters are given then the currently active device of the
+            current user will be used. This parameter accepts either Device objects returned from Get-SpotifyDevice or Player objects returned from
+            Get-SpotifyPlayer (Player objects contain a Device object).
+
+            Currently Spotify API only supports one device ID.
+
+        .PARAMETER AccessToken
+
+            The Access Token provided during the authorization process.
+
+            The Access Token must have the "user-modify-playback-state" scope authorized in order to read information.
 
         .PARAMETER SpotifyEnv
 
@@ -965,26 +1105,31 @@ Function Set-SpotifyPlayerShuffleMode {
 
     [CmdletBinding()]
 
-    Param([ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
-          [Parameter(Mandatory)] [ValidateSet('Enabled', 'Disabled')] [string]$State = 'Enabled',
-          [string]$DeviceId,
+    Param([Parameter(Mandatory)] [ValidateSet('Enabled', 'Disabled')] [string]$State = 'Enabled',
+          [Parameter(Mandatory, ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
+          [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'DeviceObj')] [NewGuy.PoshSpotify.Device[]]$Device,
+          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
 
+    Process {
 
+        If ($PSCmdlet.ParameterSetName -eq 'DeviceObj') { $DeviceId = $Device.Id }
 
-    $splat = @{
-        Method = 'PUT'
-        Path = '/v1/me/player/shuffle'
-        AccessToken = $AccessToken
-        QueryParameters = @{ state = $(If ($State -eq 'Enabled') { 'true' } Else { 'false' }) }
-        SpotifyEnv = $SpotifyEnv
+        $splat = @{
+            Method = 'PUT'
+            Path = '/v1/me/player/shuffle'
+            AccessToken = $AccessToken
+            QueryParameters = @{ state = $(If ($State -eq 'Enabled') { 'true' } Else { 'false' }) }
+            SpotifyEnv = $SpotifyEnv
+        }
+
+        If ($DeviceId) { $splat['QueryParameters']['device_id'] = $DeviceId }
+
+        $result = Invoke-SpotifyRequest @splat
+
+        Return $result
+
     }
-
-    If ($DeviceId) { $splat['QueryParameters']['device_id'] = $DeviceId }
-
-    $result = Invoke-SpotifyRequest @splat
-
-    Return $result
 
 }
 
