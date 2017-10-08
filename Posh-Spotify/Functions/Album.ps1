@@ -83,7 +83,7 @@ Function Get-SpotifyAlbum {
         }
 
         If ($Market) { $params['market'] = $Market }
-Write-Host "Id = $Id"
+
         $result = Invoke-SpotifyRequest -Method 'GET' -Path '/v1/albums' -AccessToken $AccessToken -QueryParameters $params -SpotifyEnv $SpotifyEnv
 
         Foreach ($album In $result.albums) {
