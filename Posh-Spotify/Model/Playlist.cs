@@ -82,7 +82,7 @@ namespace NewGuy.PoshSpotify {
                 this.Images = Object.Properties["images"] != null ? ((object[])Object.Properties["images"].Value).Select(i => new ImageInfo((PSObject)i)).ToList() : new List<ImageInfo>();
                 this.Name = Object.Properties["name"] != null ? (string)Object.Properties["name"].Value : "";
                 this.Owner = Object.Properties["owner"] != null ? new User((PSObject)Object.Properties["owner"].Value) : new User();
-                this.Public = Object.Properties["public"] != null ? (bool)Object.Properties["public"].Value : null as bool?;
+                this.Public = Object.Properties["public"] != null ? (bool?)Object.Properties["public"].Value : null as bool?;
                 this.SnapshotId = Object.Properties["snapshot_id"] != null ? (string)Object.Properties["snapshot_id"].Value : "";
                 this.TrackPagingInfo = Object.Properties["tracks"] != null ? new PagingInfo((PSObject)Object.Properties["tracks"].Value) : new PagingInfo();
                 this.Tracks = this.TrackPagingInfo.Items.Cast<PlaylistTrack>().ToList();
