@@ -68,6 +68,7 @@ If ($script:SpotifyEnvironmentInfo.Count -eq 0) {
 . "$PSScriptRoot\Functions\PagingInfo.ps1"
 . "$PSScriptRoot\Functions\Player.ps1"
 . "$PSScriptRoot\Functions\Playlist.ps1"
+. "$PSScriptRoot\Functions\Search.ps1"
 . "$PSScriptRoot\Functions\Track.ps1"
 
 #==================================================================================================================================

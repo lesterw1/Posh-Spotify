@@ -108,6 +108,7 @@ FileList = @(
                'Functions\PagingInfo.ps1',
                'Functions\Player.ps1',
                'Functions\Playlist.ps1',
+               'Functions\Search.ps1',
                'Functions\Track.ps1',
                'Model\Formats\Album.Format.ps1xml',
                'Model\Formats\Artist.Format.ps1xml',

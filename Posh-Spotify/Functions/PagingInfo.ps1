@@ -76,7 +76,15 @@ Function Get-SpotifyPage {
 
             $result = Invoke-SpotifyRequest -Method 'GET' -Path $path -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv
 
-            $pagingObject = [NewGuy.PoshSpotify.PagingInfo]::new($result)
+            If (($result.href -ne $null) -and ($result.href -ne '')) {
+                $pagingObject = [NewGuy.PoshSpotify.PagingInfo]::new($result)
+            } Else {
+                # If there is no HREF property then it is likely a multi page object.
+                # It has members like artists, albums or tracks that contain PagingInfo objects.
+                $type = $result | Get-Member | Where-Object { $_.MemberType -eq 'NoteProperty' } | Select-Object -ExpandProperty Name
+                $type = $type -replace 's$',''  # Remove plural form 's'.
+                $pagingObject = [NewGuy.PoshSpotify.PagingInfo]::new($result, [Enum]::Parse([NewGuy.PoshSpotify.ItemType], $type, $true))
+            }
 
         } ElseIf ($RetrieveMode -eq 'PreviousPage') {
 
@@ -85,7 +93,15 @@ Function Get-SpotifyPage {
 
             $result = Invoke-SpotifyRequest -Method 'GET' -Path $path -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv
 
-            $pagingObject = [NewGuy.PoshSpotify.PagingInfo]::new($result)
+            If (($result.href -ne $null) -and ($result.href -ne '')) {
+                $pagingObject = [NewGuy.PoshSpotify.PagingInfo]::new($result)
+            } Else {
+                # If there is no HREF property then it is likely a multi page object.
+                # It has members like artists, albums or tracks that contain PagingInfo objects.
+                $type = $result | Get-Member | Where-Object { $_.MemberType -eq 'NoteProperty' } | Select-Object -ExpandProperty Name
+                $type = $type -replace 's$',''  # Remove plural form 's'.
+                $pagingObject = [NewGuy.PoshSpotify.PagingInfo]::new($result, [Enum]::Parse([NewGuy.PoshSpotify.ItemType], $type, $true))
+            }
 
         } ElseIf ($RetrieveMode -eq 'AllPages') {
 

@@ -71,7 +71,22 @@ namespace NewGuy.PoshSpotify {
             }
         }
 
+        // This constructor primarily used by the Spotify search endpoint commands and is given an PSObject that contains one or more members of a
+        // given item type. The actual PagingInfo objects are inside these members. You must specify which type you want pull out the PagingInfo
+        // object for.
+        public PagingInfo(PSObject Object, ItemType ItemType) : this(PagingInfo.ParseMultiPageObject(Object, ItemType)) { }
+
         // Methods.
+
+        private static PSObject ParseMultiPageObject(PSObject Object, ItemType ItemType) {
+            if (Object != null) {
+                if (Object.Properties[(ItemType.ToString().ToLower() + 's')] != null) {
+                    return (PSObject)Object.Properties[(ItemType.ToString().ToLower() + 's')].Value;
+                }
+            }
+
+            return null;
+        }
 
         public override string ToString() {
             return "PagedItems[" + this.Items.Count + "/" + this.Limit + " of " + this.Total + "]";
