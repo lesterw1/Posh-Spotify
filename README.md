@@ -1,7 +1,20 @@
 # Posh-Spotify
 
-This is a PowerShell module that contains a set of wrappers for creating and sending Spotify API calls. Documentation on Spotify API can be found at the following locations:
+This is a PowerShell module that contains a set of wrapper functions for retrieving and managing Spotify content via the Spotify Web API. Authentication is required for all Spotify API requests whether you are accessing public resources or not. After authentication you will be provided with a temporary Access Token that must be provided on every API request. The core command this module provides is `Invoke-SpotifyRequest` which will handle the formatting and proper encoding of your Access Token as well as any other parameters needed for the API request. This command can be used for most all Spotify Web API endpoints.
 
+This module also provides a number of commands used to keep track of your current application's credentials, your current Access Token and associated Refresh Token, as well as several commands for initiating authentication and acquiring these tokens. Once the module is configured with these things the configurations can be exported to disk in a secure manner allowing you to easily re-import them between PowerShell sessions. See the [Optional Profile Configuration](#Profile) section below for details.
+
+The bulk of the commands provided by this module are wrappers around the individual Spotify Web API endpoints and all use the `Invoke-SpotifyRequest` command mentioned above. Some of the features these additional commands provide are listed below. There are plans to add many more featues later (ex. Playlist Modification, Search Features, etc.). In the meantime any feature this module does not have a command for should be possible via the `Invoke-SpotifyRequest` command and the appropriate Spotify Web API endpoint.
+
+Current Command Support
+
+- Retrieve devices connected to Spotify.
+- Control playback of active player (ex. Play/Pause, Volume, Skip/Previous, Shuffle/Repeat, Get Current Track).
+- Get detailed artist, album, playlist or track information.
+
+###### ***NOTE**: Use `Invoke-SpotifyRequest` for unsupported features.
+
+Documentation on Spotify Web API can be found at the following locations:
 
 - Spotify API - https://developer.spotify.com/web-api/
 - Spotify Authorization - https://developer.spotify.com/web-api/authorization-guide/
@@ -9,11 +22,36 @@ This is a PowerShell module that contains a set of wrappers for creating and sen
 
 For details on installing and using this module please refer to the following sections:
 
+- [Register With Spotify](#Register)
 - [Installation](#Install)
 - [Spotify Environment Configuration](#SpotifyEnvConfig)
+- [Spotify Authentication and Access Tokens](#Authentication)
+- [Optional Profile Configuration](#Profile)
 - [Examples](#Examples)
 
+## <a name="Register"></a> Register With Spotify
+
+Since Spotify Web API requires authentication for all requests you must first authenticate with Spotify in order to retrieve an Access Token that will be used for all API requests. In order to authenticate you must first register with Spotify. Instructions to do so are below:
+
+1. Go to https://developer.spotify.com/my-applications
+
+2. Login. You can either use your standard Spotify account to login or create a new account to be the registered "developer" for the application. The only thing that matters here is that this account will be able to make modifications to the application display, description, client ids/secret, etc. It is the admin of the application registration. If you are using this for personal use then just login with your normal Spotify account.
+
+3. Make sure that *My Applications* is selected on the navigation sidebar on the left. Then click *Create An App* button at the top right.
+
+4. Fill in the desired *Application Name* and *Application Description* and click *Create* button. This information will be visible to any user who registers your application with their account (which will just be you if this is for personal use only).
+
+5. After creating the application registration you will be able to adjust any of the settings from earlier as well as add a *Website* to be displayed with your application. Again, this will only be seen by you if this is for personal use only.
+
+6. Take note of the *Client ID* and *Client Secret* fields as these are the credentials your application will need to authenticate and retrieve an Access Token. See the [Spotify Environment Configuration](#SpotifyEnvConfig) section for details on configuring the module to use these values.
+
+7. Most will also want to add some *Redirect URIs* at this step. The *Authorization Code* (most common) and *Implicit Grant* authorization workflows both require a URI for which the user will be redirected back to after logging in to Spotify. This URI must have an HTTP listener prepared to accept the authorization response and corresponding Access Token. The authentication commands provided by this module will do this for you and use the default value `http://localhost:8080/callback/` if one is not provided. If you plan to use these commands and their defaults add `http://localhost:8080/callback/` as one of the *Redirect URIs*.
+
+For more details on getting started with Spotify Web API see the following: https://developer.spotify.com/web-api/tutorial/
+
 ## <a name="Install"></a> Installation
+
+Once you have registered with Spotify you can install the module. If you have not yet registered with Spotify please see the previous section before continuing ([Register With Spotify](#Register)). The module will not work until you have configured it with the proper information retrieved from the Spotify registration process.
 
 1. Download the module (git clone or download the zip).
 
@@ -23,23 +61,32 @@ For details on installing and using this module please refer to the following se
     Write-Host $env:PSModulePath
     ```
 
-3. Register your instance with the Spotify Developer site. This is needed to obtain a client ID and secret key that will be used to make authenticated web API calls to Spotify. This is also where you would configure the callback URLs for the authentication process. For more details see the following: https://developer.spotify.com/my-applications & https://developer.spotify.com/web-api/tutorial/
-
-
-
-
-
-
-
-
-
-
-
-4. Configure the Spotify Environment Configuration using one of the methods detailed in the [Spotify Environment Configuration](#SpotifyEnvConfig) section.
+3. Configure the module using one of the methods detailed in the [Spotify Environment Configuration](#SpotifyEnvConfig) section that follows.
 
 ## <a name="SpotifyEnvConfig"></a> Spotify Environment Configuration
 
-In order to make Spotify API calls this module will need the Spotify API Integration keys provided to you for your application environment. These keys must be provided by your organization's Spotify administrator. To configure this module for your Spotify environment you will need to gather the following information:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+In order to make Spotify API calls this module will need on each request an Access Token
+
+
+ the *Client ID* and *Secret Key* provided to you for your application during the registration process. If you do not have a Spotify Client ID and Secret Key please refer the previous section, [Register With Spotify](#Register), for details.
+
+
+For convenience this module will not request this id and secret key on every request but instead will require prior configuration :
 
 - **Spotify API Integration Key** - Application specific API integration key retrieved from your Spotify Admin (ex. DIxxxxxxxxxxxxxxxxxx).
 - **Spotify API Secret Key** - Secret key associated with the integration key.
