@@ -194,16 +194,6 @@ Function Invoke-SpotifyRequest {
 
         }
 
-        If ($response.StatusCode -eq '429') {
-
-            # TODO
-
-            # 429 TOO MANY REQUESTS
-            # Rate limiting. Sent too many requests in a short period of time.
-            # There should be a 'Retry-After' header containing the number of seconds you  must wait before the next request can be made.
-
-        }
-
         If ($response.StatusCode -eq '204') {
 
             # TODO
@@ -257,7 +247,33 @@ Function Invoke-SpotifyRequest {
 
         # Get the error from the response body if one exists and use it as a message in the error we are about to throw.
         If ($_.Exception.Response -ne $null) {
+
             [System.Net.HttpWebResponse]$response = $_.Exception.Response
+
+            If ($response.StatusCode -eq '429') {
+
+                # TODO
+
+                # 429 TOO MANY REQUESTS
+                # Rate limiting. Sent too many requests in a short period of time.
+                # There should be a 'Retry-After' header containing the number of seconds you must wait before the next request can be made.
+                # Need to make a decision as to whether to wait and try again or just return rate limiting error to user (or a switch for the option).
+
+            } ElseIf ($response.StatusCode -match '^[45]\d\d$') {
+
+                # TODO
+
+                # 4xx or 5xx ERROR
+                # Errors not specifically handled above. Spotify will return a Spotify Error object.
+                # Need to make a decision as to whether to create a new class and convert the object or just throw the error below.
+                # The error thrown below already displays this info but as a terminating exception. Do we want to force handling of these errors or
+                # do we want to silently return a converted Spotify Error object (possibly unexpected by the caller). The wrapper functions would
+                # have to check for this if necessary.
+
+            } Else {
+                # <The Error Code Below>
+            }
+
             $respStreamReader = New-Object System.IO.StreamReader($response.GetResponseStream())
             $respBody = $respStreamReader.ReadToEnd()
             $respStreamReader.Close()
