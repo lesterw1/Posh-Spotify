@@ -158,7 +158,7 @@ Function Save-SpotifyEnvironmentInfo {
             $FilePath = $FilePath -replace "$ext$","_$(Get-Date -Format 'HH.mm.ss_MMM.dd')$ext"
         }
 
-    $script:SpotifyDefaultEnv, $script:SpotifyEnvironmentInfo | ConvertTo-Json | Out-File $FilePath
+    $script:SpotifyDefaultEnv, $script:SpotifyEnvironmentInfo | ConvertTo-Json -Depth 4 | Out-File $FilePath
 
     Write-Host "`nEnvironmentInfo saved to: $FilePath" -ForegroundColor Cyan
 
@@ -220,20 +220,49 @@ Function Import-SpotifyEnvironmentInfo {
     # Grab from disk the saved information. This comes back as an array.
     $jsonObjs = (Get-Content $file | ConvertFrom-Json)
 
-    # Make sure we got something back.
+    # Make sure we got something back. Should be an array.
     If (($null -eq $jsonObjs) -or ($jsonObjs.Count -eq 0)) { Throw "Failed to retrieve information from provided file path : $FilePath" }
 
     # First object should be a string representing the default environment info.
     $defaultEnvInfo = $jsonObjs[0]
 
     # Second object should be a hashtable of environment info hashtables.
-    # Though ConvertFrom-Json returns PSCustomObject. Need to conver to hashtables.
+    # Though ConvertFrom-Json returns PSCustomObject. Need to convert to hashtables.
     $envInfoObj = $jsonObjs[1]
     $envInfoHT = @{}
     Foreach ($env In ($envInfoObj | Get-Member -MemberType NoteProperty)) {
         $envInfoHT.($env.Name) = @{}
         Foreach ($setting In ($envInfoObj.($env.Name) | Get-Member -MemberType NoteProperty)) {
             $envInfoHT.($env.Name).($setting.Name) = $envInfoObj.($env.Name).($setting.Name)
+        }
+    }
+
+    # Need to convert any UserSessions into actual AuthenticationToken objects.
+    Foreach ($env In $envInfoHT.Keys) {
+        If ($envInfoHT.$env.UserSessions -is [array]) {
+
+            # New array containing only converted AuthenticationToken objects.
+            $newUserSessionsArray = @()
+
+            Foreach ($sess In $envInfoHT.$env.UserSessions) {
+
+                # Calculate the remaining time left on the access token.
+                $expiresOn = $sess.ExpiresOn.ToLocalTime()
+                $expiresInSec = [int]($expiresOn - (Get-Date)).TotalSeconds
+
+                # Create object and set optional properties.
+                $newSess = [NewGuy.PoshSpotify.AuthenticationToken]::new($sess.AccessToken, $sess.TokenType, $expiresInSec)
+                If ($sess.RefreshToken) { $newSess.RefreshToken = $sess.RefreshToken }
+                If ($sess.Scopes) { $newSess.Scopes = $sess.Scopes }
+
+                # Add new Authentication Token to new UserSessions array.
+                $newUserSessionsArray += $newSess
+
+            }
+
+            # Overwrite the old UserSessions array with the new.
+            $envInfoHT.$env.UserSessions = $newUserSessionsArray
+
         }
     }
 
