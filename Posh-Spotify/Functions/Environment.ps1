@@ -606,10 +606,10 @@ Function Test-SpotifyEnvInfoFormat {
 
             # If the UserSessions key exists, make sure it is an array containing only AuthenticationToken objects.
             If ($script:SpotifyEnvironmentInfo[$env].UserSessions -ne $null) {
-                If (($script:SpotifyEnvironmentInfo[$env].UserSessions -isnot [array]) -or 
-                    ($script:SpotifyEnvironmentInfo[$env].UserSessions | ForEach-Object -Begin { $Valid = $true } `
-                                                                                        -Process { If ($_ -isnot [NewGuy.PoshSpotify.AuthenticationToken]) { $Valid = $false } } `
-                                                                                        -End { Return $Valid })) {
+                If (($script:SpotifyEnvironmentInfo[$env].UserSessions -isnot [array]) -or
+                    ($script:SpotifyEnvironmentInfo[$env].UserSessions | ForEach-Object -Begin { $NotValid = $false } `
+                                                                                        -Process { If ($_ -isnot [NewGuy.PoshSpotify.AuthenticationToken]) { $NotValid = $true } } `
+                                                                                        -End { Return $NotValid })) {
                     Throw "The $env key in the SpotifyEnvironmentInfo hashtable contains an improperly formatted UserSessions key. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
                 }
             }
