@@ -415,13 +415,15 @@ Function Test-SpotifyEnvInfoFormat {
 
         .DESCRIPTION
 
-            Verifies the provided Spotify environment configuration hashtable is correctly formatted. This configuration hashtable can created in a number of ways.
+            Verifies the provided Spotify environment configuration hashtable is correctly formatted. This configuration hashtable can created in a
+            number of ways.
 
             For details on environment configurations please see https://github.com/The-New-Guy/Posh-Spotify.
 
         .NOTES
 
-            The $script:SpotifyEnvironmentInfo hashtable must be of the following format to properly configure the Spotify environment info. Additionally the current $script:DefaultSpotifyEnv must match at least one of the provided keys in the main hashtable.
+            The $script:SpotifyEnvironmentInfo hashtable must be of the following format to properly configure the Spotify environment info.
+            Additionally the current $script:DefaultSpotifyEnv must match at least one of the provided keys in the main hashtable.
 
             $script:SpotifyEnvironmentInfo = @{
 
@@ -441,6 +443,11 @@ Function Test-SpotifyEnvInfoFormat {
                     # ProxyUsername = 'janedoe'
                     # ProxyPassword = 'YourProxySecretsHere'
 
+                    # System Keys.
+
+                    # User Session Array. An array of AuthenticationToken objects. This will be created by this module if not present.
+                    UserSessions = @()
+
                 }
 
                 Test = @{
@@ -459,6 +466,11 @@ Function Test-SpotifyEnvInfoFormat {
                     # ProxyUsername = 'janedoe'
                     # ProxyPasswordEncrypted = 'Big long protected SecureString represented as a string on 1 line here'
 
+                    # System Keys.
+
+                    # User Session Array. An array of AuthenticationToken objects. This will be created by this module if not present.
+                    UserSessions = @()
+
                 }
 
                 Dev = @{
@@ -475,6 +487,11 @@ Function Test-SpotifyEnvInfoFormat {
                     # ProxyBypassList = @('*.domain.local', '*.otherdomain.local')
                     # ProxyBypassOnLocal = $true
                     # ProxyUseDefaultCredentials = $true
+
+                    # System Keys.
+
+                    # User Session Array. An array of AuthenticationToken objects. This will be created by this module if not present.
+                    UserSessions = @()
 
                 }
             }
@@ -584,6 +601,18 @@ Function Test-SpotifyEnvInfoFormat {
                     Throw "The $env key in the SpotifyEnvironmentInfo hashtable contains an improperly formatted ProxyPassword or ProxyPasswordEncrypted key. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
                 }
             }
+
+            ## Check system keys. ##
+
+            # If the UserSessions key exists, make sure it is an array containing only AuthenticationToken objects.
+            If ($script:SpotifyEnvironmentInfo[$env].UserSessions -ne $null) {
+                If (($script:SpotifyEnvironmentInfo[$env].UserSessions -isnot [array]) -or 
+                    ($script:SpotifyEnvironmentInfo[$env].UserSessions | ForEach-Object -Begin { $Valid = $true } `
+                                                                                        -Process { If ($_ -isnot [NewGuy.PoshSpotify.AuthenticationToken]) { $Valid = $false } } `
+                                                                                        -End { Return $Valid })) {
+                    Throw "The $env key in the SpotifyEnvironmentInfo hashtable contains an improperly formatted UserSessions key. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
+                }
+            }
         }
     } Else {
         Throw "The SpotifyEnvironmentInfo hashtable is not defined or is not in the proper format. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo | Out-String)"
@@ -675,7 +704,7 @@ Function Get-SpotifySystemProxy {
 
 }
 
-#region Get-SpotifySystemProxy
+#endregion Get-SpotifySystemProxy
 
 #endregion Private Functions
 
