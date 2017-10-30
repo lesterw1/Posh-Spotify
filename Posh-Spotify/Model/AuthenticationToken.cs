@@ -15,12 +15,16 @@ namespace NewGuy.PoshSpotify {
 
     public class AuthenticationToken {
 
+        // Properties.
+
         public string AccessToken { get; set; }
         public string TokenType { get; set; }
         public DateTime ExpiresOn { get; set; }
         public string RefreshToken { get; set; }
         public bool HasExpired { get { return DateTime.Now > ExpiresOn; } }
         public List<string> Scopes { get; set; }
+
+        // Constructors.
 
         public AuthenticationToken () {
             this.AccessToken = "";
@@ -44,6 +48,12 @@ namespace NewGuy.PoshSpotify {
                 this.RefreshToken = Object.Properties["refresh_token"] != null ? (string)Object.Properties["refresh_token"].Value : "";
                 this.Scopes = Object.Properties["scope"] != null ? ((string)Object.Properties["scope"].Value).Split(' ').Select(i => i).ToList() : new List<string>();
             }
+        }
+
+        // Methods.
+
+        public override string ToString() {
+            return this.AccessToken;
         }
 
     }
