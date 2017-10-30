@@ -100,10 +100,10 @@ Function Initialize-SpotifyAuthorizationCodeFlow {
 
     Process {
 
-        #region Get Authorization Code
-
         # If we don't have a Refresh Token we must request access from the user.
         If ($PSCmdlet.ParameterSetName -eq 'AquireToken') {
+
+            #region Get Authorization Code
 
             $spotifyAuthUrl = "https://$script:SpotifyAccountsApiHostname/authorize/"
             $spotifyAuthUrl += "?client_id=$($script:SpotifyEnvironmentInfo[$SpotifyEnv].ClientId)"
