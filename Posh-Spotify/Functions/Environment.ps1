@@ -614,7 +614,7 @@ Function Test-SpotifyEnvInfoFormat {
                 Throw "The $env key in the SpotifyEnvironmentInfo hashtable is missing the ClientId key or it is in the wrong format. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
             }
 
-            # The final required key must be one of the following, but not both.
+            # The final required key must be one of the following.
             # 1. The 'SecretKey' should contain the Spotify API Application Secret Key in plain text.
             # 2. The 'SecretKeyEncrypted' should contain the Spotify API Application Secret Key as a string representation of a SecureString.
             If ((($script:SpotifyEnvironmentInfo[$env].SecretKey -eq $null) -or
@@ -624,6 +624,14 @@ Function Test-SpotifyEnvInfoFormat {
                  ($script:SpotifyEnvironmentInfo[$env].SecretKeyEncrypted -isnot [string]) -or
                  ($script:SpotifyEnvironmentInfo[$env].SecretKeyEncrypted.Length -eq 0))) {
                 Throw "The $env key in the SpotifyEnvironmentInfo hashtable is missing the SecretKey/SecretKeyEncrypted key or it is in the wrong format. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
+            }
+
+            # The above check does not account for the case where SecretKey is valid but SecretKeyEncrypted is invalid.
+            # Since SecretKeyEncrypted is used by default when both keys are given we will do a second check on SecretKeyEncrypted.
+            If (($script:SpotifyEnvironmentInfo[$env].SecretKeyEncrypted -ne $null) -and
+                (($script:SpotifyEnvironmentInfo[$env].SecretKeyEncrypted -isnot [string]) -or
+                 ($script:SpotifyEnvironmentInfo[$env].SecretKeyEncrypted.Length -eq 0))) {
+                Throw "The $env key in the SpotifyEnvironmentInfo hashtable has a SecretKeyEncrypted key in the wrong format. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
             }
 
             ## Check optional proxy keys. ##
@@ -669,7 +677,6 @@ Function Test-SpotifyEnvInfoFormat {
                 # The proxy password keys must be one of the following.
                 # 1. The 'ProxyPassword' should contain the proxy password in plain text.
                 # 2. The 'ProxyPasswordEncrypted' should contain the proxy password as a string representation of a SecureString.
-                # 3. Neither should exist is the 'ProxyUsername' key does not exist and if it does exist then one and only one ProxyPassword/ProxyPasswordEncrypted should exist.
                 If (($script:SpotifyEnvironmentInfo[$env].ProxyUsername -ne $null) -and ($script:SpotifyEnvironmentInfo[$env].ProxyPassword -eq $null) -and ($script:SpotifyEnvironmentInfo[$env].ProxyPasswordEncrypted -eq $null)) {
                     Throw "The $env key in the SpotifyEnvironmentInfo hashtable contains an ProxyUsername key but does not contain a ProxyPassword or ProxyPasswordEncrypted key. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
                 }
@@ -682,6 +689,15 @@ Function Test-SpotifyEnvInfoFormat {
                       ($script:SpotifyEnvironmentInfo[$env].ProxyPasswordEncrypted -isnot [string]) -or
                       ($script:SpotifyEnvironmentInfo[$env].ProxyPasswordEncrypted.Length -eq 0)))) {
                     Throw "The $env key in the SpotifyEnvironmentInfo hashtable contains an improperly formatted ProxyPassword or ProxyPasswordEncrypted key. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
+                }
+
+                # The above check does not account for the case where ProxyPassword is valid but ProxyPasswordEncrypted is invalid.
+                # Since ProxyPasswordEncrypted is used by default when both keys are given we will do a second check on ProxyPasswordEncrypted.
+                If (($script:SpotifyEnvironmentInfo[$env].ProxyUsername -ne $null) -and
+                    ($script:SpotifyEnvironmentInfo[$env].ProxyPasswordEncrypted -ne $null) -and
+                    (($script:SpotifyEnvironmentInfo[$env].ProxyPasswordEncrypted -isnot [string]) -or
+                     ($script:SpotifyEnvironmentInfo[$env].ProxyPasswordEncrypted.Length -eq 0))) {
+                        Throw "The $env key in the SpotifyEnvironmentInfo hashtable has a ProxyPasswordEncrypted key in the wrong format. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
                 }
             }
 
