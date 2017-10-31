@@ -42,8 +42,7 @@ Function Get-SpotifyEnvironmentInfo {
 
     # Hashtables pass by reference. So we have to recreate/clone them to prevent the user from modifying the hashtable they are getting
     # and in turn modifying the hashtable stored in this module without a proper validation test being performed on it.
-    $userEnvironmentInfo = @{}
-    $SpotifyEnvironmentInfo.Keys | ForEach-Object { $userEnvironmentInfo[$_] = $SpotifyEnvironmentInfo[$_].Clone() }
+    $userEnvironmentInfo = Copy-SpotifyEnvInfo -SpotifyEnvInfo $SpotifyEnvironmentInfo
     Return $userEnvironmentInfo
 
 }
@@ -97,8 +96,7 @@ Function Set-SpotifyEnvironmentInfo {
     # Set the current environment info to the specified info.
     # Hashtables pass by reference. So we have to recreate/clone them to prevent the user from modifying the hashtable they passed in
     # and in turn modifying the hashtable stored in this module without a proper validation test being performed on it.
-    $userEnvironmentInfo = @{}
-    $SpotifyEnvironmentInfo.Keys | ForEach-Object { $userEnvironmentInfo[$_] = $SpotifyEnvironmentInfo[$_].Clone() }
+    $userEnvironmentInfo = Copy-SpotifyEnvInfo -SpotifyEnvInfo $SpotifyEnvironmentInfo
     $script:SpotifyEnvironmentInfo = $userEnvironmentInfo
     $script:SpotifyDefaultEnv = $SpotifyDefaultEnv
 
@@ -407,6 +405,62 @@ Export-ModuleMember -Function 'Set-SpotifyEnvironmentProxy'
 #######################
 
 #region Private Functions
+
+#====================================================================================================================================================
+#########################
+## Copy-SpotifyEnvInfo ##
+#########################
+
+#region Copy-SpotifyEnvInfo
+
+# Make a copy of the provided Spotify environment configuration hashtable. This hashtable may have come from the user and may be invalid.
+# However, we don't care about validation, that will be done later. We will just clone the primitives and manually clone the known complex objects.
+Function Copy-SpotifyEnvInfo {
+
+    Param ([Parameter(Mandatory)] [hashtable]$SpotifyEnvInfo)
+
+    $userEnvironmentInfo = @{}
+    $SpotifyEnvInfo.Keys | ForEach-Object { $userEnvironmentInfo[$_] = $SpotifyEnvInfo[$_].Clone() }
+
+    # UserSessions should be an array containing AuthenticationTokens. If it doesn't, who cares, it will be caught later.
+    Foreach ($env In $userEnvironmentInfo.Keys) {
+        If (($userEnvironmentInfo.$env.Keys -contains 'UserSessions') -and ($userEnvironmentInfo.$env.UserSessions -is [array])) {
+
+            # New array containing only converted AuthenticationToken objects.
+            $newUserSessionsArray = @()
+
+            Foreach ($sess In $userEnvironmentInfo.$env.UserSessions) {
+                If ($sess -is [NewGuy.PoshSpotify.AuthenticationToken]) {
+
+                    # Calculate the remaining time left on the access token.
+                    $expiresOn = $sess.ExpiresOn
+                    $expiresInSec = [int]($expiresOn - (Get-Date)).TotalSeconds
+
+                    # Create object and set optional properties.
+                    $newSess = [NewGuy.PoshSpotify.AuthenticationToken]::new($sess.AccessToken, $sess.TokenType, $expiresInSec)
+                    If ($sess.RefreshToken) { $newSess.RefreshToken = $sess.RefreshToken }
+                    If ($sess.Scopes) { $newSess.Scopes = $sess.Scopes }
+
+                    # Add new Authentication Token to new UserSessions array.
+                    $newUserSessionsArray += $newSess
+
+                } Else {
+                    # Not an AuthenticationToken? Whatever, invalid data will be handled later.
+                    $newUserSessionsArray = $sess
+                }
+            }
+
+            # Overwrite the old UserSessions array with the new.
+            $userEnvironmentInfo.$env.UserSessions = $newUserSessionsArray
+
+        }
+    }
+
+    Return $userEnvironmentInfo
+
+}
+
+#endregion Copy-SpotifyEnvInfo
 
 #====================================================================================================================================================
 #####################
