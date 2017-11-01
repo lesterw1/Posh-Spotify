@@ -174,6 +174,7 @@ Function Add-SpotifyUserSession {
             If ($RefreshToken) { $userSess.RefreshToken = $RefreshToken }
             If ($AccessToken) { $userSess.AccessToken = $AccessToken }
             If ($ExpiresOn) { $userSess.ExpiresOn = $ExpiresOn }
+            $userSess.TokenType = 'Bearer'
         }
 
         If ($MakeDefault) {
@@ -286,138 +287,6 @@ Function Initialize-SpotifySession {
 Export-ModuleMember -Function 'Initialize-SpotifySession'
 
 #endregion Initialize-SpotifySession
-
-#====================================================================================================================================================
-################################
-## Save-SpotifyDefaultSession ##
-################################
-
-#region Save-SpotifyDefaultSession
-
-Function Save-SpotifyDefaultSession {
-
-    <#
-
-        .SYNOPSIS
-
-            Saves the current default session information with Spotify.
-
-        .DESCRIPTION
-
-            Saves the current default session information with Spotify. Includes information such as Refresh and Access token.
-
-        .PARAMETER FilePath
-
-            The path to save the default session information with Spotify to.
-
-        .PARAMETER NoTimestampAppend
-
-            By default this command appends the current date and time onto the filename of the save. This switch will prevent the appending of the
-            timestamp.
-
-        .NOTES
-
-            TODO : At some point I would like to add functionality for storing this AuthenticationToken with SecureStrings for the AccessToken and
-            RefershToken.
-
-    #>
-
-    [CmdletBinding()]
-
-    Param([string]$FilePath = ($script:SpotifyDefaultAuthenticationTokenSaveLocation + '\' + $script:SpotifyDefaultAuthenticationTokenSaveFilename),
-          [switch]$NoTimestampAppend)
-
-    If (-not $NoTimestampAppend) {
-        $ext = [IO.Path]::GetExtension($FilePath)
-        $FilePath = $FilePath -replace "$ext$","_$(Get-Date -Format 'HH.mm.ss_MMM.dd')$ext"
-    }
-
-    $script:SpotifyDefaultAuthenticationToken | ConvertTo-Json | Out-File $FilePath
-
-    Write-Host "`nAuthenticationToken saved to: $FilePath" -ForegroundColor Cyan
-
-}
-
-Export-ModuleMember -Function 'Save-SpotifyDefaultSession'
-
-#endregion Save-SpotifyDefaultSession
-
-#====================================================================================================================================================
-##################################
-## Import-SpotifyDefaultSession ##
-##################################
-
-#region Import-SpotifyDefaultSession
-
-Function Import-SpotifyDefaultSession {
-
-    <#
-
-        .SYNOPSIS
-
-            Loads the default session information with Spotify.
-
-        .DESCRIPTION
-
-            Loads the default session information with Spotify. Includes information such as Refresh and Access token.
-
-        .PARAMETER FilePath
-
-            The path to load the default session information with Spotify from.
-
-    #>
-
-    [CmdletBinding()]
-    [OutputType('NewGuy.PoshSpotify.AuthenticationToken')]
-
-    Param([string]$FilePath)
-
-    # Throw all errors to stop the script.
-    $ErrorActionPreference = 'Stop'
-
-    # Initialize result object.
-    $authObj = $null
-
-    # If FilePath was not provided build a default one. This only works if it was saved with default path and appended timestamp.
-    # An * will be added as a wildcard for the date/time part of the filename.
-    If (($FilePath -eq $null) -or ($FilePath -eq '')) {
-        $FilePath = ($script:SpotifyDefaultAuthenticationTokenSaveLocation + '\' + $script:SpotifyDefaultAuthenticationTokenSaveFilename)
-        $ext = [IO.Path]::GetExtension($FilePath)
-        $FilePath = $FilePath -replace "$ext$","_*$ext"
-        Write-Verbose "No path specified. Searching in following path : $FilePath"
-    }
-
-    # Verify we have a valid file now.
-    If (-not (Test-Path $FilePath)) { Throw "Invalid file path : $FilePath" }
-
-    # If there are multiple matches on FilePath, sort by name and pick the last one.
-    # Assuming the files end in a date, it should be the newest file. If not then who knows what the user is looking for.
-    $file = Get-ChildItem $FilePath | Sort-Object Name | Select-Object -Last 1
-
-    # Grab from disk the saved information.
-    $jsonObj = (Get-Content $file | ConvertFrom-Json)
-
-    # Make sure we got something back.
-    If (($null -eq $jsonObj) -or ($jsonObj -eq '')) { Throw "Failed to retrieve information from provided file path : $FilePath" }
-
-    # Calculate the remaining time left on the access token.
-    $expiresOn = $jsonObj.ExpiresOn.ToLocalTime()
-    $expiresInSec = [int]($expiresOn - (Get-Date)).TotalSeconds
-
-    # Create object and set optional properties.
-    $authObj = [NewGuy.PoshSpotify.AuthenticationToken]::new($jsonObj.AccessToken, $jsonObj.TokenType, $expiresInSec)
-    If ($jsonObj.RefreshToken) { $authObj.RefreshToken = $jsonObj.RefreshToken }
-    If ($jsonObj.Scopes) { $authObj.Scopes = $jsonObj.Scopes }
-
-    $script:SpotifyDefaultAuthenticationToken = $authObj
-
-    Return $authObj
-
-}
-
-Export-ModuleMember -Function 'Import-SpotifyDefaultSession'
-
-#endregion Import-SpotifyDefaultSession
 
 #====================================================================================================================================================
 ###################################
