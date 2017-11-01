@@ -156,7 +156,7 @@ Function Save-SpotifyEnvironmentInfo {
             $FilePath = $FilePath -replace "$ext$","_$(Get-Date -Format 'HH.mm.ss_MMM.dd')$ext"
         }
 
-    $script:SpotifyDefaultEnv, $script:SpotifyEnvironmentInfo | ConvertTo-Json -Depth 4 | Out-File $FilePath
+    $script:SpotifyDefaultEnv, $script:SpotifyEnvironmentInfo | ConvertTo-Json -Depth 5 | Out-File $FilePath
 
     Write-Host "`nEnvironmentInfo saved to: $FilePath" -ForegroundColor Cyan
 
