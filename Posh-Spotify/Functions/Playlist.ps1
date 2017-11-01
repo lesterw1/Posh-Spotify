@@ -70,18 +70,18 @@ Function Get-SpotifyPlaylist {
 
                 https://developer.spotify.com/web-api/user-guide/#rate-limiting
 
-        .PARAMETER AccessToken
-
-            The Access Token provided during the authorization process.
-
-            The Access Token must have the "playlist-read-collaborative" and "playlist-read-private" scope authorized in order to read information.
-
         .PARAMETER SpotifyEnv
 
             A string matching a key in the Spotify environment configuration hashtable to be used when making Spotify API calls. If this parameter is
             not specified it will use the current default environment configuration.
 
             For details on environment configurations please see https://github.com/The-New-Guy/Posh-Spotify.
+
+        .PARAMETER AccessToken
+
+            The Access Token provided during the authorization process.
+
+            The Access Token must have the "playlist-read-collaborative" and "playlist-read-private" scope authorized in order to read information.
 
     #>
 
@@ -93,8 +93,8 @@ Function Get-SpotifyPlaylist {
           [int]$Limit = 20,
           [int]$Offset = 0,
           [switch]$SkipTrackRetrieval,
-          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
-          [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
+          [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
+          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
 
     Begin {
 

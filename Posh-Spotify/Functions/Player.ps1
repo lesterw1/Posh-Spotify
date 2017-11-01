@@ -37,12 +37,6 @@ Function Get-SpotifyDevice {
 
                 Spotify Web API : https://developer.spotify.com/web-api/get-a-users-available-devices/
 
-        .PARAMETER AccessToken
-
-            The Access Token provided during the authorization process.
-
-            The Access Token must have the "user-read-playback-state" scope authorized in order to read information.
-
         .PARAMETER SpotifyEnv
 
             A string matching a key in the Spotify environment configuration hashtable to be used when making Spotify API calls. If this parameter is
@@ -50,13 +44,19 @@ Function Get-SpotifyDevice {
 
             For details on environment configurations please see https://github.com/The-New-Guy/Posh-Spotify.
 
+        .PARAMETER AccessToken
+
+            The Access Token provided during the authorization process.
+
+            The Access Token must have the "user-read-playback-state" scope authorized in order to read information.
+
     #>
 
     [CmdletBinding()]
     [OutputType('NewGuy.PoshSpotify.Device')]
 
-    Param([ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
-          [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
+    Param([ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
+          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
 
     $Devices = @()
 
@@ -105,12 +105,6 @@ Function Get-SpotifyPlayer {
 
             https://developer.spotify.com/web-api/track-relinking-guide/
 
-        .PARAMETER AccessToken
-
-            The Access Token provided during the authorization process.
-
-            The Access Token must have the "user-read-playback-state" scope authorized in order to read information.
-
         .PARAMETER SpotifyEnv
 
             A string matching a key in the Spotify environment configuration hashtable to be used when making Spotify API calls. If this parameter is
@@ -118,14 +112,20 @@ Function Get-SpotifyPlayer {
 
             For details on environment configurations please see https://github.com/The-New-Guy/Posh-Spotify.
 
+        .PARAMETER AccessToken
+
+            The Access Token provided during the authorization process.
+
+            The Access Token must have the "user-read-playback-state" scope authorized in order to read information.
+
     #>
 
     [CmdletBinding()]
     [OutputType('NewGuy.PoshSpotify.Player')]
 
     Param([string]$Market,
-          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
-          [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
+          [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
+          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
 
     $splat = @{
         Method = 'GET'
@@ -178,13 +178,6 @@ Function Get-SpotifyCurrentlyPlaying {
 
             https://developer.spotify.com/web-api/track-relinking-guide/
 
-        .PARAMETER AccessToken
-
-            The Access Token provided during the authorization process.
-
-            The Access Token must have the "user-read-currently-playing" and/or "user-read-playback-state" scope authorized in order to read
-            information.
-
         .PARAMETER SpotifyEnv
 
             A string matching a key in the Spotify environment configuration hashtable to be used when making Spotify API calls. If this parameter is
@@ -192,14 +185,21 @@ Function Get-SpotifyCurrentlyPlaying {
 
             For details on environment configurations please see https://github.com/The-New-Guy/Posh-Spotify.
 
+        .PARAMETER AccessToken
+
+            The Access Token provided during the authorization process.
+
+            The Access Token must have the "user-read-currently-playing" and/or "user-read-playback-state" scope authorized in order to read
+            information.
+
     #>
 
     [CmdletBinding()]
     [OutputType('NewGuy.PoshSpotify.CurrentPlayingItem')]
 
     Param([string]$Market,
-          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
-          [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
+          [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
+          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
 
     $splat = @{
         Method = 'GET'
@@ -264,18 +264,18 @@ Function Set-SpotifyPlayer {
 
             Currently Spotify API only supports one device ID.
 
-        .PARAMETER AccessToken
-
-            The Access Token provided during the authorization process.
-
-            The Access Token must have the "user-modify-playback-state" scope authorized in order to read information.
-
         .PARAMETER SpotifyEnv
 
             A string matching a key in the Spotify environment configuration hashtable to be used when making Spotify API calls. If this parameter is
             not specified it will use the current default environment configuration.
 
             For details on environment configurations please see https://github.com/The-New-Guy/Posh-Spotify.
+
+        .PARAMETER AccessToken
+
+            The Access Token provided during the authorization process.
+
+            The Access Token must have the "user-modify-playback-state" scope authorized in order to read information.
 
     #>
 
@@ -284,8 +284,8 @@ Function Set-SpotifyPlayer {
     Param([switch]$Play,
           [Parameter(Mandatory, ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
           [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'DeviceObj')] [NewGuy.PoshSpotify.Device[]]$Device,
-          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
-          [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
+          [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
+          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
 
     Process {
 
@@ -382,18 +382,18 @@ Function Start-SpotifyPlayback {
 
             Currently Spotify API only supports one device ID.
 
-        .PARAMETER AccessToken
-
-            The Access Token provided during the authorization process.
-
-            The Access Token must have the "user-modify-playback-state" scope authorized in order to read information.
-
         .PARAMETER SpotifyEnv
 
             A string matching a key in the Spotify environment configuration hashtable to be used when making Spotify API calls. If this parameter is
             not specified it will use the current default environment configuration.
 
             For details on environment configurations please see https://github.com/The-New-Guy/Posh-Spotify.
+
+        .PARAMETER AccessToken
+
+            The Access Token provided during the authorization process.
+
+            The Access Token must have the "user-modify-playback-state" scope authorized in order to read information.
 
     #>
 
@@ -421,8 +421,8 @@ Function Start-SpotifyPlayback {
           [Parameter(ParameterSetName = 'TracksObj')]
           [NewGuy.PoshSpotify.Device[]]$Device,
 
-          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
-          [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
+          [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
+          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
 
     Process {
 
@@ -503,12 +503,6 @@ Function Stop-SpotifyPlayback {
 
             Currently Spotify API only supports one device ID.
 
-        .PARAMETER AccessToken
-
-            The Access Token provided during the authorization process.
-
-            The Access Token must have the "user-modify-playback-state" scope authorized in order to read information.
-
         .PARAMETER SpotifyEnv
 
             A string matching a key in the Spotify environment configuration hashtable to be used when making Spotify API calls. If this parameter is
@@ -516,14 +510,20 @@ Function Stop-SpotifyPlayback {
 
             For details on environment configurations please see https://github.com/The-New-Guy/Posh-Spotify.
 
+        .PARAMETER AccessToken
+
+            The Access Token provided during the authorization process.
+
+            The Access Token must have the "user-modify-playback-state" scope authorized in order to read information.
+
     #>
 
     [CmdletBinding()]
 
     Param([Parameter(Mandatory, ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
           [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'DeviceObj')] [NewGuy.PoshSpotify.Device[]]$Device,
-          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
-          [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
+          [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
+          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
 
     Process {
 
@@ -588,12 +588,6 @@ Function Skip-SpotifyNextTrack {
 
             Currently Spotify API only supports one device ID.
 
-        .PARAMETER AccessToken
-
-            The Access Token provided during the authorization process.
-
-            The Access Token must have the "user-modify-playback-state" scope authorized in order to read information.
-
         .PARAMETER SpotifyEnv
 
             A string matching a key in the Spotify environment configuration hashtable to be used when making Spotify API calls. If this parameter is
@@ -601,14 +595,20 @@ Function Skip-SpotifyNextTrack {
 
             For details on environment configurations please see https://github.com/The-New-Guy/Posh-Spotify.
 
+        .PARAMETER AccessToken
+
+            The Access Token provided during the authorization process.
+
+            The Access Token must have the "user-modify-playback-state" scope authorized in order to read information.
+
     #>
 
     [CmdletBinding()]
 
     Param([Parameter(Mandatory, ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
           [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'DeviceObj')] [NewGuy.PoshSpotify.Device[]]$Device,
-          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
-          [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
+          [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
+          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
 
     Process {
 
@@ -676,12 +676,6 @@ Function Skip-SpotifyPreviousTrack {
 
             Currently Spotify API only supports one device ID.
 
-        .PARAMETER AccessToken
-
-            The Access Token provided during the authorization process.
-
-            The Access Token must have the "user-modify-playback-state" scope authorized in order to read information.
-
         .PARAMETER SpotifyEnv
 
             A string matching a key in the Spotify environment configuration hashtable to be used when making Spotify API calls. If this parameter is
@@ -689,14 +683,20 @@ Function Skip-SpotifyPreviousTrack {
 
             For details on environment configurations please see https://github.com/The-New-Guy/Posh-Spotify.
 
+        .PARAMETER AccessToken
+
+            The Access Token provided during the authorization process.
+
+            The Access Token must have the "user-modify-playback-state" scope authorized in order to read information.
+
     #>
 
     [CmdletBinding()]
 
     Param([Parameter(Mandatory, ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
           [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'DeviceObj')] [NewGuy.PoshSpotify.Device[]]$Device,
-          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
-          [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
+          [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
+          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
 
     Process {
 
@@ -786,18 +786,18 @@ Function Set-SpotifyTrackSeek {
 
             Currently Spotify API only supports one device ID.
 
-        .PARAMETER AccessToken
-
-            The Access Token provided during the authorization process.
-
-            The Access Token must have the "user-modify-playback-state" scope authorized in order to read information.
-
         .PARAMETER SpotifyEnv
 
             A string matching a key in the Spotify environment configuration hashtable to be used when making Spotify API calls. If this parameter is
             not specified it will use the current default environment configuration.
 
             For details on environment configurations please see https://github.com/The-New-Guy/Posh-Spotify.
+
+        .PARAMETER AccessToken
+
+            The Access Token provided during the authorization process.
+
+            The Access Token must have the "user-modify-playback-state" scope authorized in order to read information.
 
     #>
 
@@ -808,8 +808,8 @@ Function Set-SpotifyTrackSeek {
           [int]$Milliseconds = 0,
           [Parameter(Mandatory, ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
           [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'DeviceObj')] [NewGuy.PoshSpotify.Device[]]$Device,
-          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
-          [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
+          [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
+          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
 
     Process {
 
@@ -889,18 +889,18 @@ Function Set-SpotifyPlayerVolume {
 
             Currently Spotify API only supports one device ID.
 
-        .PARAMETER AccessToken
-
-            The Access Token provided during the authorization process.
-
-            The Access Token must have the "user-modify-playback-state" scope authorized in order to read information.
-
         .PARAMETER SpotifyEnv
 
             A string matching a key in the Spotify environment configuration hashtable to be used when making Spotify API calls. If this parameter is
             not specified it will use the current default environment configuration.
 
             For details on environment configurations please see https://github.com/The-New-Guy/Posh-Spotify.
+
+        .PARAMETER AccessToken
+
+            The Access Token provided during the authorization process.
+
+            The Access Token must have the "user-modify-playback-state" scope authorized in order to read information.
 
     #>
 
@@ -909,8 +909,8 @@ Function Set-SpotifyPlayerVolume {
     Param([Parameter(Mandatory)] [ValidateScript({ ($_ -ge 0) -and ($_ -le 100) })] [int]$Volume,
           [Parameter(Mandatory, ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
           [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'DeviceObj')] [NewGuy.PoshSpotify.Device[]]$Device,
-          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
-          [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
+          [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
+          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
 
     Process {
 
@@ -990,18 +990,18 @@ Function Set-SpotifyPlayerRepeatMode {
 
             Currently Spotify API only supports one device ID.
 
-        .PARAMETER AccessToken
-
-            The Access Token provided during the authorization process.
-
-            The Access Token must have the "user-modify-playback-state" scope authorized in order to read information.
-
         .PARAMETER SpotifyEnv
 
             A string matching a key in the Spotify environment configuration hashtable to be used when making Spotify API calls. If this parameter is
             not specified it will use the current default environment configuration.
 
             For details on environment configurations please see https://github.com/The-New-Guy/Posh-Spotify.
+
+        .PARAMETER AccessToken
+
+            The Access Token provided during the authorization process.
+
+            The Access Token must have the "user-modify-playback-state" scope authorized in order to read information.
 
     #>
 
@@ -1010,8 +1010,8 @@ Function Set-SpotifyPlayerRepeatMode {
     Param([Parameter(Mandatory)] [ValidateSet('Track', 'Context', 'Off')] [string]$State = 'Track',
           [Parameter(Mandatory, ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
           [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'DeviceObj')] [NewGuy.PoshSpotify.Device[]]$Device,
-          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
-          [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
+          [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
+          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
 
     Process {
 
@@ -1088,18 +1088,18 @@ Function Set-SpotifyPlayerShuffleMode {
 
             Currently Spotify API only supports one device ID.
 
-        .PARAMETER AccessToken
-
-            The Access Token provided during the authorization process.
-
-            The Access Token must have the "user-modify-playback-state" scope authorized in order to read information.
-
         .PARAMETER SpotifyEnv
 
             A string matching a key in the Spotify environment configuration hashtable to be used when making Spotify API calls. If this parameter is
             not specified it will use the current default environment configuration.
 
             For details on environment configurations please see https://github.com/The-New-Guy/Posh-Spotify.
+
+        .PARAMETER AccessToken
+
+            The Access Token provided during the authorization process.
+
+            The Access Token must have the "user-modify-playback-state" scope authorized in order to read information.
 
     #>
 
@@ -1108,8 +1108,8 @@ Function Set-SpotifyPlayerShuffleMode {
     Param([Parameter(Mandatory)] [ValidateSet('Enabled', 'Disabled')] [string]$State = 'Enabled',
           [Parameter(Mandatory, ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
           [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'DeviceObj')] [NewGuy.PoshSpotify.Device[]]$Device,
-          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
-          [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
+          [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
+          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
 
     Process {
 

@@ -115,18 +115,18 @@ Function Get-SpotifySearch {
             The index of the first result to return. Default: 0 (i.e., the first result). Maximum offset: 100.000. Use with limit to get the next page
             of search results.
 
-        .PARAMETER AccessToken
-
-            The Access Token provided during the authorization process.
-
-            If Market parameter is "from_token", the current user must have authorized the "user-read-private" scope.
-
         .PARAMETER SpotifyEnv
 
             A string matching a key in the Spotify environment configuration hashtable to be used when making Spotify API calls. If this parameter is
             not specified it will use the current default environment configuration.
 
             For details on environment configurations please see https://github.com/The-New-Guy/Posh-Spotify.
+
+        .PARAMETER AccessToken
+
+            The Access Token provided during the authorization process.
+
+            If Market parameter is "from_token", the current user must have authorized the "user-read-private" scope.
 
     #>
 
@@ -138,8 +138,8 @@ Function Get-SpotifySearch {
           [Alias('Country')] [string]$Market,
           [int]$Limit = 50,
           [int]$Offset = 0,
-          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
-          [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
+          [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
+          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
 
     Begin {
 

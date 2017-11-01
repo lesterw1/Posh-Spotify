@@ -46,16 +46,16 @@ Function Get-SpotifyPage {
 
             The page to retrieve. Valid values are NextPage, PreviousPage, AllPages. Default is NextPage.
 
-        .PARAMETER AccessToken
-
-            The Access Token provided during the authorization process.
-
         .PARAMETER SpotifyEnv
 
             A string matching a key in the Spotify environment configuration hashtable to be used when making Spotify API calls. If this parameter is
             not specified it will use the current default environment configuration.
 
             For details on environment configurations please see https://github.com/The-New-Guy/Posh-Spotify.
+
+        .PARAMETER AccessToken
+
+            The Access Token provided during the authorization process.
 
     #>
 
@@ -64,8 +64,8 @@ Function Get-SpotifyPage {
 
     Param([Parameter(Mandatory, ValueFromPipeline)] [NewGuy.PoshSpotify.PagingInfo]$PagingInfo,
           [ValidateSet('NextPage', 'PreviousPage', 'AllPages')] [string]$RetrieveMode = 'NextPage',
-          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
-          [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
+          [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
+          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
 
     Process {
 

@@ -46,10 +46,6 @@ Function Get-SpotifyArtist {
 
             https://developer.spotify.com/web-api/track-relinking-guide/
 
-        .PARAMETER AccessToken
-
-            The Access Token provided during the authorization process.
-
         .PARAMETER SpotifyEnv
 
             A string matching a key in the Spotify environment configuration hashtable to be used when making Spotify API calls. If this parameter is
@@ -57,14 +53,18 @@ Function Get-SpotifyArtist {
 
             For details on environment configurations please see https://github.com/The-New-Guy/Posh-Spotify.
 
+        .PARAMETER AccessToken
+
+            The Access Token provided during the authorization process.
+
     #>
 
     [CmdletBinding()]
     [OutputType('NewGuy.PoshSpotify.Artist[]')]
 
     Param([Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)] [string[]]$Id,
-          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired),
-          [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
+          [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
+          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
 
     Begin {
 
