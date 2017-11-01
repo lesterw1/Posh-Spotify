@@ -25,26 +25,16 @@
 #== DEFAULT PREFERENCES ==#
 #=========================#
 
-# Default location for saving Authentication Token (Save-SpotifyDefaultSession).
-$script:SpotifyDefaultAuthenticationTokenSaveLocation = $env:TEMP
-# $script:SpotifyDefaultAuthenticationTokenSaveLocation = '.'  # Current directory.
-
-# Default file name of Authentication Token save file (Save-SpotifyDefaultSession).
-$script:SpotifyDefaultAuthenticationTokenSaveFilename = "$($env:USERNAME)_$($env:COMPUTERNAME)_SpotifyAuthenticationToken.txt"
-
-# Default location for saving Authentication Token (Save-SpotifyDefaultSession).
+# Default location for saving EnvironmentInfo (Save-SpotifyEnvironmentInfo).
 $script:SpotifyDefaultEnvironmentInfoSaveLocation = $env:TEMP
 # $script:SpotifyDefaultEnvironmentInfoSaveLocation = '.'  # Current directory.
 
-# Default location for saving EnvironmentInfo (Save-SpotifyEnvironmentInfo).
-$script:SpotifyDefaultEnvironmentInfoSaveFilename = "$($env:USERNAME)_$($env:COMPUTERNAME)_SpotifyEnvironmentInfo.txt"
+# Default filename for saving EnvironmentInfo (Save-SpotifyEnvironmentInfo).
+$script:SpotifyDefaultEnvironmentInfoSaveFilename = "$($env:USERNAME)_$($env:COMPUTERNAME)_SpotifyEnvironmentInfo.json"
 
 #===================#
 #== DO NOT MODIFY ==#
 #===================#
-
-# Authentication Token (Set-SpotifyDefaultSession).
-$script:SpotifyDefaultAuthenticationToken = $null
 
 # Current Spotify Environment Info (Set-SpotifyEnvironmentInfo).
 $script:SpotifyDefaultEnvironmentInfo = $null
