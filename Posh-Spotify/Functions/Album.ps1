@@ -76,7 +76,7 @@ Function Get-SpotifyAlbum {
     Process {
 
         # Maximum of 20 albums per request.
-        If ($Id.Count -gt 20) { Throw "Only 20 albums per request allowed."}
+        If ($Id.Count -gt 20) { Throw "Only 20 albums per request allowed." }
 
         $params = @{
             ids = $Id -join ','

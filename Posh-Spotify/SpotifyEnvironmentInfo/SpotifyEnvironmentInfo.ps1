@@ -4,7 +4,8 @@
 
 #>
 
-# If the -SpotifyEnv parameter is not used during an API call then the SpotifyDefaultEnv value below will be used to determine which Spotify environment configuration to use.
+# If the -SpotifyEnv parameter is not used during an API call then the SpotifyDefaultEnv value below will be used to determine which Spotify
+# environment configuration to use.
 $script:SpotifyDefaultEnv = 'Prod'
 
 $script:SpotifyEnvironmentInfo = @{

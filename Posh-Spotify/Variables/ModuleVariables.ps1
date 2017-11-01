@@ -8,7 +8,7 @@
         DO NOT MODIFY       : Variables that are used to store values throughout the operation of the script and should NOT be modified.
 
         DEFAULT PREFERENCES : Variables that are merely default values for parameters to various public commands and can be modified to suit your
-                             preference.
+                              preference.
 
         CONFIGURATIONS      : Variables that are used for various settings and configurations for internal operations of this module. These variables
                               can be modified to adjust for Spotify API changes and tweak performance and optoins of the module.

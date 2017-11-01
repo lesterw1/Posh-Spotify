@@ -24,7 +24,7 @@ Author = 'New-Guy'
 CompanyName = 'New-Guy.com'
 
 # Copyright statement for this module
-Copyright = '(c) 2016 New-Guy.com. All rights reserved.'
+Copyright = '(c) 2017 New-Guy.com. All rights reserved.'
 
 # Description of the functionality provided by this module
 Description = 'This module contains powershell wrappers to leverage the Spotify API functions described here https://developer.spotify.com/web-api/'
