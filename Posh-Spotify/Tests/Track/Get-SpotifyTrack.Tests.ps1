@@ -4,11 +4,11 @@
 
 #>
 
-# If the parameters below are not provided default locations will be used. See the module documentation for details.
-Param([string]$AuthenticationTokenFilePath, [string]$EnvironmentInfoFilePath)
+# If the parameter below is not provided a default location will be used. See the module documentation for details.
+Param([string]$EnvironmentInfoFilePath)
 
 # Initialize Spotify API session and environment info.
-. "$PSScriptRoot\..\Test-SpotifySessionLauncher.ps1" -AuthenticationTokenFilePath $AuthenticationTokenFilePath -EnvironmentInfoFilePath $EnvironmentInfoFilePath
+. "$PSScriptRoot\..\Test-SpotifySessionLauncher.ps1" -EnvironmentInfoFilePath $EnvironmentInfoFilePath
 
 # Run tests inside the module scope so that internal private commands can be tested and mocked.
 InModuleScope Posh-Spotify {

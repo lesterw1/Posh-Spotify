@@ -13,11 +13,9 @@ Get-Module Posh-Spotify | Remove-Module
 # Import the module to be tested (up one folder).
 Import-Module "$PSScriptRoot\..\Posh-Spotify.psd1"
 
-If ($EnvironmentInfoFilePath.Length -gt 0) { $envPath = @{ FilePath = $EnvironmentInfoFilePath } }
-
 Try {
 
-    Import-SpotifyEnvironmentInfo @envPath | Out-Null
+    Import-SpotifyEnvironmentInfo -FilePath $EnvironmentInfoFilePath | Out-Null
 
 } Catch {
 
@@ -27,7 +25,7 @@ Could not load Spotify session and environment info.
 Exception Message: $($_.Exception.Message)
 
 Please note these tests were designed to run using the module's default file name and location settings.
-To run these tests ensure that there is a valid AuthenticationToken and EnvironmentInfo saved to the default locations or use the following to invoke the tests.
+To run these tests ensure that there is a valid Spotify environment configuration file with a valid user session saved to the default locations or use the following to invoke the tests.
 
     Invoke-Pester -Script @{ Path = '.\*'; Parameters = @{ EnvironmentInfoFilePath = <EnvironmentInfoPath> } }
 "@
