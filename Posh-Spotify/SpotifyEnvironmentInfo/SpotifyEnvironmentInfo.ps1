@@ -4,10 +4,12 @@
 
 #>
 
-# If the -SpotifyEnv parameter is not used during an API call then the SpotifyDefaultEnv value below will be used to determine which Spotify
-# environment configuration to use.
+# A hashtable key used to get the default Spotify environment configuration that will be used for API requests when one is not given by the user.
+# This will be set when configuring the module. (Set-SpotifyEnvironmentInfo, Import-SpotifyEnvironmentInfo)
 $script:SpotifyDefaultEnv = 'Prod'
 
+# A hashtable of one or more Spotify environment configurations that will be used for API requests.
+# This will be set when configuring the module. (Set-SpotifyEnvironmentInfo, Import-SpotifyEnvironmentInfo)
 $script:SpotifyEnvironmentInfo = @{
 
     Prod = @{
@@ -33,7 +35,7 @@ $script:SpotifyEnvironmentInfo = @{
         # Required Keys.
 
         ClientId = 'xxxxxxxxxxxxxxxxxxxx'
-        SecretKeyEncrypted = 'Big long protected SecureString represented as a string on 1 line here'
+        SecretKeyEncrypted = 'Big long protected SecureString converted to a standard string (though encrypted) all on one line here'
 
         # Optional keys.
 
@@ -42,7 +44,7 @@ $script:SpotifyEnvironmentInfo = @{
         # ProxyBypassList = @('*.domain.local', '*.otherdomain.local')
         # ProxyBypassOnLocal = $true
         # ProxyUsername = 'janedoe'
-        # ProxyPasswordEncrypted = 'Big long protected SecureString represented as a string on 1 line here'
+        # ProxyPasswordEncrypted = 'Big long protected SecureString converted to a standard string (though encrypted) all on one line here'
 
     }
 
@@ -51,7 +53,7 @@ $script:SpotifyEnvironmentInfo = @{
         # Required Keys.
 
         ClientId = 'xxxxxxxxxxxxxxxxxxxx'
-        SecretKeyEncrypted = 'Big long protected SecureString represented as a string on 1 line here'
+        SecretKeyEncrypted = 'Big long protected SecureString converted to a standard string (though encrypted) all on one line here'
 
         # Optional keys.
 

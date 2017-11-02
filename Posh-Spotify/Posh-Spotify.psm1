@@ -5,36 +5,14 @@
 
 #==================================================================================================================================
 
-#####################
-# Module Parameters #
-#####################
-
-# The Spotify environment info can be passed to the module during the Import-Modue command using the -ArguementList parameter.
-Param([hashtable]$SpotifyEnvironmentInfo = @{},
-      [string]$SpotifyDefaultEnv)
-
-# Hashtables pass by reference. So we have to recreate/clone them to prevent the user from modifying the hashtable they passed in
-# and in turn modifying the hashtable stored in this module without a proper validation tests being performed on it.
-# If the user did not provide any environment info during the Import-Module command then the SpotifyEnvironmentInfo.ps1 file will be
-# used. If the user provided environment info but did not provide a default Spotify environment then throw an error.
-$userEnvironmentInfo = @{}
-$SpotifyEnvironmentInfo.Keys | ForEach-Object { $userEnvironmentInfo[$_] = $SpotifyEnvironmentInfo[$_].Clone() }
-$script:SpotifyEnvironmentInfo = $userEnvironmentInfo
-$script:SpotifyDefaultEnv = If (($SpotifyEnvironmentInfo.Count -gt 1) -and ($SpotifyDefaultEnv.Length -eq 0)) { Throw 'Must provide a default Spotify environment key with argument list.' } Else { $SpotifyDefaultEnv }
-
-#==================================================================================================================================
-
 #########################
 # Module Initialization #
 #########################
 
 # Load the Spotify environment info such as the client id and secret key.
-# Either use the info provided by the user on import of the module via the -ArguementList parameter or load from a file.
 # The file will define the $SpotifyEnvironmentInfo variable in the script scope (a.k.a. module scope in this case).
 
-If ($script:SpotifyEnvironmentInfo.Count -eq 0) {
-    . "$PSScriptRoot\SpotifyEnvironmentInfo\SpotifyEnvironmentInfo.ps1"
-}
+. "$PSScriptRoot\SpotifyEnvironmentInfo\SpotifyEnvironmentInfo.ps1"
 
 # Using the System.Web.HttpUtility .Net library.
 [System.Reflection.Assembly]::Load('System.Web, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a') | Out-Null

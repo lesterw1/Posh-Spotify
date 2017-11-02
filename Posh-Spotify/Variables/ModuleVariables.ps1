@@ -1,17 +1,13 @@
 <#
 
-    All module scoped variables. These variables will not be in scope to the PowerShell session this module was loaded in. Some variables are used
-    to store values throughout the operation of the script and should only be modified by the module. These variables will be marked as DO NOT MODIFY.
-    Some variables are merely default values for parameters to various public commands and can be modified to suit your preference. These variables
-    will be marked as DEFAULT PREFERENCES.
-
-        DO NOT MODIFY       : Variables that are used to store values throughout the operation of the script and should NOT be modified.
+    All module scoped variables. These variables will not be in scope to the PowerShell session this module was loaded in and once loaded are used
+    internally only.
 
         DEFAULT PREFERENCES : Variables that are merely default values for parameters to various public commands and can be modified to suit your
                               preference.
 
         CONFIGURATIONS      : Variables that are used for various settings and configurations for internal operations of this module. These variables
-                              can be modified to adjust for Spotify API changes and tweak performance and optoins of the module.
+                              can be modified to adjust for Spotify API changes and tweak performance and options of the module.
 
 #>
 
@@ -25,19 +21,12 @@
 #== DEFAULT PREFERENCES ==#
 #=========================#
 
-# Default location for saving EnvironmentInfo (Save-SpotifyEnvironmentInfo).
-$script:SpotifyDefaultEnvironmentInfoSaveLocation = $env:TEMP
+# Default location for saving Spotify environment configurations (Save-SpotifyEnvironmentInfo).
 # $script:SpotifyDefaultEnvironmentInfoSaveLocation = '.'  # Current directory.
+$script:SpotifyDefaultEnvironmentInfoSaveLocation = $env:TEMP
 
-# Default filename for saving EnvironmentInfo (Save-SpotifyEnvironmentInfo).
+# Default filename for saving Spotify environment configurations (Save-SpotifyEnvironmentInfo).
 $script:SpotifyDefaultEnvironmentInfoSaveFilename = "$($env:USERNAME)_$($env:COMPUTERNAME)_SpotifyEnvironmentInfo.json"
-
-#===================#
-#== DO NOT MODIFY ==#
-#===================#
-
-# Current Spotify Environment Info (Set-SpotifyEnvironmentInfo).
-$script:SpotifyDefaultEnvironmentInfo = $null
 
 #====================================================================================================================================================
 
