@@ -35,18 +35,18 @@ Function Initialize-SpotifyAuthorizationCodeFlow {
         .PARAMETER CallbackUrl
 
             The URI to redirect to after the user grants/denies permission. This URI needs to have been entered in the Redirect URI whitelist that you
-            specified when you registered your application. The value of redirect_uri here must exactly match one of the values you entered when you
+            specified when you registered your application. The value of CallbackUrl here must exactly match one of the values you entered when you
             registered your application, including upper/lowercase, terminating slashes, etc.
 
         .PARAMETER State
 
-            The state can be useful for correlating requests and responses. Because your redirect_uri can be guessed, using a state value can increase
+            The state can be useful for correlating requests and responses. Because your CallbackUrl can be guessed, using a state value can increase
             your assurance that an incoming connection is the result of an authentication request. If you generate a random string or encode the hash
             of some client state (e.g., a cookie) in this state variable, you can validate the response to additionally ensure that the request and
             response originated in the same browser. This provides protection against attacks such as cross-site request forgery. See RFC-6749.
 
             By default, this command will genearte a new GUID and use that as the state. If you wish no state parameter be sent to the Spotify API,
-            use null or an empty string disable the feature.
+            use null or an empty string to disable the feature.
 
         .PARAMETER Scopes
 
@@ -57,7 +57,7 @@ Function Initialize-SpotifyAuthorizationCodeFlow {
         .PARAMETER ShowDialog
 
             Whether or not to force the user to approve the app again if they’ve already done so. If false (default), a user who has already approved
-            the application may be automatically redirected to the URI specified by redirect_uri. If true, the user will not be automatically
+            the application may be automatically redirected to the URI specified by CallbackUrl. If true, the user will not be automatically
             redirected and will have to approve the app again.
 
         .PARAMETER RefreshToken

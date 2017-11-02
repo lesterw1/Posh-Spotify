@@ -33,6 +33,10 @@ Function Get-SpotifyDefaultSession {
             Get the current default session information with Spotify. Includes information such as Refresh and Access token. Each Spotify environment
             configuration can have zero or more user sessions where the first session in the array is considered to be default.
 
+        .PARAMETER RefreshIfExpired
+
+            If the default session is expired, attempt to re-initialize the session.
+
         .PARAMETER SpotifyEnv
 
             A string matching a key in the Spotify environment configuration hashtable to be used when making Spotify API calls. If this parameter is
@@ -45,12 +49,19 @@ Function Get-SpotifyDefaultSession {
     [CmdletBinding()]
     [OutputType('NewGuy.PoshSpotify.AuthenticationToken')]
 
-    Param([ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
+    Param([switch]$RefreshIfExpired,
+          [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
 
     Process {
 
         # If a UserSessions array exist, return a copy of the first (default) session.
         If ($script:SpotifyEnvironmentInfo[$SpotifyEnv].Keys -contains 'UserSessions') {
+
+            # Refresh the token first if needed.
+            If ($RefreshIfExpired) {
+                Initialize-SpotifySession -SpotifyEnv $SpotifyEnv
+            }
+
             $userSess = [NewGuy.PoshSpotify.AuthenticationToken]::new()
 
             $userSess.AccessToken = $script:SpotifyEnvironmentInfo[$SpotifyEnv].UserSessions[0].AccessToken
@@ -208,20 +219,42 @@ Function Initialize-SpotifySession {
 
         .DESCRIPTION
 
-            Initializes the user session information and authenticates with Spotify. If an AuthenticationToken object is given that object will be
-            updated with the newly initialized session. If none is provided then the default user session of the Spotify environment configuration
-            will be updated. If none are initialized, an entirely new session will be initialized which will result in a user login request.
+            Initializes the user session information and authenticates with Spotify. Authentication and authorization will occur in following ways:
+
+            - If a previously acquired user session's AuthenticationToken is given, that token will be updated with the newly initialized session. If
+              the provided user session has not yet expired it will not be refreshed by default.
+
+            - If no user session is not provided then the default user session's AuthenticationToken of the Spotify environment configuration will be
+              updated. If the default user session has not yet expired it will not be refreshed by default.
+
+            - If the environment does not have any initialized sessions, an entirely new session will be initialized which will result in a user login
+              to Spotify via the user's default browser. This process will progress as follows:
+
+                - The user will be directed to the Spotify login page via their default browser where the user will login to Spotify. This module
+                  will block the return of the command line while this happens. If the user is already logged into Spotify they will be immediately
+                  directed to the authorization page.
+
+                - After login, the authorization page will ask the user to approve your application (i.e. this module). A list of user permission
+                  scopes configured through the environment configuration will be presented to the user for approval. If the user has already accepted
+                  your application and the requested scopes previously, the user will be immediately redirected to your CallbackUrl.
+
+                - After authroziation, the user will be directed to your CallbackUrl configured through the environment configuration.
 
             For details on Spotfy authentication please see https://github.com/The-New-Guy/Posh-Spotify.
 
         .PARAMETER AuthenticationToken
 
-            An AuthenticationToken object. AuthenthicationTokens can be retrieved using one of the authentication commands such as the
-            Initialize-SpotifyAuthorizationCodeFlow command.
+            An AuthenticationToken object. AuthenthicationTokens, which represent user sessions, can be retrieved using one of the authentication
+            commands such as the Initialize-SpotifyAuthorizationCodeFlow command.
 
-        .PARAMETER Force
+        .PARAMETER ForceRefresh
 
-            Forces a re-initialization of the default session if one was already previously initialized for the current session.
+            Forces a refresh of the provided user session (AuthenticationToken) or the environment's default user session even if the session has not
+            yet expired. This should only be used if there is a need to refresh the token before it has expired. No user login is required.
+
+        .PARAMETER ForceAuth
+
+            Forces a full re-authentication with the user which will result in a user login request.
 
         .PARAMETER PassThru
 
@@ -240,7 +273,8 @@ Function Initialize-SpotifySession {
     [OutputType('NewGuy.PoshSpotify.AuthenticationToken')]
 
     Param([NewGuy.PoshSpotify.AuthenticationToken]$AuthenticationToken,
-          [switch]$Force,
+          [switch]$ForceAuth,
+          [switch]$ForceRefresh,
           [switch]$PassThru,
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
 
@@ -257,8 +291,8 @@ Function Initialize-SpotifySession {
         Else { $OriginalToken = [NewGuy.PoshSpotify.AuthenticationToken]::new() }
 
         # Check the status of the token and initialize a new one if needed.
-        If (!$Force -and $OriginalToken.AccessToken -and ($OriginalToken.ExpiresOn -gt (Get-Date))) { $NewToken = $OriginalToken }
-        ElseIf (!$Force -and $OriginalToken.RefreshToken) { $NewToken = Initialize-SpotifyAuthorizationCodeFlow -RefreshToken $OriginalToken.RefreshToken }
+        If (!$ForceAuth -and !$ForceRefresh -and $OriginalToken.AccessToken -and ($OriginalToken.ExpiresOn -gt (Get-Date))) { $NewToken = $OriginalToken }
+        ElseIf (!$ForceAuth -and $OriginalToken.RefreshToken) { $NewToken = Initialize-SpotifyAuthorizationCodeFlow -RefreshToken $OriginalToken.RefreshToken }
         Else { $NewToken = Initialize-SpotifyAuthorizationCodeFlow }
 
         # Keep previously recorded scopes if new authorization object doesn't contain any.
@@ -287,55 +321,6 @@ Function Initialize-SpotifySession {
 Export-ModuleMember -Function 'Initialize-SpotifySession'
 
 #endregion Initialize-SpotifySession
-
-#====================================================================================================================================================
-###################################
-## Get-SpotifyDefaultAccessToken ##
-###################################
-
-#region Get-SpotifyDefaultAccessToken
-
-Function Get-SpotifyDefaultAccessToken {
-
-    <#
-
-        .SYNOPSIS
-
-            Returns the current default user session Access Token or $null if not initialized.
-
-        .DESCRIPTION
-
-            Returns the current default user session Access Token or $null if not initialized. Each Spotify environment configuration can have zero or
-            more user sessions where the first session in the array is considered to be default.
-
-        .PARAMETER IsRequired
-
-            If this switch is given, terminating errors will occur if a user session Access Token has not yet been initialized.
-
-        .PARAMETER SpotifyEnv
-
-            A string matching a key in the Spotify environment configuration hashtable to be used when making Spotify API calls. If this parameter is
-            not specified it will use the current default environment configuration.
-
-            For details on environment configurations please see https://github.com/The-New-Guy/Posh-Spotify.
-
-    #>
-
-    [CmdletBinding()]
-    [OutputType([string])]
-
-    Param([switch]$IsRequired,
-          [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
-
-    If ($script:SpotifyEnvironmentInfo[$SpotifyEnv].UserSessions[0].AccessToken) { Return $script:SpotifyEnvironmentInfo[$SpotifyEnv].UserSessions[0].AccessToken }
-    ElseIf ($IsRequired) { Throw 'An Access Token is required for this procedure. Either provide an Access Token to the -AccessToken parameter or configure a new session with the Initialize-SpotifySession command.' }
-    Else { Return $null }
-
-}
-
-Export-ModuleMember -Function 'Get-SpotifyDefaultAccessToken'
-
-#endregion Get-SpotifyDefaultAccessToken
 
 #====================================================================================================================================================
 #############################
@@ -397,3 +382,58 @@ Export-ModuleMember -Function 'Add-SpotifyCommandAlias'
 #endregion Spotify Default Session Functions
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+#################################################
+## Spotify Default Session Functions - Private ##
+#################################################
+
+#region Spotify Default Session Functions - Private
+
+#====================================================================================================================================================
+###################################
+## Get-SpotifyDefaultAccessToken ##
+###################################
+
+#region Get-SpotifyDefaultAccessToken
+
+Function Get-SpotifyDefaultAccessToken {
+
+    <#
+
+        .SYNOPSIS
+
+            Returns the current default user session Access Token or $null if not initialized.
+
+        .DESCRIPTION
+
+            Returns the current default user session Access Token or $null if not initialized. Each Spotify environment configuration can have zero or
+            more user sessions where the first session in the array is considered to be default.
+
+        .PARAMETER IsRequired
+
+            If this switch is given, terminating errors will occur if a user session Access Token has not yet been initialized.
+
+        .PARAMETER SpotifyEnv
+
+            A string matching a key in the Spotify environment configuration hashtable to be used when making Spotify API calls. If this parameter is
+            not specified it will use the current default environment configuration.
+
+            For details on environment configurations please see https://github.com/The-New-Guy/Posh-Spotify.
+
+    #>
+
+    [CmdletBinding()]
+    [OutputType([string])]
+
+    Param([switch]$IsRequired,
+          [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
+
+    If (($script:SpotifyEnvironmentInfo[$SpotifyEnv].UserSessions[0]).AccessToken) { Return (Get-SpotifyDefaultSession -SpotifyEnv $SpotifyEnv -RefreshIfExpired).AccessToken }
+    ElseIf ($IsRequired) { Throw 'An Access Token is required for this procedure. Either provide an Access Token to the -AccessToken parameter or configure a new session with the Initialize-SpotifySession command.' }
+    Else { Return $null }
+
+}
+
+#endregion Get-SpotifyDefaultAccessToken
+
+#endregion Spotify Default Session Functions - Private
