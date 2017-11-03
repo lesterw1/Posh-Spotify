@@ -55,7 +55,8 @@ Function Get-SpotifyDefaultSession {
     Process {
 
         # If a UserSessions array exist, return a copy of the first (default) session.
-        If ($script:SpotifyEnvironmentInfo[$SpotifyEnv].Keys -contains 'UserSessions') {
+        If (($script:SpotifyEnvironmentInfo[$SpotifyEnv].Keys -contains 'UserSessions') -and
+            ($script:SpotifyEnvironmentInfo[$SpotifyEnv].UserSessions -gt 0)) {
 
             # Refresh the token first if needed.
             If ($RefreshIfExpired) {
@@ -288,7 +289,7 @@ Function Initialize-SpotifySession {
         # If a user provides a token use that, otherwise find the default for the provided environment.
         If ($AuthenticationToken) { $OriginalToken = $AuthenticationToken }
         ElseIf ($null -ne $script:SpotifyEnvironmentInfo[$SpotifyEnv].UserSessions[0]) { $OriginalToken = $script:SpotifyEnvironmentInfo[$SpotifyEnv].UserSessions[0] }
-        Else { $OriginalToken = [NewGuy.PoshSpotify.AuthenticationToken]::new() }
+        Else { $script:SpotifyEnvironmentInfo[$SpotifyEnv].UserSessions += $OriginalToken = [NewGuy.PoshSpotify.AuthenticationToken]::new() }
 
         # Check the status of the token and initialize a new one if needed.
         If (!$ForceAuth -and !$ForceRefresh -and $OriginalToken.AccessToken -and ($OriginalToken.ExpiresOn -gt (Get-Date))) { $NewToken = $OriginalToken }

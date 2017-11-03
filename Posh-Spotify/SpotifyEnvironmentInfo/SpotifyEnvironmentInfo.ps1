@@ -21,6 +21,16 @@ $script:SpotifyEnvironmentInfo = @{
 
         # Optional keys.
 
+        CallbackUrl = 'http://localhost:8080/callback/'
+        Scopes = @(
+            'user-modify-playback-state',
+            'user-read-playback-state',
+            'user-read-private',
+            'user-modify-playback-state',
+            'user-read-playback-state',
+            'user-read-private'
+        )
+
         # ProxyServer = 'your-proxy-01.domain.local'
         # ProxyPort = 8080
         # ProxyBypassList = @('*.domain.local', '*.otherdomain.local')
@@ -39,6 +49,16 @@ $script:SpotifyEnvironmentInfo = @{
 
         # Optional keys.
 
+        CallbackUrl = 'http://localhost:8080/callback/'
+        Scopes = @(
+            'user-modify-playback-state',
+            'user-read-playback-state',
+            'user-read-private',
+            'user-modify-playback-state',
+            'user-read-playback-state',
+            'user-read-private'
+        )
+
         # ProxyServer = 'your-proxy-01.domain.local'
         # ProxyPort = 8080
         # ProxyBypassList = @('*.domain.local', '*.otherdomain.local')
@@ -56,6 +76,16 @@ $script:SpotifyEnvironmentInfo = @{
         SecretKeyEncrypted = 'Big long protected SecureString converted to a standard string (though encrypted) all on one line here'
 
         # Optional keys.
+
+        CallbackUrl = 'http://localhost:8080/callback/'
+        Scopes = @(
+            'user-modify-playback-state',
+            'user-read-playback-state',
+            'user-read-private',
+            'user-modify-playback-state',
+            'user-read-playback-state',
+            'user-read-private'
+        )
 
         # ProxyServer = 'your-proxy-01.domain.local'
         # ProxyPort = 8080

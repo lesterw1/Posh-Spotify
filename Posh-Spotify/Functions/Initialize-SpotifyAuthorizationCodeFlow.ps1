@@ -105,6 +105,16 @@ Function Initialize-SpotifyAuthorizationCodeFlow {
 
             #region Get Authorization Code
 
+            # If no CallbackUrl was given, see if there is an environment specific CallbackUrl, otherwise use the default above.
+            If (($null -eq $PSBoundParameters['CallbakUrl']) -and ($null -ne $script:SpotifyEnvironmentInfo[$SpotifyEnv].CallbackUrl)) {
+                $CallbackUrl = $script:SpotifyEnvironmentInfo[$SpotifyEnv].CallbackUrl
+            }
+
+            # If no Scopes were given, see if there is an environment specific set of scopes.
+            If (($null -eq $PSBoundParameters['Scopes']) -and ($script:SpotifyEnvironmentInfo[$SpotifyEnv].Scopes -gt 0)) {
+                $Scopes = $script:SpotifyEnvironmentInfo[$SpotifyEnv].Scopes
+            }
+
             $spotifyAuthUrl = "https://$script:SpotifyAccountsApiHostname/authorize/"
             $spotifyAuthUrl += "?client_id=$($script:SpotifyEnvironmentInfo[$SpotifyEnv].ClientId)"
             $spotifyAuthUrl += '&response_type=code'

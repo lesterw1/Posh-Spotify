@@ -519,6 +519,16 @@ Function Test-SpotifyEnvInfoFormat {
 
                     # Optional keys.
 
+                    $CallbackUrl = 'http://localhost:8080/callback/'
+                    $Scopes = @(
+                        'user-modify-playback-state',
+                        'user-read-playback-state',
+                        'user-read-private',
+                        'user-modify-playback-state',
+                        'user-read-playback-state',
+                        'user-read-private'
+                    )
+
                     # ProxyServer = 'your-proxy-01.domain.local'
                     # ProxyPort = 8080
                     # ProxyBypassList = @('*.domain.local', '*.otherdomain.local')
@@ -542,6 +552,16 @@ Function Test-SpotifyEnvInfoFormat {
 
                     # Optional keys.
 
+                    $CallbackUrl = 'http://localhost:8080/callback/'
+                    $Scopes = @(
+                        'user-modify-playback-state',
+                        'user-read-playback-state',
+                        'user-read-private',
+                        'user-modify-playback-state',
+                        'user-read-playback-state',
+                        'user-read-private'
+                    )
+
                     # ProxyServer = 'your-proxy-01.domain.local'
                     # ProxyPort = 8080
                     # ProxyBypassList = @('*.domain.local', '*.otherdomain.local')
@@ -564,6 +584,16 @@ Function Test-SpotifyEnvInfoFormat {
                     SecretKeyEncrypted = 'Big long protected SecureString represented as a string on 1 line here'
 
                     # Optional keys.
+
+                    $CallbackUrl = 'http://localhost:8080/callback/'
+                    $Scopes = @(
+                        'user-modify-playback-state',
+                        'user-read-playback-state',
+                        'user-read-private',
+                        'user-modify-playback-state',
+                        'user-read-playback-state',
+                        'user-read-private'
+                    )
 
                     # ProxyServer = 'your-proxy-01.domain.local'
                     # ProxyPort = 8080
@@ -632,6 +662,20 @@ Function Test-SpotifyEnvInfoFormat {
                 (($script:SpotifyEnvironmentInfo[$env].SecretKeyEncrypted -isnot [string]) -or
                  ($script:SpotifyEnvironmentInfo[$env].SecretKeyEncrypted.Length -eq 0))) {
                 Throw "The $env key in the SpotifyEnvironmentInfo hashtable has a SecretKeyEncrypted key in the wrong format. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
+            }
+
+            ## Check optional CallbackUrl and Scopes keys. ##
+
+            # The 'CallbackUrl' should contain the callback URL registered with Spotify and will be used to redirect users to after authentication.
+            If (($script:SpotifyEnvironmentInfo[$env].CallbackUrl -ne $null) -and
+                (($script:SpotifyEnvironmentInfo[$env].CallbackUrl -isnot [string]) -or
+                 ($script:SpotifyEnvironmentInfo[$env].CallbackUrl.Length -eq 0))) {
+                Throw "The $env key in the SpotifyEnvironmentInfo hashtable has a CallbackUrl key in the wrong format. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
+            }
+
+            # The 'Scopes' should contain a list of strings that representing the permission scopes you are requesting access for during authentication.
+            If (($script:SpotifyEnvironmentInfo[$env].Scopes -ne $null) -and ($script:SpotifyEnvironmentInfo[$env].Scopes -isnot [array])) {
+                Throw "The $env key in the SpotifyEnvironmentInfo hashtable has a CallbackUrl key in the wrong format. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
             }
 
             ## Check optional proxy keys. ##
