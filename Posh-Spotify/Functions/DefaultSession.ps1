@@ -56,7 +56,7 @@ Function Get-SpotifyDefaultSession {
 
         # If a UserSessions array exist, return a copy of the first (default) session.
         If (($script:SpotifyEnvironmentInfo[$SpotifyEnv].Keys -contains 'UserSessions') -and
-            ($script:SpotifyEnvironmentInfo[$SpotifyEnv].UserSessions -gt 0)) {
+            ($script:SpotifyEnvironmentInfo[$SpotifyEnv].UserSessions.Count -gt 0)) {
 
             # Refresh the token first if needed.
             If ($RefreshIfExpired) {
