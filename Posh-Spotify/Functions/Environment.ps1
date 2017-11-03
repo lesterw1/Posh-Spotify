@@ -675,7 +675,7 @@ Function Test-SpotifyEnvInfoFormat {
 
             # The 'Scopes' should contain a list of strings that representing the permission scopes you are requesting access for during authentication.
             If (($script:SpotifyEnvironmentInfo[$env].Scopes -ne $null) -and ($script:SpotifyEnvironmentInfo[$env].Scopes -isnot [array])) {
-                Throw "The $env key in the SpotifyEnvironmentInfo hashtable has a CallbackUrl key in the wrong format. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
+                Throw "The $env key in the SpotifyEnvironmentInfo hashtable has a Scopes key in the wrong format. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
             }
 
             ## Check optional proxy keys. ##
