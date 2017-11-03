@@ -2,7 +2,7 @@
 
 This is a PowerShell module that contains a set of wrapper functions for retrieving and managing Spotify content via the Spotify Web API. Authentication is required for all Spotify API requests whether you are accessing public resources or not. After authentication you will be provided with a temporary Access Token that must be provided on every API request. The core command this module provides is `Invoke-SpotifyRequest` which will handle the formatting and proper encoding of your Access Token as well as any other parameters needed for the API request. This command can be used for most all Spotify Web API endpoints.
 
-This module also provides a number of commands used to keep track of your current application's credentials, your current Access Token and associated Refresh Token, as well as several commands for initiating authentication and acquiring these tokens. Once the module is configured with these things the configurations can be exported to disk in a secure manner allowing you to easily re-import them between PowerShell sessions. See the [Optional Profile Configuration](#Profile) section below for details.
+This module also provides a number of commands used to automatically keep track of your current application's credentials, your current Access Token and associated Refresh Token, as well as several commands for initiating authentication and acquiring these tokens. Once the module is configured with these parameters the configurations can be exported to disk in a secure manner allowing you to easily re-import them between PowerShell sessions. See the [Optional Profile Configuration](#Profile) section below for details.
 
 The bulk of the commands provided by this module are wrappers around the individual Spotify Web API endpoints and all use the `Invoke-SpotifyRequest` command mentioned above. Some of the features these additional commands provide are listed below. There are plans to add many more featues later (ex. Playlist Modification, Search Features, etc.). In the meantime any feature this module does not have a command for should be possible via the `Invoke-SpotifyRequest` command and the appropriate Spotify Web API endpoint.
 
@@ -65,19 +65,79 @@ Once you have registered with Spotify you can install the module. If you have no
 
 ## <a name="SpotifyEnvConfig"></a> Spotify Environment Configuration
 
+### Quick Start
 
+This module has two required pramaters needed for configuration and several optional parameters. There are a few different methods in which these parameters can be configured but the quick start instructions are below. Note that [registration](#Register) of you app is still required.
 
+1. Import the module and configure your ClientId and SecretKey.
 
+```powershell
+# Import the module.
+Import-Module Posh-Spotify
 
+# Gather your ClientId and SecretKey. It can be plain text or encrypted SecureString as seen below.
+$ClientId = 'xxxxxxxxxxxxxxxxxxxx'
+$SecretKeyEncrypted = ConvertFrom-SecureString (ConvertTo-SecureString -String 'yourSecretKeyHere' -AsPlainText -Force)
 
+# Get a copy of the default module configuration (includes pre-configured CallbackUrl and Scopes).
+$EnvInfo = Get-SpotifyEnvironmentInfo
 
+# Add your ClientId and SecretKey.
+$EnvInfo.Home.ClientId = $ClientId
+$EnvInfo.Home.SecretKeyEncrypted = $SecretKeyEncrypted
 
+# Set your modified copy of the environment configuration back to the module.
+Set-SpotifyEnvironmentInfo $EnvInfo Home
+```
 
+2. Initialize a session. This will require user login to Spotify. The command below will open the user's default browser and direct them to the Spotify login page. Once the user has logged in and accepted the requested user permission scopes they will be redirected back to a CallbackUrl. The default for CallbackUrl for this module is `http://localhost:8080/callback/`.
 
+```powershell
+Initialize-SpotifySession
+```
 
+3. Assuming the user authenticated and accepted the authorization request, your module is now ready to run commands. Try the following to make sure everything works.
 
+```powershell
+# List your devices registered with Spotify.
+Get-SpotifyDevice
 
+# List your environment and new acquired tokens.
+(Get-SpotifyEnvironmentInfo).Home
 
+# List your current default user session.
+Get-SpotifyDefaultSession
+```
+
+4. Use the following to save your environment configuration and newly acquired AccessToken/RefreshToken pair so that you can easily reload between PowerShell sessions.
+
+```powershell
+# This will save your configuration to $env:APPDATA by default.
+# Timestamps are added to the end of the filename for saved configuration files by default.
+# Use -FilePath to specify a custom location.
+Save-SpotifyEnvironmentInfo
+```
+
+5. Later you can use the following to reload your configuration in a new PowerShell session.
+
+```powershell
+# This will by default look in the $env:APPDATA location for your configuration.
+Import-SpotifyEnvironmentInfo
+
+# Run commands.
+```
+
+6. **[OPTIONAL]** Add command aliases (ex. Play/Pause, Skip/SkipBack).
+
+```powershell
+Add-SpotifyCommandAlias
+```
+
+This is just the quick start to getting a personal environment setup and configured. There are many other ways to configure the module and a few more options that can be modified as needed. To get more details on advanced configuration of the module and profile customization continue to the following sections.
+
+### Module Configuration Explanation
+
+**STILL WORKING ON THIS SECTION**
 
 
 In order to make Spotify API calls this module will need on each request an Access Token
@@ -85,25 +145,22 @@ In order to make Spotify API calls this module will need on each request an Acce
 
  the *Client ID* and *Secret Key* provided to you for your application during the registration process. If you do not have a Spotify Client ID and Secret Key please refer the previous section, [Register With Spotify](#Register), for details.
 
-
 For convenience this module will not request this id and secret key on every request but instead will require prior configuration :
 
-- **Spotify API Integration Key** - Application specific API integration key retrieved from your Spotify Admin (ex. DIxxxxxxxxxxxxxxxxxx).
-- **Spotify API Secret Key** - Secret key associated with the integration key.
-- **Spotify API Hostname** - Environment specific API host that will handle the API calls (ex. api-nnnnnxnx.Spotifysecurity.com).
+- **Spotify API Client ID Key** - Application specific API client id key retrieved from your Spotify Developer registration.
+- **Spotify API Secret Key** - Secret key associated with the client id key.
 
 To avoid typing in this information for every Spotify API call, this module will use an internal hashtable to maintain this information for each application environment. The hashtable will support multiple application environments (integration keys) and will support the Spotify Secret Key being stored as either a plain text string or an encrypted SecureString. This hashtable will have the following format where the keys to the main hashtable are the application environments:
 
 ``` powershell
 SpotifyEnvironmentInfo = @{
 
-    Prod = @{
+    Home = @{
 
         # Required Keys.
 
         ClientId = 'DIxxxxxxxxxxxxxxxxxx'
-        SecretKey = 'YourSecretsHere'
-        ApiHostname = 'api-nnnnnxnx.Spotifysecurity.com'
+        SecretKeyEncrypted = 'Big long protected SecureString represented as a string on 1 line here'
 
         # Optional keys.
 
@@ -116,13 +173,12 @@ SpotifyEnvironmentInfo = @{
 
     }
 
-    Test = @{
+    Work = @{
 
         # Required Keys.
 
         ClientId = 'DIxxxxxxxxxxxxxxxxxx'
         SecretKeyEncrypted = 'Big long protected SecureString represented as a string on 1 line here'
-        ApiHostname = 'api-nnnnnxnx.Spotifysecurity.com'
 
         # Optional keys.
 
@@ -135,13 +191,12 @@ SpotifyEnvironmentInfo = @{
 
     }
 
-    Dev = @{
+    Test = @{
 
         # Required Keys.
 
         ClientId = 'DIxxxxxxxxxxxxxxxxxx'
-        SecretKeyEncrypted = 'Big long protected SecureString represented as a string on 1 line here'
-        ApiHostname = 'api-nnnnnxnx.Spotifysecurity.com'
+        SecretKey = 'YourSecretsHere'
 
         # Optional keys.
 
@@ -163,7 +218,6 @@ SpotifyEnvironmentInfo = @{
 
     1. **ClientId** - The Spotify integration key.
     2. **SecretKey/SecretKeyEncrypted** - The Spotify secret key associated with the integration key. If the **SecretKey** key is used then the secret key is in plain text. If the **SecretKeyEncrypted** key is used then the secret key is a string representation of a standard *SecureString*. If both keys are used only the **SecretKeyEncrypted** key will be used.
-    3. **ApiHostname** - The hostname of the API host used to process the API calls.
 
 4. The inner hashtable can optionally have the following keys:
 
@@ -180,7 +234,6 @@ Once this information has been given to the module you can make Spotify API call
 The Spotify application environment details can be provided in one of the following ways:
 
 - [SpotifyEnvironmentInfo.ps1 File](#SpotifyEnvFile) - Provide environment info prior to importing the module. This is the only method that will persist in new PowerShell sessions.
-- [ArgumentList Configuration](#SpotifyEnvArgumentList) - Provide environment info during the module import process.
 - [Set-SpotifyEnvironmentInfo](#SpotifyEnvArgumentList) - Provide environment info after the module has been imported.
 - [Proxy Configuration](#Proxy) - Provide proxy server conifguration info after the environment info has already be configured.
 

@@ -6,18 +6,18 @@
 
 # A hashtable key used to get the default Spotify environment configuration that will be used for API requests when one is not given by the user.
 # This will be set when configuring the module. (Set-SpotifyEnvironmentInfo, Import-SpotifyEnvironmentInfo)
-$script:SpotifyDefaultEnv = 'Prod'
+$script:SpotifyDefaultEnv = 'Home'
 
 # A hashtable of one or more Spotify environment configurations that will be used for API requests.
 # This will be set when configuring the module. (Set-SpotifyEnvironmentInfo, Import-SpotifyEnvironmentInfo)
 $script:SpotifyEnvironmentInfo = @{
 
-    Prod = @{
+    Home = @{
 
         # Required Keys.
 
         ClientId = 'xxxxxxxxxxxxxxxxxxxx'
-        SecretKey = 'YourSecretsHere'
+        SecretKeyEncrypted = 'Big long protected SecureString converted to a standard string (though encrypted) all on one line here'
 
         # Optional keys.
 
@@ -40,58 +40,58 @@ $script:SpotifyEnvironmentInfo = @{
 
     }
 
-    Test = @{
+    # Work = @{
 
-        # Required Keys.
+    #     # Required Keys.
 
-        ClientId = 'xxxxxxxxxxxxxxxxxxxx'
-        SecretKeyEncrypted = 'Big long protected SecureString converted to a standard string (though encrypted) all on one line here'
+    #     ClientId = 'xxxxxxxxxxxxxxxxxxxx'
+    #     SecretKeyEncrypted = 'Big long protected SecureString converted to a standard string (though encrypted) all on one line here'
 
-        # Optional keys.
+    #     # Optional keys.
 
-        CallbackUrl = 'http://localhost:8080/callback/'
-        Scopes = @(
-            'user-modify-playback-state',
-            'user-read-playback-state',
-            'user-read-private',
-            'user-modify-playback-state',
-            'user-read-playback-state',
-            'user-read-private'
-        )
+    #     CallbackUrl = 'http://localhost:8080/callback/'
+    #     Scopes = @(
+    #         'user-modify-playback-state',
+    #         'user-read-playback-state',
+    #         'user-read-private',
+    #         'user-modify-playback-state',
+    #         'user-read-playback-state',
+    #         'user-read-private'
+    #     )
 
-        # ProxyServer = 'your-proxy-01.domain.local'
-        # ProxyPort = 8080
-        # ProxyBypassList = @('*.domain.local', '*.otherdomain.local')
-        # ProxyBypassOnLocal = $true
-        # ProxyUsername = 'janedoe'
-        # ProxyPasswordEncrypted = 'Big long protected SecureString converted to a standard string (though encrypted) all on one line here'
+    #     # ProxyServer = 'your-proxy-01.domain.local'
+    #     # ProxyPort = 8080
+    #     # ProxyBypassList = @('*.domain.local', '*.otherdomain.local')
+    #     # ProxyBypassOnLocal = $true
+    #     # ProxyUsername = 'janedoe'
+    #     # ProxyPasswordEncrypted = 'Big long protected SecureString converted to a standard string (though encrypted) all on one line here'
 
-    }
+    # }
 
-    Dev = @{
+    # Test = @{
 
-        # Required Keys.
+    #     # Required Keys.
 
-        ClientId = 'xxxxxxxxxxxxxxxxxxxx'
-        SecretKeyEncrypted = 'Big long protected SecureString converted to a standard string (though encrypted) all on one line here'
+    #     ClientId = 'xxxxxxxxxxxxxxxxxxxx'
+    #     SecretKey = 'YourSecretsHere'
 
-        # Optional keys.
+    #     # Optional keys.
 
-        CallbackUrl = 'http://localhost:8080/callback/'
-        Scopes = @(
-            'user-modify-playback-state',
-            'user-read-playback-state',
-            'user-read-private',
-            'user-modify-playback-state',
-            'user-read-playback-state',
-            'user-read-private'
-        )
+    #     CallbackUrl = 'http://localhost:8080/callback/'
+    #     Scopes = @(
+    #         'user-modify-playback-state',
+    #         'user-read-playback-state',
+    #         'user-read-private',
+    #         'user-modify-playback-state',
+    #         'user-read-playback-state',
+    #         'user-read-private'
+    #     )
 
-        # ProxyServer = 'your-proxy-01.domain.local'
-        # ProxyPort = 8080
-        # ProxyBypassList = @('*.domain.local', '*.otherdomain.local')
-        # ProxyBypassOnLocal = $true
-        # ProxyUseDefaultCredentials = $true
+    #     # ProxyServer = 'your-proxy-01.domain.local'
+    #     # ProxyPort = 8080
+    #     # ProxyBypassList = @('*.domain.local', '*.otherdomain.local')
+    #     # ProxyBypassOnLocal = $true
+    #     # ProxyUseDefaultCredentials = $true
 
-    }
+    # }
 }
