@@ -567,7 +567,7 @@ Function Set-SpotifyRequestProxy {
     }
 }
 
-#region Set-SpotifyRequestProxy
+#endregion Set-SpotifyRequestProxy
 
 #endregion Utility Functions
 
