@@ -326,7 +326,7 @@ Both the *Authorization Code* and *Implicit Grant* authentication workflows requ
 
 For more details on Spotify authentication workflows see the following: https://developer.spotify.com/web-api/authorization-guide/
 
-Currently this module supports the following authentication workflows. If a workflow is not present here it can still be acomplished with **Invoke-SpotifyRequest**.
+Currently this module supports the following authentication workflows. If a workflow is not present here it can still be acomplished with **Invoke-SpotifyRequest**. Note that the **Initialize-SpotifySession** uses the *Authorization Code* workflow and automatically adds the acquired user session to the environment configuration's `UserSessions` array if not already.
 
 ##### Authroziation Code Flow
 
