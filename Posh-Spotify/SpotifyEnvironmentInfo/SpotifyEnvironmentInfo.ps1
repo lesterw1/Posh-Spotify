@@ -22,7 +22,7 @@ $script:SpotifyEnvironmentInfo = @{
         # Optional keys.
 
         CallbackUrl = 'http://localhost:8080/callback/'
-        Scopes = @(
+        DefaultScopes = @(
             'user-modify-playback-state',
             'user-read-playback-state',
             'user-read-private',
@@ -50,7 +50,7 @@ $script:SpotifyEnvironmentInfo = @{
     #     # Optional keys.
 
     #     CallbackUrl = 'http://localhost:8080/callback/'
-    #     Scopes = @(
+    #     DefaultScopes = @(
     #         'user-modify-playback-state',
     #         'user-read-playback-state',
     #         'user-read-private',
@@ -78,7 +78,7 @@ $script:SpotifyEnvironmentInfo = @{
     #     # Optional keys.
 
     #     CallbackUrl = 'http://localhost:8080/callback/'
-    #     Scopes = @(
+    #     DefaultScopes = @(
     #         'user-modify-playback-state',
     #         'user-read-playback-state',
     #         'user-read-private',

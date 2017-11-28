@@ -308,11 +308,11 @@ Function Initialize-SpotifySession {
         $OriginalToken.Scopes = $NewToken.Scopes
         $OriginalToken.TokenType = $NewToken.TokenType
 
-        # Since we simply updated the values of the original AuthenticationToken object, whether that came from the user or as the default user
+        # Since we simply updated the values of the original AuthenticationToken object, whether it came from the user or as the default user
         # session for the given environment, we don't need to update the UserSessions lists nor does the user have to worry about working with a new
         # object.
 
-        # Pass the object on thru if requested and if originally provided by the user.
+        # Pass the object on thru if requested and only if originally provided by the user.
         If ($PassThru -and $AuthenticationToken) { Return $OriginalToken }
 
     }

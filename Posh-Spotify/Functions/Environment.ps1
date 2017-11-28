@@ -519,8 +519,8 @@ Function Test-SpotifyEnvInfoFormat {
 
                     # Optional keys.
 
-                    $CallbackUrl = 'http://localhost:8080/callback/'
-                    $Scopes = @(
+                    CallbackUrl = 'http://localhost:8080/callback/'
+                    DefaultScopes = @(
                         'user-modify-playback-state',
                         'user-read-playback-state',
                         'user-read-private',
@@ -552,8 +552,8 @@ Function Test-SpotifyEnvInfoFormat {
 
                     # Optional keys.
 
-                    $CallbackUrl = 'http://localhost:8080/callback/'
-                    $Scopes = @(
+                    CallbackUrl = 'http://localhost:8080/callback/'
+                    DefaultScopes = @(
                         'user-modify-playback-state',
                         'user-read-playback-state',
                         'user-read-private',
@@ -585,8 +585,8 @@ Function Test-SpotifyEnvInfoFormat {
 
                     # Optional keys.
 
-                    $CallbackUrl = 'http://localhost:8080/callback/'
-                    $Scopes = @(
+                    CallbackUrl = 'http://localhost:8080/callback/'
+                    DefaultScopes = @(
                         'user-modify-playback-state',
                         'user-read-playback-state',
                         'user-read-private',
@@ -664,7 +664,7 @@ Function Test-SpotifyEnvInfoFormat {
                 Throw "The $env key in the SpotifyEnvironmentInfo hashtable has a SecretKeyEncrypted key in the wrong format. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
             }
 
-            ## Check optional CallbackUrl and Scopes keys. ##
+            ## Check optional CallbackUrl and DefaultScopes keys. ##
 
             # The 'CallbackUrl' should contain the callback URL registered with Spotify and will be used to redirect users to after authentication.
             If (($script:SpotifyEnvironmentInfo[$env].CallbackUrl -ne $null) -and
@@ -673,9 +673,9 @@ Function Test-SpotifyEnvInfoFormat {
                 Throw "The $env key in the SpotifyEnvironmentInfo hashtable has a CallbackUrl key in the wrong format. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
             }
 
-            # The 'Scopes' should contain a list of strings that representing the permission scopes you are requesting access for during authentication.
-            If (($script:SpotifyEnvironmentInfo[$env].Scopes -ne $null) -and ($script:SpotifyEnvironmentInfo[$env].Scopes -isnot [array])) {
-                Throw "The $env key in the SpotifyEnvironmentInfo hashtable has a Scopes key in the wrong format. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
+            # The 'DefaultScopes' should contain a list of strings that representing the permission scopes you are requesting access for during authentication.
+            If (($script:SpotifyEnvironmentInfo[$env].DefaultScopes -ne $null) -and ($script:SpotifyEnvironmentInfo[$env].DefaultScopes -isnot [array])) {
+                Throw "The $env key in the SpotifyEnvironmentInfo hashtable has a DefaultScopes key in the wrong format. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
             }
 
             ## Check optional proxy keys. ##

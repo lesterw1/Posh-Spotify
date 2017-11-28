@@ -111,8 +111,8 @@ Function Initialize-SpotifyAuthorizationCodeFlow {
             }
 
             # If no Scopes were given, see if there is an environment specific set of scopes.
-            If (($null -eq $PSBoundParameters['Scopes']) -and ($script:SpotifyEnvironmentInfo[$SpotifyEnv].Scopes -gt 0)) {
-                $Scopes = $script:SpotifyEnvironmentInfo[$SpotifyEnv].Scopes
+            If (($null -eq $PSBoundParameters['Scopes']) -and ($script:SpotifyEnvironmentInfo[$SpotifyEnv].DefaultScopes -gt 0)) {
+                $Scopes = $script:SpotifyEnvironmentInfo[$SpotifyEnv].DefaultScopes
             }
 
             $spotifyAuthUrl = "https://$script:SpotifyAccountsApiHostname/authorize/"

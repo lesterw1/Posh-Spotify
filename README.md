@@ -163,7 +163,7 @@ SpotifyEnvironmentInfo = @{
         # Optional keys.
 
         CallbackUrl = 'http://localhost:8080/callback/'
-        Scopes = @(
+        DefaultScopes = @(
             'user-modify-playback-state',
             'user-read-playback-state',
             'user-read-private',
@@ -190,7 +190,7 @@ SpotifyEnvironmentInfo = @{
 
         # Optional keys.
 
-        Scopes = @(
+        DefaultScopes = @(
             'user-modify-playback-state',
             'user-read-playback-state',
             'user-read-private',
@@ -239,7 +239,7 @@ SpotifyEnvironmentInfo = @{
 4. The inner environment hashtable can optionally have the following keys:
 
     1. **CallbackUrl** - The callback url setup during registration. If not prsent the default will be `http://localhost:8080/callback/`.
-    2. **Scopes** - The set of user permission scopes that should be requested anytime a full authentication is required. The user must authorize the use of these scopes to obtain access to the commands that use them.
+    2. **DefaultScopes** - The default set of user permission scopes that should be requested anytime a full authentication is required. The user must authorize the use of these scopes to obtain access to the commands that use them.
     3. **ProxyServer** - The hostname of the proxy server used to connect to Spotify if a proxy server is required. All other proxy related keys will be ignored if this key is not present.
     4. **ProxyPort** - The port to use when connecting through the specified proxy server. Port 80 will be chosen if this key is not present.
     5. **ProxyBypassList** - The list of URIs that will not use the proxy. No bypass list will be used if this key is not present.
