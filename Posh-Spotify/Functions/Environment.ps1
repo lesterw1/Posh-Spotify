@@ -153,7 +153,7 @@ Function Save-SpotifyEnvironmentInfo {
 
         If (-not $NoTimestampAppend) {
             $ext = [IO.Path]::GetExtension($FilePath)
-            $FilePath = $FilePath -replace "$ext$","_$(Get-Date -Format 'HH.mm.ss_MMM.dd')$ext"
+            $FilePath = $FilePath -replace "$ext$","_$(Get-Date -Format 'yyyy.MM.dd_HH.mm.ss')$ext"
         }
 
     $script:SpotifyDefaultEnv, $script:SpotifyEnvironmentInfo | ConvertTo-Json -Depth 5 | Out-File $FilePath
