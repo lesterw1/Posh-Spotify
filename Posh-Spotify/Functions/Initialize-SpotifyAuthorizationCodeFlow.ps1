@@ -236,8 +236,8 @@ State : $State
 
             $AuthObj = [NewGuy.PoshSpotify.AuthenticationToken]::new($authZRes)
 
-            $AuthObj.RefreshToken = $RefreshToken  # Don't get a new Refresh Token so save the one we got.
-            If ($authZRes.scope) { $AuthObj.Scopes += $authZRes.scope -split ' ' }
+            # We don't get a new Refresh Token when doing a refresh operation so just save the one we already got.
+            $AuthObj.RefreshToken = $RefreshToken
 
             #endregion Get Access Token
 
