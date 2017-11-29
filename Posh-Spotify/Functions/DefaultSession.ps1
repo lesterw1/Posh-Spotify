@@ -296,11 +296,6 @@ Function Initialize-SpotifySession {
         ElseIf (!$ForceAuth -and $OriginalToken.RefreshToken) { $NewToken = Initialize-SpotifyAuthorizationCodeFlow -RefreshToken $OriginalToken.RefreshToken }
         Else { $NewToken = Initialize-SpotifyAuthorizationCodeFlow }
 
-        # Keep previously recorded scopes if new authorization object doesn't contain any.
-        If (($OriginalToken.Scopes.Count -gt 0) -and ($NewToken.Scopes.Count -eq 0)) {
-            $NewToken.Scopes = $OriginalToken.Scopes
-        }
-
         # Now update the original token with the new token's information.
         $OriginalToken.AccessToken = $NewToken.AccessToken
         $OriginalToken.RefreshToken = $NewToken.RefreshToken
