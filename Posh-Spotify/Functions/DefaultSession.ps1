@@ -293,8 +293,8 @@ Function Initialize-SpotifySession {
 
         # Check the status of the token and initialize a new one if needed.
         If (!$ForceAuth -and !$ForceRefresh -and $OriginalToken.AccessToken -and ($OriginalToken.ExpiresOn -gt (Get-Date))) { $NewToken = $OriginalToken }
-        ElseIf (!$ForceAuth -and $OriginalToken.RefreshToken) { $NewToken = Initialize-SpotifyAuthorizationCodeFlow -RefreshToken $OriginalToken.RefreshToken }
-        Else { $NewToken = Initialize-SpotifyAuthorizationCodeFlow }
+        ElseIf (!$ForceAuth -and $OriginalToken.RefreshToken) { $NewToken = Initialize-SpotifyAuthorizationCodeFlow -RefreshToken $OriginalToken.RefreshToken -SpotifyEnv $SpotifyEnv }
+        Else { $NewToken = Initialize-SpotifyAuthorizationCodeFlow -SpotifyEnv $SpotifyEnv }
 
         # Now update the original token with the new token's information.
         $OriginalToken.AccessToken = $NewToken.AccessToken
