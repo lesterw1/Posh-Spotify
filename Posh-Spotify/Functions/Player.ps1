@@ -254,16 +254,14 @@ Function Set-SpotifyPlayer {
 
         .PARAMETER DeviceId
 
-            The device for which this command targets. If neither DeviceId nor Device parameters are given then the currently active device of the
-            current user will be used.
+            The device for which this command targets.
 
             Currently Spotify API only supports one device ID.
 
         .PARAMETER Device
 
-            The device for which this command targets. If neither DeviceId nor Device parameters are given then the currently active device of the
-            current user will be used. This parameter accepts either Device objects returned from Get-SpotifyDevice or Player objects returned from
-            Get-SpotifyPlayer (Player objects contain a Device object).
+            The device for which this command targets. This parameter accepts either Device objects returned from Get-SpotifyDevice or Player objects
+            returned from Get-SpotifyPlayer (Player objects contain a Device object).
 
             Currently Spotify API only supports one device ID.
 
@@ -366,7 +364,7 @@ Function Start-SpotifyPlayback {
 
                 -Offset 5
 
-            Example 2: Start at specify track uri in play context (album, playlist, etc).
+            Example 2: Start at specified track uri in play context (album, playlist, etc).
 
                 -Offset "spotify:track:1301WleyT98MSxVHPZCA6M"
 
@@ -521,10 +519,10 @@ Function Stop-SpotifyPlayback {
 
     #>
 
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = 'CurrentActiveDevice')]
 
-    Param([Parameter(Mandatory, ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
-          [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'DeviceObj')] [NewGuy.PoshSpotify.Device[]]$Device,
+    Param([Parameter(ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
+          [Parameter(ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'DeviceObj')] [NewGuy.PoshSpotify.Device[]]$Device,
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
           [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
 
@@ -606,10 +604,10 @@ Function Skip-SpotifyNextTrack {
 
     #>
 
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = 'CurrentActiveDevice')]
 
-    Param([Parameter(Mandatory, ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
-          [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'DeviceObj')] [NewGuy.PoshSpotify.Device[]]$Device,
+    Param([Parameter(ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
+          [Parameter(ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'DeviceObj')] [NewGuy.PoshSpotify.Device[]]$Device,
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
           [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
 
@@ -694,10 +692,10 @@ Function Skip-SpotifyPreviousTrack {
 
     #>
 
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = 'CurrentActiveDevice')]
 
-    Param([Parameter(Mandatory, ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
-          [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'DeviceObj')] [NewGuy.PoshSpotify.Device[]]$Device,
+    Param([Parameter(ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
+          [Parameter(ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'DeviceObj')] [NewGuy.PoshSpotify.Device[]]$Device,
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
           [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
 
@@ -804,13 +802,13 @@ Function Set-SpotifyTrackSeek {
 
     #>
 
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = 'CurrentActiveDevice')]
 
     Param([int]$Minutes = 0,
           [int]$Seconds = 0,
           [int]$Milliseconds = 0,
-          [Parameter(Mandatory, ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
-          [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'DeviceObj')] [NewGuy.PoshSpotify.Device[]]$Device,
+          [Parameter(ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
+          [Parameter(ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'DeviceObj')] [NewGuy.PoshSpotify.Device[]]$Device,
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
           [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
 
@@ -907,11 +905,11 @@ Function Set-SpotifyPlayerVolume {
 
     #>
 
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = 'CurrentActiveDevice')]
 
     Param([Parameter(Mandatory)] [ValidateScript({ ($_ -ge 0) -and ($_ -le 100) })] [int]$Volume,
-          [Parameter(Mandatory, ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
-          [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'DeviceObj')] [NewGuy.PoshSpotify.Device[]]$Device,
+          [Parameter(ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
+          [Parameter(ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'DeviceObj')] [NewGuy.PoshSpotify.Device[]]$Device,
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
           [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
 
@@ -1008,11 +1006,11 @@ Function Set-SpotifyPlayerRepeatMode {
 
     #>
 
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = 'CurrentActiveDevice')]
 
     Param([Parameter(Mandatory)] [ValidateSet('Track', 'Context', 'Off')] [string]$State = 'Track',
-          [Parameter(Mandatory, ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
-          [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'DeviceObj')] [NewGuy.PoshSpotify.Device[]]$Device,
+          [Parameter(ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
+          [Parameter(ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'DeviceObj')] [NewGuy.PoshSpotify.Device[]]$Device,
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
           [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
 
@@ -1106,11 +1104,11 @@ Function Set-SpotifyPlayerShuffleMode {
 
     #>
 
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = 'CurrentActiveDevice')]
 
     Param([Parameter(Mandatory)] [ValidateSet('Enabled', 'Disabled')] [string]$State = 'Enabled',
-          [Parameter(Mandatory, ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
-          [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'DeviceObj')] [NewGuy.PoshSpotify.Device[]]$Device,
+          [Parameter(ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
+          [Parameter(ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'DeviceObj')] [NewGuy.PoshSpotify.Device[]]$Device,
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
           [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
 
