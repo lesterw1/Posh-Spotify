@@ -149,23 +149,26 @@ Export-ModuleMember -Function 'Get-SpotifyPlayer'
 #endregion Get-SpotifyPlayer
 
 #====================================================================================================================================================
-#################################
-## Get-SpotifyCurrentlyPlaying ##
-#################################
+#####################################
+## Get-SpotifyCurrentPlayerContext ##
+#####################################
 
-#region Get-SpotifyCurrentlyPlaying
+#region Get-SpotifyCurrentPlayerContext
 
-Function Get-SpotifyCurrentlyPlaying {
+Function Get-SpotifyCurrentPlayerContext {
 
     <#
 
         .SYNOPSIS
 
-            Get the object currently being played on the user’s Spotify account.
+            Get the player context of the currently active player on the user’s Spotify account. The player context details what is playing (Album,
+            Artist, Playlist) and the current progress of that context (i.e. IsPlaying, Track, Progress).
 
         .DESCRIPTION
 
-            Get the object currently being played on the user’s Spotify account. An Access Token is required for this API call.
+            Get the player context of the currently active player on the user’s Spotify account. The player context details what is playing (Album,
+            Artist, Playlist) and the current progress of that context (i.e. IsPlaying, Track, Progress). An Access Token is required for this API
+            call.
 
             For details on this Spotify API endpoint and its response format please review the Spotify documentation found at the following locations.
 
@@ -195,7 +198,7 @@ Function Get-SpotifyCurrentlyPlaying {
     #>
 
     [CmdletBinding()]
-    [OutputType('NewGuy.PoshSpotify.CurrentPlayingItem')]
+    [OutputType('NewGuy.PoshSpotify.PlayerContext')]
 
     Param([string]$Market,
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
@@ -212,15 +215,15 @@ Function Get-SpotifyCurrentlyPlaying {
 
     $result = Invoke-SpotifyRequest @splat
 
-    $currPlaying = [NewGuy.PoshSpotify.CurrentPlayingItem]::new($result)
+    $currPlaying = [NewGuy.PoshSpotify.PlayerContext]::new($result)
 
     Return $currPlaying
 
 }
 
-Export-ModuleMember -Function 'Get-SpotifyCurrentlyPlaying'
+Export-ModuleMember -Function 'Get-SpotifyCurrentPlayerContext'
 
-#endregion Get-SpotifyCurrentlyPlaying
+#endregion Get-SpotifyCurrentPlayerContext
 
 #====================================================================================================================================================
 #######################
