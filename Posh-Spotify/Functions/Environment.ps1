@@ -510,24 +510,35 @@ Function Test-SpotifyEnvInfoFormat {
 
             $script:SpotifyEnvironmentInfo = @{
 
-                Prod = @{
+                Home = @{
 
                     # Required Keys.
 
-                    ClientId = 'DIxxxxxxxxxxxxxxxxxx'
-                    SecretKey = 'YourSecretsHere'
+                    ClientId = 'yourClientIdHere'
+                    SecretKeyEncrypted = 'Big long protected SecureString converted to a standard string (though encrypted) all on one line here'
 
                     # Optional keys.
 
                     CallbackUrl = 'http://localhost:8080/callback/'
                     DefaultScopes = @(
-                        'user-modify-playback-state',
-                        'user-read-playback-state',
+                        'playlist-read-private',
+                        'playlist-read-collaborative',
+                        'playlist-modify-public',
+                        'playlist-modify-private',
+                        'ugc-image-upload',
+                        'user-follow-modify',
+                        'user-follow-read',
+                        'user-library-read',
+                        'user-library-modify',
                         'user-read-private',
-                        'user-modify-playback-state',
+                        'user-read-birthdate',
+                        'user-read-email',
+                        'user-top-read',
                         'user-read-playback-state',
-                        'user-read-private'
-                    )
+                        'user-modify-playback-state',
+                        'user-read-currently-playing',
+                        'user-read-recently-played'
+                    )  # Basically all scopes possible.
 
                     # ProxyServer = 'your-proxy-01.domain.local'
                     # ProxyPort = 8080
@@ -543,31 +554,42 @@ Function Test-SpotifyEnvInfoFormat {
 
                 }
 
-                Test = @{
+                Work = @{
 
                     # Required Keys.
 
-                    ClientId = 'DIxxxxxxxxxxxxxxxxxx'
-                    SecretKeyEncrypted = 'Big long protected SecureString represented as a string on 1 line here'
+                    ClientId = 'yourClientIdHere'
+                    SecretKeyEncrypted = 'Big long protected SecureString converted to a standard string (though encrypted) all on one line here'
 
                     # Optional keys.
 
                     CallbackUrl = 'http://localhost:8080/callback/'
                     DefaultScopes = @(
-                        'user-modify-playback-state',
-                        'user-read-playback-state',
+                        'playlist-read-private',
+                        'playlist-read-collaborative',
+                        'playlist-modify-public',
+                        'playlist-modify-private',
+                        'ugc-image-upload',
+                        'user-follow-modify',
+                        'user-follow-read',
+                        'user-library-read',
+                        'user-library-modify',
                         'user-read-private',
-                        'user-modify-playback-state',
+                        'user-read-birthdate',
+                        'user-read-email',
+                        'user-top-read',
                         'user-read-playback-state',
-                        'user-read-private'
-                    )
+                        'user-modify-playback-state',
+                        'user-read-currently-playing',
+                        'user-read-recently-played'
+                    )  # Basically all scopes possible.
 
                     # ProxyServer = 'your-proxy-01.domain.local'
                     # ProxyPort = 8080
                     # ProxyBypassList = @('*.domain.local', '*.otherdomain.local')
                     # ProxyBypassOnLocal = $true
                     # ProxyUsername = 'janedoe'
-                    # ProxyPasswordEncrypted = 'Big long protected SecureString represented as a string on 1 line here'
+                    # ProxyPasswordEncrypted = 'Big long protected SecureString converted to a standard string (though encrypted) all on one line here'
 
                     # System Keys.
 
@@ -576,20 +598,17 @@ Function Test-SpotifyEnvInfoFormat {
 
                 }
 
-                Dev = @{
+                Test = @{
 
                     # Required Keys.
 
-                    ClientId = 'DIxxxxxxxxxxxxxxxxxx'
-                    SecretKeyEncrypted = 'Big long protected SecureString represented as a string on 1 line here'
+                    ClientId = 'yourClientIdHere'
+                    SecretKey = 'YourSecretsHere'
 
                     # Optional keys.
 
                     CallbackUrl = 'http://localhost:8080/callback/'
                     DefaultScopes = @(
-                        'user-modify-playback-state',
-                        'user-read-playback-state',
-                        'user-read-private',
                         'user-modify-playback-state',
                         'user-read-playback-state',
                         'user-read-private'

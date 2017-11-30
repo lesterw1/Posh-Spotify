@@ -78,7 +78,7 @@ This module has two required pramaters needed for configuration and several opti
 Import-Module Posh-Spotify
 
 # Gather your ClientId and SecretKey. It can be plain text (SecretKey) or encrypted SecureString (SecretKeyEncrypted) as seen below.
-$ClientId = 'xxxxxxxxxxxxxxxxxxxx'
+$ClientId = 'yourClientIdHere'
 $SecretKeyEncrypted = ConvertFrom-SecureString (ConvertTo-SecureString -String 'yourSecretKeyHere' -AsPlainText -Force)
 
 # Get a copy of the default module configuration (includes pre-configured CallbackUrl and Scopes).
@@ -157,20 +157,31 @@ SpotifyEnvironmentInfo = @{
 
         # Required Keys.
 
-        ClientId = 'DIxxxxxxxxxxxxxxxxxx'
-        SecretKeyEncrypted = 'Big long protected SecureString represented as a string on 1 line here'
+        ClientId = 'yourClientIdHere'
+        SecretKeyEncrypted = 'Big long protected SecureString converted to a standard string (though encrypted) all on one line here'
 
         # Optional keys.
 
         CallbackUrl = 'http://localhost:8080/callback/'
         DefaultScopes = @(
-            'user-modify-playback-state',
-            'user-read-playback-state',
+            'playlist-read-private',
+            'playlist-read-collaborative',
+            'playlist-modify-public',
+            'playlist-modify-private',
+            'ugc-image-upload',
+            'user-follow-modify',
+            'user-follow-read',
+            'user-library-read',
+            'user-library-modify',
             'user-read-private',
-            'user-modify-playback-state',
+            'user-read-birthdate',
+            'user-read-email',
+            'user-top-read',
             'user-read-playback-state',
-            'user-read-private'
-        )
+            'user-modify-playback-state',
+            'user-read-currently-playing',
+            'user-read-recently-played'
+        )  # Basically all scopes possible.
 
         # ProxyServer = 'your-proxy-01.domain.local'
         # ProxyPort = 8080
@@ -185,26 +196,38 @@ SpotifyEnvironmentInfo = @{
 
         # Required Keys.
 
-        ClientId = 'DIxxxxxxxxxxxxxxxxxx'
-        SecretKeyEncrypted = 'Big long protected SecureString represented as a string on 1 line here'
+        ClientId = 'yourClientIdHere'
+        SecretKeyEncrypted = 'Big long protected SecureString converted to a standard string (though encrypted) all on one line here'
 
         # Optional keys.
 
+        CallbackUrl = 'http://localhost:8080/callback/'
         DefaultScopes = @(
-            'user-modify-playback-state',
-            'user-read-playback-state',
+            'playlist-read-private',
+            'playlist-read-collaborative',
+            'playlist-modify-public',
+            'playlist-modify-private',
+            'ugc-image-upload',
+            'user-follow-modify',
+            'user-follow-read',
+            'user-library-read',
+            'user-library-modify',
             'user-read-private',
-            'user-modify-playback-state',
+            'user-read-birthdate',
+            'user-read-email',
+            'user-top-read',
             'user-read-playback-state',
-            'user-read-private'
-        )
+            'user-modify-playback-state',
+            'user-read-currently-playing',
+            'user-read-recently-played'
+        )  # Basically all scopes possible.
 
         # ProxyServer = 'your-proxy-01.domain.local'
         # ProxyPort = 8080
         # ProxyBypassList = @('*.domain.local', '*.otherdomain.local')
         # ProxyBypassOnLocal = $true
         # ProxyUsername = 'janedoe'
-        # ProxyPasswordEncrypted = 'Big long protected SecureString represented as a string on 1 line here'
+        # ProxyPasswordEncrypted = 'Big long protected SecureString converted to a standard string (though encrypted) all on one line here'
 
     }
 
@@ -212,10 +235,17 @@ SpotifyEnvironmentInfo = @{
 
         # Required Keys.
 
-        ClientId = 'DIxxxxxxxxxxxxxxxxxx'
+        ClientId = 'yourClientIdHere'
         SecretKey = 'YourSecretsHere'
 
         # Optional keys.
+
+        CallbackUrl = 'http://localhost:8080/callback/'
+        DefaultScopes = @(
+            'user-modify-playback-state',
+            'user-read-playback-state',
+            'user-read-private'
+        )
 
         # ProxyServer = 'your-proxy-01.domain.local'
         # ProxyPort = 8080
@@ -227,9 +257,9 @@ SpotifyEnvironmentInfo = @{
 }
 ```
 
-1. The main hashtable contains one or more environments represented as additional hashtables. The keys of the main hashtable are the names for each of the environment hashtables.
+1. The main hashtable contains one or more environments represented as additional hashtables. The keys of the main hashtable are the names for each of the environment hashtables (ex. Home, Work, Test).
 
-2. The main hashtable must contain a key that matches the default Spotify environment. The default Spotify environment must be provided during the Spotify environment configuration. See details below on how this is done.
+2. The main hashtable must contain a key that matches the default Spotify environment. The default Spotify environment must be provided during the Spotify environment configuration. This will be discussed in the next section.
 
 3. The inner environment hashtable must have the following keys:
 
@@ -284,7 +314,7 @@ The module has a *SpotifyEnvironmentInfo.ps1* file that comes with pre-filled in
 
 ``` powershell
 # Gather your ClientId and SecretKey. It can be plain text (SecretKey) or encrypted SecureString (SecretKeyEncrypted) as seen below.
-$ClientId = 'xxxxxxxxxxxxxxxxxxxx'
+$ClientId = 'yourClientIdHere'
 $SecretKeyEncrypted = ConvertFrom-SecureString (ConvertTo-SecureString -String 'yourSecretKeyHere' -AsPlainText -Force)
 
 # Get a copy of the default module configuration (includes pre-configured CallbackUrl and Scopes).
@@ -344,10 +374,23 @@ $userSession | Add-SpotifyUserSession -MakeDefault
 # Authenticate and request authorization for the custom callback url and scopes.
 # This command will block the prompt until authentication is complete and the user successfully redirected back to the CallbackUrl.
 $scopes = @(
-    'user-modify-playback-state',
+    'playlist-read-private',
+    'playlist-read-collaborative',
+    'playlist-modify-public',
+    'playlist-modify-private',
+    'ugc-image-upload',
+    'user-follow-modify',
+    'user-follow-read',
+    'user-library-read',
+    'user-library-modify',
+    'user-read-private',
+    'user-read-birthdate',
+    'user-read-email',
+    'user-top-read',
     'user-read-playback-state',
     'user-modify-playback-state',
-    'user-read-playback-state',
+    'user-read-currently-playing',
+    'user-read-recently-played'
 )
 $userSession = Initialize-SpotifyAuthorizationCodeFlow -CallbackUrl 'http://localhost/myCustomCallbackUrl/' -Scopes $scopes
 

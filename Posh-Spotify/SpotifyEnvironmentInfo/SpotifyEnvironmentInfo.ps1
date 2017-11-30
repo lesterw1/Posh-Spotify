@@ -16,20 +16,31 @@ $script:SpotifyEnvironmentInfo = @{
 
         # Required Keys.
 
-        ClientId = 'xxxxxxxxxxxxxxxxxxxx'
+        ClientId = 'yourClientIdHere'
         SecretKeyEncrypted = 'Big long protected SecureString converted to a standard string (though encrypted) all on one line here'
 
         # Optional keys.
 
         CallbackUrl = 'http://localhost:8080/callback/'
         DefaultScopes = @(
-            'user-modify-playback-state',
-            'user-read-playback-state',
+            'playlist-read-private',
+            'playlist-read-collaborative',
+            'playlist-modify-public',
+            'playlist-modify-private',
+            'ugc-image-upload',
+            'user-follow-modify',
+            'user-follow-read',
+            'user-library-read',
+            'user-library-modify',
             'user-read-private',
-            'user-modify-playback-state',
+            'user-read-birthdate',
+            'user-read-email',
+            'user-top-read',
             'user-read-playback-state',
-            'user-read-private'
-        )
+            'user-modify-playback-state',
+            'user-read-currently-playing',
+            'user-read-recently-played'
+        )  # Basically all scopes possible.
 
         # ProxyServer = 'your-proxy-01.domain.local'
         # ProxyPort = 8080
@@ -44,20 +55,31 @@ $script:SpotifyEnvironmentInfo = @{
 
     #     # Required Keys.
 
-    #     ClientId = 'xxxxxxxxxxxxxxxxxxxx'
+    #     ClientId = 'yourClientIdHere'
     #     SecretKeyEncrypted = 'Big long protected SecureString converted to a standard string (though encrypted) all on one line here'
 
     #     # Optional keys.
 
     #     CallbackUrl = 'http://localhost:8080/callback/'
     #     DefaultScopes = @(
-    #         'user-modify-playback-state',
-    #         'user-read-playback-state',
+    #         'playlist-read-private',
+    #         'playlist-read-collaborative',
+    #         'playlist-modify-public',
+    #         'playlist-modify-private',
+    #         'ugc-image-upload',
+    #         'user-follow-modify',
+    #         'user-follow-read',
+    #         'user-library-read',
+    #         'user-library-modify',
     #         'user-read-private',
-    #         'user-modify-playback-state',
+    #         'user-read-birthdate',
+    #         'user-read-email',
+    #         'user-top-read',
     #         'user-read-playback-state',
-    #         'user-read-private'
-    #     )
+    #         'user-modify-playback-state',
+    #         'user-read-currently-playing',
+    #         'user-read-recently-played'
+    #     )  # Basically all scopes possible.
 
     #     # ProxyServer = 'your-proxy-01.domain.local'
     #     # ProxyPort = 8080
@@ -72,16 +94,13 @@ $script:SpotifyEnvironmentInfo = @{
 
     #     # Required Keys.
 
-    #     ClientId = 'xxxxxxxxxxxxxxxxxxxx'
+    #     ClientId = 'yourClientIdHere'
     #     SecretKey = 'YourSecretsHere'
 
     #     # Optional keys.
 
     #     CallbackUrl = 'http://localhost:8080/callback/'
     #     DefaultScopes = @(
-    #         'user-modify-playback-state',
-    #         'user-read-playback-state',
-    #         'user-read-private',
     #         'user-modify-playback-state',
     #         'user-read-playback-state',
     #         'user-read-private'
