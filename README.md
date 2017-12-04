@@ -487,7 +487,7 @@ Get-SpotifyDevice | ? { $_.Name -match $env:COMPUTERNAME } | Play
 
 ``` powershell
 # Get current track on currently active player device.
-$song = (Get-SpotifyCurrentlyPlaying).Track
+$song = (Get-SpotifyCurrentPlayerContext).Track
 
 # View simplified versions of Album and Artist of the song.
 $song.Album

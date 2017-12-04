@@ -2,9 +2,9 @@
 <Configuration>
     <ViewDefinitions>
         <View>
-            <Name>NewGuy.PoshSpotify.CurrentPlayingItem</Name>
+            <Name>NewGuy.PoshSpotify.PlayerContext</Name>
             <ViewSelectedBy>
-                <TypeName>NewGuy.PoshSpotify.CurrentPlayingItem</TypeName>
+                <TypeName>NewGuy.PoshSpotify.PlayerContext</TypeName>
             </ViewSelectedBy>
             <ListControl>
                 <ListEntries>
@@ -48,7 +48,7 @@
         <View>
             <Name>Table</Name>
             <ViewSelectedBy>
-                <TypeName>NewGuy.PoshSpotify.CurrentPlayingItem</TypeName>
+                <TypeName>NewGuy.PoshSpotify.PlayerContext</TypeName>
             </ViewSelectedBy>
             <TableControl>
                 <TableHeaders>

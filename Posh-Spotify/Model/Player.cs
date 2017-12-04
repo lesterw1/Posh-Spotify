@@ -2,6 +2,11 @@
 
     Player Object Model
 
+    Context - Object representing the context of the player (i.e. Album, Artist, Playlist).
+    PlayerContext - Object containing a Context object and the current progress of that Context (i.e. IsPlaying, Progress, Track).
+    Device - Object representing a particular device and current device information (i.e. Name, ID, Volume).
+    Player - Object containing a PlayerContext and a Device object along with player settings (i.e. ShuffleState, RepeatState).
+
     https://developer.spotify.com/web-api/get-information-about-the-users-current-playback/
 
 */
@@ -15,13 +20,13 @@ namespace NewGuy.PoshSpotify {
     public enum PlayerRepeatState { Off, Track, Context }
     public enum DeviceType { Computer, Smartphone, Speaker}
 
-    /*============================*/
-    /*== Current Playing Object ==*/
-    /*============================*/
+    /*===========================*/
+    /*== Player Context Object ==*/
+    /*===========================*/
 
-    // Current playing object
+    // Player Context object used to hold current Context and Context related progress.
 
-    public class CurrentPlayingItem {
+    public class PlayerContext {
 
         public Context Context { get; set; }
         public bool IsPlaying { get; set; }
@@ -29,7 +34,7 @@ namespace NewGuy.PoshSpotify {
         public TimeSpan Progress { get; set; }
         public Track Track { get; set; }
 
-        public CurrentPlayingItem() {
+        public PlayerContext() {
             this.Context = new Context();
             this.IsPlaying = false;
             this.PlayerFetchedOn = DateTime.Now.ToLocalTime();
@@ -37,7 +42,7 @@ namespace NewGuy.PoshSpotify {
             this.Track = null;
         }
 
-        public CurrentPlayingItem(PSObject Object) : this() {
+        public PlayerContext(PSObject Object) : this() {
 
             if (Object != null) {
 
@@ -63,9 +68,9 @@ namespace NewGuy.PoshSpotify {
     /*== Player Object ==*/
     /*===================*/
 
-    // Player object
+    // Player object which adds a Device and Device state information to the PlayerContext.
 
-    public class Player : CurrentPlayingItem {
+    public class Player : PlayerContext {
 
         public Device Device { get; set; }
         public PlayerRepeatState RepeatState { get; set; }
@@ -111,7 +116,7 @@ namespace NewGuy.PoshSpotify {
     /*== Context Object ==*/
     /*====================*/
 
-    // Context object used by the player to describe what is playing (i.e. Album, Artist, Playlist)
+    // Context object used by the Player to describe what is playing (i.e. Album, Artist, Playlist).
 
     public class Context {
 
