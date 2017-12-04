@@ -360,11 +360,11 @@ Function Start-SpotifyPlayback {
 
             Provide either a postive integer to specify a "position" within the context or use a Spotify resource uri to specify the iten to start at.
 
-            Example 1: Start at 5 item of play context (album, playlist, etc).
+            Example 1: Start at 5th item of play context (album, playlist, etc). Use this when using the ContextUri parameter.
 
                 -Offset 5
 
-            Example 2: Start at specified track uri in play context (album, playlist, etc).
+            Example 2: Start at specified track uri in provided list of Tracks. Use this when using the Tracks parameter.
 
                 -Offset "spotify:track:1301WleyT98MSxVHPZCA6M"
 
@@ -398,43 +398,27 @@ Function Start-SpotifyPlayback {
 
     #>
 
-    Param([Parameter(ParameterSetName = 'ContextUriId')]
-          [Parameter(ParameterSetName = 'ContextUriObj')]
-          [string]$ContextUri,
+    [CmdletBinding(DefaultParameterSetName = 'CurrentActiveDevice')]
 
-          [Parameter(ParameterSetName = 'TracksId')]
-          [Parameter(ParameterSetName = 'TracksObj')]
+    Param([string]$ContextUri,
           [string[]]$Tracks,
-
-          [Parameter(ParameterSetName = 'ContextUriId')]
-          [Parameter(ParameterSetName = 'TracksId')]
-          [Parameter(ParameterSetName = 'ContextUriObj')]
-          [Parameter(ParameterSetName = 'TracksObj')]
           [string]$Offset,
-
-          [Parameter(Mandatory, ValueFromPipeline, ParameterSetName = 'DefaultId')]
-          [Parameter(ParameterSetName = 'ContextUriId')]
-          [Parameter(ParameterSetName = 'TracksId')]
-          [string[]]$DeviceId,
-
-          [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'DefaultObj')]
-          [Parameter(ParameterSetName = 'ContextUriObj')]
-          [Parameter(ParameterSetName = 'TracksObj')]
-          [NewGuy.PoshSpotify.Device[]]$Device,
-
+          [Parameter(ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
+          [Parameter(ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'DeviceObj')] [NewGuy.PoshSpotify.Device[]]$Device,
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
           [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
 
     Process {
 
-        If ($PSCmdlet.ParameterSetName -match 'Obj') { $DeviceId = $Device.Id }
+        If ($PSCmdlet.ParameterSetName -eq 'DeviceObj') { $DeviceId = $Device.Id }
 
         $bodyParams = $null
 
-        If ($PSCmdlet.ParameterSetName -match 'Context') { $bodyParams = @{ 'context_uri' = $ContextUri } }
-        ElseIf ($PSCmdlet.ParameterSetName -match 'Tracks') { $bodyParams = @{ 'uris' = $Tracks } }
+        If ($ContextUri -and $Tracks) { Throw 'Spotify does not support both ContextUri and Tracks parameter on the same request.' }
+        ElseIf ($ContextUri) { $bodyParams = @{ 'context_uri' = $ContextUri } }
+        ElseIf ($Tracks) { $bodyParams = @{ 'uris' = $Tracks } }
 
-        If ($Offset) {
+        If ($Offset -and ($ContextUri -or $Tracks)) {
             $parsedOffset = $null
             If ([int]::TryParse($Offset, [ref]$parsedOffset)) {
                 $bodyParams['offset'] = @{ position = $parsedOffset }
