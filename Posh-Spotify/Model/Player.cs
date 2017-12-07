@@ -112,49 +112,6 @@ namespace NewGuy.PoshSpotify {
 
     }
 
-    /*====================*/
-    /*== Context Object ==*/
-    /*====================*/
-
-    // Context object used by the Player to describe what is playing (i.e. Album, Artist, Playlist).
-
-    public class Context {
-
-        // Backing fields.
-
-        private ItemType type;
-
-        // Properties in full object.
-
-        public ExternalUrl ExternalUrl { get; set; }
-        public string FullDetailUri { get; set; }
-        public ItemType ItemType { get { return this.type; } }
-        public string Uri { get; set; }
-
-        public Context() {
-            this.ExternalUrl = new ExternalUrl();
-            this.FullDetailUri = "";
-            this.type = ItemType.Album;
-            this.Uri = "";
-        }
-
-        public Context(PSObject Object) : this() {
-            if (Object != null) {
-                this.ExternalUrl = Object.Properties["external_urls"] != null ? new ExternalUrl((PSObject)Object.Properties["external_urls"].Value) : new ExternalUrl();
-                this.FullDetailUri = Object.Properties["href"] != null ? (string)Object.Properties["href"].Value : "";
-                this.type = Object.Properties["type"] != null ? (ItemType)Enum.Parse(typeof(ItemType), ((string)Object.Properties["type"].Value), true) : ItemType.Album;
-                this.Uri = Object.Properties["uri"] != null ? (string)Object.Properties["uri"].Value : "";
-            }
-        }
-
-        // Methods.
-
-        public override string ToString() {
-            return this.ItemType.ToString();
-        }
-
-    }
-
     /*===================*/
     /*== Device Object ==*/
     /*===================*/

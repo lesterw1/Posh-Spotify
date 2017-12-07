@@ -14,21 +14,16 @@ namespace NewGuy.PoshSpotify {
     using System.Management.Automation;
     using System.Linq;
 
-    public class Artist {
+    public class Artist : Context {
 
         // Backing fields.
 
-        private ItemType type;
         private int popularity;
 
         // Properties in simplified object.
 
-        public ExternalUrl ExternalUrl { get; set; }
-        public string FullDetailUri { get; set; }
         public string Id { get; set; }
         public string Name { get; set; }
-        public ItemType Type { get { return this.type; } }
-        public string Uri { get; set; }
 
         // Properties in full object.
 

@@ -14,14 +14,6 @@ namespace NewGuy.PoshSpotify {
     using System.Management.Automation;
     using System.Linq;
 
-    public enum ItemType {
-        Album,
-        Artist,
-        Playlist,
-        Track,
-        User
-    }
-
     public class PagingInfo {
 
         public string FullDetailUri { get; set; }

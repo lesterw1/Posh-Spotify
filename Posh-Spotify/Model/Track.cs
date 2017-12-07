@@ -20,11 +20,10 @@ namespace NewGuy.PoshSpotify {
 
     // Track object
 
-    public class Track {
+    public class Track : Context {
 
         // Backing fields.
 
-        private ItemType type;
         private int popularity;
 
         // Properties in simplified object.
@@ -34,16 +33,12 @@ namespace NewGuy.PoshSpotify {
         public int DiscNumber { get; set; }
         public TimeSpan Duration { get; set; }
         public bool HasExplicitLyrics { get; set; }
-        public ExternalUrl ExternalUrl { get; set; }
-        public string FullDetailUri { get; set; }
         public string Id { get; set; }
         public bool IsPlayable { get; set ; }
         public TrackLink LinkedFrom { get; set; }
         public string Name { get; set; }
         public string PreviewUrl { get; set; }
         public int TrackNumber { get; set; }
-        public ItemType Type { get { return this.type; } }
-        public string Uri { get; set; }
 
         // Properties in full object.
 
@@ -117,22 +112,16 @@ namespace NewGuy.PoshSpotify {
 
     // TrackLink object used by the track to locate the original track in case of Track Relinking : https://developer.spotify.com/web-api/track-relinking-guide/
 
-    public class TrackLink {
+    public class TrackLink : Context {
 
-        private string type;
-
-        public ExternalUrl ExternalUrl { get; set; }
-        public string FullDetailUri { get; set; }
         public string Id { get; set; }
-        public string LinkType { get { return this.type; } }
-        public string Uri { get; set; }
 
         public TrackLink() {
             this.ExternalUrl = new ExternalUrl();
             this.FullDetailUri = "";
             this.Id = "";
+            this.type = ItemType.Track;
             this.Uri = "";
-            this.type = "track";
         }
 
         public TrackLink(PSObject Object) : this() {

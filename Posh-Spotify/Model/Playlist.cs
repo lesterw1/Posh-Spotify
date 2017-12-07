@@ -20,25 +20,17 @@ namespace NewGuy.PoshSpotify {
 
     // Playlist object
 
-    public class Playlist {
-
-        // Backing fields.
-
-        private ItemType type;
+    public class Playlist : Context {
 
         // Properties in simplified object.
 
         public bool Collaborative { get; set; }
-        public ExternalUrl ExternalUrl { get; set; }
-        public string FullDetailUri { get; set; }
         public string Id { get; set; }
         public List<ImageInfo> Images { get; set; }
         public string Name { get; set; }
         public User Owner { get; set; }
         public bool? Public { get; set; }  // Value of null means not relevant.
         public string SnapshotId { get; set; }
-        public ItemType Type { get { return this.type; } }
-        public string Uri { get; set; }
 
         // Properties in full object.
 

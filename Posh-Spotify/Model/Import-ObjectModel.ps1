@@ -19,6 +19,7 @@ Try {
         "$PSScriptRoot\Artist.cs",
         "$PSScriptRoot\Album.cs",
         "$PSScriptRoot\AuthenticationToken.cs",
+        "$PSScriptRoot\Context.cs",
         "$PSScriptRoot\Copyright.cs",
         "$PSScriptRoot\ExternalId.cs",
         "$PSScriptRoot\ExternalUrl.cs",
