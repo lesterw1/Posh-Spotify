@@ -14,11 +14,10 @@ namespace NewGuy.PoshSpotify {
     using System.Management.Automation;
     using System.Linq;
 
-    public class Album {
+    public class Album : Context {
 
         // Backing fields.
 
-        private ItemType type;
         private int popularity;
 
         // Properties in simplified object.
@@ -26,13 +25,9 @@ namespace NewGuy.PoshSpotify {
         public string AlbumType { get; set; }
         public List<Artist> Artists { get; set; }
         public List<string> AvailableMarkets { get; set; }
-        public ExternalUrl ExternalUrl { get; set; }
-        public string FullDetailUri { get; set; }
         public string Id { get; set; }
         public List<ImageInfo> Images { get; set; }
         public string Name { get; set; }
-        public ItemType Type { get { return this.type; } }
-        public string Uri { get; set; }
 
         // Properties in full object.
 

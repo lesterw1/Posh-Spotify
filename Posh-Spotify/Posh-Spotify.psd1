@@ -125,6 +125,7 @@ FileList = @(
                'Model\Album.cs',
                'Model\Artist.cs',
                'Model\AuthenticationToken.cs',
+               'Model\Context.cs',
                'Model\Copyright.cs',
                'Model\ExternalId.cs',
                'Model\ExternalUrl.cs',

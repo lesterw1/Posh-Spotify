@@ -206,7 +206,7 @@
                     <ListEntry>
                         <ListItems>
                             <ListItem>
-                                <PropertyName>ItemType</PropertyName>
+                                <PropertyName>Type</PropertyName>
                             </ListItem>
                             <ListItem>
                                 <PropertyName>FullDetailUri</PropertyName>
@@ -243,7 +243,7 @@
                     <TableRowEntry>
                         <TableColumnItems>
                             <TableColumnItem>
-                                <PropertyName>ItemType</PropertyName>
+                                <PropertyName>Type</PropertyName>
                             </TableColumnItem>
                             <TableColumnItem>
                                 <PropertyName>FullDetailUri</PropertyName>

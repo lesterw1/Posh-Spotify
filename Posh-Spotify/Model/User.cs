@@ -14,22 +14,14 @@ namespace NewGuy.PoshSpotify {
     using System.Management.Automation;
     using System.Linq;
 
-    public class User {
-
-        // Backing fields.
-
-        private ItemType type;
+    public class User : Context {
 
         // Properties in simplified (public) object.
 
         public string DisplayName { get; set; }
-        public ExternalUrl ExternalUrl { get; set; }
         public FollowerInfo Followers { get; set; }
-        public string FullDetailUri { get; set; }
         public string Id { get; set; }
         public List<ImageInfo> Images { get; set; }
-        public ItemType Type { get { return this.type; } }
-        public string Uri { get; set; }
 
         // Properties in full (private) object.
 
