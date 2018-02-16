@@ -133,7 +133,7 @@ FileList = @(
                'Model\ImageInfo.cs',
                'Model\Import-ObjectModel.ps1',
                'Model\PagingInfo.cs',
-               'Model\Playler.cs',
+               'Model\Player.cs',
                'Model\Playlist.cs',
                'Model\Track.cs',
                'Model\User.cs',
