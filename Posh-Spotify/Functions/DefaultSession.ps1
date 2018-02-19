@@ -20,7 +20,7 @@
 
 #region Get-SpotifyDefaultSession
 
-Function Get-SpotifyDefaultSession {
+function Get-SpotifyDefaultSession {
 
     <#
 
@@ -49,17 +49,17 @@ Function Get-SpotifyDefaultSession {
     [CmdletBinding()]
     [OutputType('NewGuy.PoshSpotify.AuthenticationToken')]
 
-    Param([switch]$RefreshIfExpired,
+    param([switch]$RefreshIfExpired,
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
 
-    Process {
+    process {
 
         # If a UserSessions array exist, return a copy of the first (default) session.
-        If (($script:SpotifyEnvironmentInfo[$SpotifyEnv].Keys -contains 'UserSessions') -and
+        if (($script:SpotifyEnvironmentInfo[$SpotifyEnv].Keys -contains 'UserSessions') -and
             ($script:SpotifyEnvironmentInfo[$SpotifyEnv].UserSessions.Count -gt 0)) {
 
             # Refresh the token first if needed.
-            If ($RefreshIfExpired) {
+            if ($RefreshIfExpired) {
                 Initialize-SpotifySession -SpotifyEnv $SpotifyEnv
             }
 
@@ -71,7 +71,7 @@ Function Get-SpotifyDefaultSession {
             $userSess.Scopes = $script:SpotifyEnvironmentInfo[$SpotifyEnv].UserSessions[0].Scopes
             $userSess.TokenType = $script:SpotifyEnvironmentInfo[$SpotifyEnv].UserSessions[0].TokenType
 
-            Return $userSess
+            return $userSess
         }
 
     }
@@ -89,7 +89,7 @@ Export-ModuleMember -Function 'Get-SpotifyDefaultSession'
 
 #region Add-SpotifyUserSession
 
-Function Add-SpotifyUserSession {
+function Add-SpotifyUserSession {
 
     <#
 
@@ -150,7 +150,7 @@ Function Add-SpotifyUserSession {
 
     [CmdletBinding(DefaultParameterSetName = 'Parameters')]
 
-    Param([Parameter(ParameterSetName = 'Parameters', ValueFromPipeline, Position = 0)]
+    param([Parameter(ParameterSetName = 'Parameters', ValueFromPipeline, Position = 0)]
           [string]$RefreshToken,
 
           [Parameter(ParameterSetName = 'Parameters', Position = 1)]
@@ -167,31 +167,31 @@ Function Add-SpotifyUserSession {
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })]
           [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
 
-    Process {
+    process {
 
         # If a UserSessions array doesn't already exist, create one.
-        If ($script:SpotifyEnvironmentInfo[$SpotifyEnv].Keys -notcontains 'UserSessions') {
+        if ($script:SpotifyEnvironmentInfo[$SpotifyEnv].Keys -notcontains 'UserSessions') {
             $script:SpotifyEnvironmentInfo[$SpotifyEnv].UserSessions = @()
         }
 
         $userSess = [NewGuy.PoshSpotify.AuthenticationToken]::new()
 
-        If ($AuthenticationToken) {
+        if ($AuthenticationToken) {
             $userSess.AccessToken = $AuthenticationToken.AccessToken
             $userSess.RefreshToken = $AuthenticationToken.RefreshToken
             $userSess.ExpiresOn = $AuthenticationToken.ExpiresOn
             $userSess.Scopes = $AuthenticationToken.Scopes
             $userSess.TokenType = $AuthenticationToken.TokenType
-        } Else {
-            If ($RefreshToken) { $userSess.RefreshToken = $RefreshToken }
-            If ($AccessToken) { $userSess.AccessToken = $AccessToken }
-            If ($ExpiresOn) { $userSess.ExpiresOn = $ExpiresOn }
+        } else {
+            if ($RefreshToken) { $userSess.RefreshToken = $RefreshToken }
+            if ($AccessToken) { $userSess.AccessToken = $AccessToken }
+            if ($ExpiresOn) { $userSess.ExpiresOn = $ExpiresOn }
             $userSess.TokenType = 'Bearer'
         }
 
-        If ($MakeDefault) {
+        if ($MakeDefault) {
             $script:SpotifyEnvironmentInfo[$SpotifyEnv].UserSessions = @($userSess) + $script:SpotifyEnvironmentInfo[$SpotifyEnv].UserSessions
-        } Else {
+        } else {
             $script:SpotifyEnvironmentInfo[$SpotifyEnv].UserSessions += $userSess
         }
 
@@ -210,7 +210,7 @@ Export-ModuleMember -Function 'Add-SpotifyUserSession'
 
 #region Initialize-SpotifySession
 
-Function Initialize-SpotifySession {
+function Initialize-SpotifySession {
 
     <#
 
@@ -273,28 +273,28 @@ Function Initialize-SpotifySession {
     [CmdletBinding()]
     [OutputType('NewGuy.PoshSpotify.AuthenticationToken')]
 
-    Param([NewGuy.PoshSpotify.AuthenticationToken]$AuthenticationToken,
+    param([NewGuy.PoshSpotify.AuthenticationToken]$AuthenticationToken,
           [switch]$ForceAuth,
           [switch]$ForceRefresh,
           [switch]$PassThru,
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
 
-    Process {
+    process {
 
         # If a UserSessions array doesn't already exist, create one.
-        If ($script:SpotifyEnvironmentInfo[$SpotifyEnv].Keys -notcontains 'UserSessions') {
+        if ($script:SpotifyEnvironmentInfo[$SpotifyEnv].Keys -notcontains 'UserSessions') {
             $script:SpotifyEnvironmentInfo[$SpotifyEnv].UserSessions = @()
         }
 
         # If a user provides a token use that, otherwise find the default for the provided environment.
-        If ($AuthenticationToken) { $OriginalToken = $AuthenticationToken }
-        ElseIf ($null -ne $script:SpotifyEnvironmentInfo[$SpotifyEnv].UserSessions[0]) { $OriginalToken = $script:SpotifyEnvironmentInfo[$SpotifyEnv].UserSessions[0] }
-        Else { $script:SpotifyEnvironmentInfo[$SpotifyEnv].UserSessions += $OriginalToken = [NewGuy.PoshSpotify.AuthenticationToken]::new() }
+        if ($AuthenticationToken) { $OriginalToken = $AuthenticationToken }
+        elseif ($null -ne $script:SpotifyEnvironmentInfo[$SpotifyEnv].UserSessions[0]) { $OriginalToken = $script:SpotifyEnvironmentInfo[$SpotifyEnv].UserSessions[0] }
+        else { $script:SpotifyEnvironmentInfo[$SpotifyEnv].UserSessions += $OriginalToken = [NewGuy.PoshSpotify.AuthenticationToken]::new() }
 
         # Check the status of the token and initialize a new one if needed.
-        If (!$ForceAuth -and !$ForceRefresh -and $OriginalToken.AccessToken -and ($OriginalToken.ExpiresOn -gt (Get-Date))) { $NewToken = $OriginalToken }
-        ElseIf (!$ForceAuth -and $OriginalToken.RefreshToken) { $NewToken = Initialize-SpotifyAuthorizationCodeFlow -RefreshToken $OriginalToken.RefreshToken -SpotifyEnv $SpotifyEnv }
-        Else { $NewToken = Initialize-SpotifyAuthorizationCodeFlow -SpotifyEnv $SpotifyEnv }
+        if (!$ForceAuth -and !$ForceRefresh -and $OriginalToken.AccessToken -and ($OriginalToken.ExpiresOn -gt (Get-Date))) { $NewToken = $OriginalToken }
+        elseif (!$ForceAuth -and $OriginalToken.RefreshToken) { $NewToken = Initialize-SpotifyAuthorizationCodeFlow -RefreshToken $OriginalToken.RefreshToken -SpotifyEnv $SpotifyEnv }
+        else { $NewToken = Initialize-SpotifyAuthorizationCodeFlow -SpotifyEnv $SpotifyEnv }
 
         # Now update the original token with the new token's information.
         $OriginalToken.AccessToken = $NewToken.AccessToken
@@ -308,7 +308,7 @@ Function Initialize-SpotifySession {
         # object.
 
         # Pass the object on thru if requested and only if originally provided by the user.
-        If ($PassThru -and $AuthenticationToken) { Return $OriginalToken }
+        if ($PassThru -and $AuthenticationToken) { return $OriginalToken }
 
     }
 
@@ -325,7 +325,7 @@ Export-ModuleMember -Function 'Initialize-SpotifySession'
 
 #region Add-SpotifyCommandAlias
 
-Function Add-SpotifyCommandAlias {
+function Add-SpotifyCommandAlias {
 
     <#
 
@@ -353,7 +353,7 @@ Function Add-SpotifyCommandAlias {
 
     [CmdletBinding()]
 
-    Param([ValidateSet('Play',
+    param([ValidateSet('Play',
                        'Pause',
                        'Skip',
                        'NextTrack',
@@ -361,13 +361,13 @@ Function Add-SpotifyCommandAlias {
                        'PreviousTrack',
                        'Player')] [string[]]$Aliases)
 
-    If (($Aliases.Count -eq 0) -or ($Aliases -contains 'Play')) { Set-Alias -Name Play -Value Start-SpotifyPlayback -Scope Global }
-    If (($Aliases.Count -eq 0) -or ($Aliases -contains 'Pause')) { Set-Alias -Name Pause -Value Stop-SpotifyPlayback -Scope Global }
-    If (($Aliases.Count -eq 0) -or ($Aliases -contains 'Skip')) { Set-Alias -Name Skip -Value Skip-SpotifyNextTrack -Scope Global }
-    If (($Aliases.Count -eq 0) -or ($Aliases -contains 'NextTrack')) { Set-Alias -Name NextTrack -Value Skip-SpotifyNextTrack -Scope Global }
-    If (($Aliases.Count -eq 0) -or ($Aliases -contains 'SkipBack')) { Set-Alias -Name SkipBack -Value Skip-SpotifyPreviousTrack -Scope Global }
-    If (($Aliases.Count -eq 0) -or ($Aliases -contains 'PreviousTrack')) { Set-Alias -Name PreviousTrack -Value Skip-SpotifyPreviousTrack -Scope Global }
-    If (($Aliases.Count -eq 0) -or ($Aliases -contains 'Player')) { Set-Alias -Name Player -Value Get-SpotifyPlayer -Scope Global }
+    if (($Aliases.Count -eq 0) -or ($Aliases -contains 'Play')) { Set-Alias -Name Play -Value Start-SpotifyPlayback -Scope Global }
+    if (($Aliases.Count -eq 0) -or ($Aliases -contains 'Pause')) { Set-Alias -Name Pause -Value Stop-SpotifyPlayback -Scope Global }
+    if (($Aliases.Count -eq 0) -or ($Aliases -contains 'Skip')) { Set-Alias -Name Skip -Value Skip-SpotifyNextTrack -Scope Global }
+    if (($Aliases.Count -eq 0) -or ($Aliases -contains 'NextTrack')) { Set-Alias -Name NextTrack -Value Skip-SpotifyNextTrack -Scope Global }
+    if (($Aliases.Count -eq 0) -or ($Aliases -contains 'SkipBack')) { Set-Alias -Name SkipBack -Value Skip-SpotifyPreviousTrack -Scope Global }
+    if (($Aliases.Count -eq 0) -or ($Aliases -contains 'PreviousTrack')) { Set-Alias -Name PreviousTrack -Value Skip-SpotifyPreviousTrack -Scope Global }
+    if (($Aliases.Count -eq 0) -or ($Aliases -contains 'Player')) { Set-Alias -Name Player -Value Get-SpotifyPlayer -Scope Global }
 
 }
 
@@ -392,7 +392,7 @@ Export-ModuleMember -Function 'Add-SpotifyCommandAlias'
 
 #region Get-SpotifyDefaultAccessToken
 
-Function Get-SpotifyDefaultAccessToken {
+function Get-SpotifyDefaultAccessToken {
 
     <#
 
@@ -421,12 +421,12 @@ Function Get-SpotifyDefaultAccessToken {
     [CmdletBinding()]
     [OutputType([string])]
 
-    Param([switch]$IsRequired,
+    param([switch]$IsRequired,
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
 
-    If (($script:SpotifyEnvironmentInfo[$SpotifyEnv].UserSessions[0]).AccessToken) { Return (Get-SpotifyDefaultSession -SpotifyEnv $SpotifyEnv -RefreshIfExpired).AccessToken }
-    ElseIf ($IsRequired) { Throw 'An Access Token is required for this procedure. Either provide an Access Token to the -AccessToken parameter or configure a new session with the Initialize-SpotifySession command.' }
-    Else { Return $null }
+    if (($script:SpotifyEnvironmentInfo[$SpotifyEnv].UserSessions[0]).AccessToken) { return (Get-SpotifyDefaultSession -SpotifyEnv $SpotifyEnv -RefreshIfExpired).AccessToken }
+    elseif ($IsRequired) { throw 'An Access Token is required for this procedure. Either provide an Access Token to the -AccessToken parameter or configure a new session with the Initialize-SpotifySession command.' }
+    else { return $null }
 
 }
 

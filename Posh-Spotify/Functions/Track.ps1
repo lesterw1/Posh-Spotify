@@ -19,7 +19,7 @@
 
 #region Get-SpotifyTrack
 
-Function Get-SpotifyTrack {
+function Get-SpotifyTrack {
 
     <#
 
@@ -62,39 +62,39 @@ Function Get-SpotifyTrack {
     [CmdletBinding()]
     [OutputType('NewGuy.PoshSpotify.Track[]')]
 
-    Param([Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)] [string[]]$Id,
+    param([Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)] [string[]]$Id,
           [Alias('Country')] [string]$Market,
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
           [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
 
-    Begin {
+    begin {
 
         $TrackList = @()
 
     }
 
-    Process {
+    process {
 
         # Maximum of 50 tracks per request.
-        If ($Id.Count -gt 50) { Throw "Only 50 tracks per request allowed."}
+        if ($Id.Count -gt 50) { throw "Only 50 tracks per request allowed."}
 
         $params = @{
             ids = $Id -join ','
         }
 
-        If ($Market) { $params['market'] = $Market }
+        if ($Market) { $params['market'] = $Market }
 
         $result = Invoke-SpotifyRequest -Method 'GET' -Path '/v1/tracks' -AccessToken $AccessToken -QueryParameters $params -SpotifyEnv $SpotifyEnv
 
-        Foreach ($track In $result.tracks) {
+        foreach ($track in $result.tracks) {
             $TrackList += [NewGuy.PoshSpotify.Track]::new($track)
         }
 
     }
 
-    End {
+    end {
 
-        Return $TrackList
+        return $TrackList
 
     }
 

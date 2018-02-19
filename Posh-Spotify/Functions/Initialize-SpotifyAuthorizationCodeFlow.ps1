@@ -13,7 +13,7 @@
 
 #region Initialize-SpotifyAuthorizationCodeFlow
 
-Function Initialize-SpotifyAuthorizationCodeFlow {
+function Initialize-SpotifyAuthorizationCodeFlow {
 
     <#
 
@@ -81,14 +81,14 @@ Function Initialize-SpotifyAuthorizationCodeFlow {
     [CmdletBinding(DefaultParameterSetName = 'AquireToken')]
     [OutputType('NewGuy.PoshSpotify.AuthenticationToken')]
 
-    Param([Parameter(ParameterSetName = 'AquireToken')] [string]$CallbackUrl = 'http://localhost:8080/callback/',
+    param([Parameter(ParameterSetName = 'AquireToken')] [string]$CallbackUrl = 'http://localhost:8080/callback/',
           [Parameter(ParameterSetName = 'AquireToken')] [string]$State = ((New-Guid).Guid -replace '-',''),
           [Parameter(ParameterSetName = 'AquireToken')] [string[]]$Scopes,
           [Parameter(ParameterSetName = 'AquireToken')] [switch]$ShowDialog,
           [Parameter(ParameterSetName = 'RefreshToken')] [string]$RefreshToken,
           [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
 
-    Begin {
+    begin {
 
         # The authorization code need to obtain a access and refresh token.
         $AuthCode = $null
@@ -98,20 +98,20 @@ Function Initialize-SpotifyAuthorizationCodeFlow {
 
     }
 
-    Process {
+    process {
 
         # If we don't have a Refresh Token we must request access from the user.
-        If ($PSCmdlet.ParameterSetName -eq 'AquireToken') {
+        if ($PSCmdlet.ParameterSetName -eq 'AquireToken') {
 
             #region Get Authorization Code
 
             # If no CallbackUrl was given, see if there is an environment specific CallbackUrl, otherwise use the default above.
-            If (($null -eq $PSBoundParameters['CallbakUrl']) -and ($null -ne $script:SpotifyEnvironmentInfo[$SpotifyEnv].CallbackUrl)) {
+            if (($null -eq $PSBoundParameters['CallbakUrl']) -and ($null -ne $script:SpotifyEnvironmentInfo[$SpotifyEnv].CallbackUrl)) {
                 $CallbackUrl = $script:SpotifyEnvironmentInfo[$SpotifyEnv].CallbackUrl
             }
 
             # If no Scopes were given, see if there is an environment specific set of scopes.
-            If (($null -eq $PSBoundParameters['Scopes']) -and ($script:SpotifyEnvironmentInfo[$SpotifyEnv].DefaultScopes -gt 0)) {
+            if (($null -eq $PSBoundParameters['Scopes']) -and ($script:SpotifyEnvironmentInfo[$SpotifyEnv].DefaultScopes -gt 0)) {
                 $Scopes = $script:SpotifyEnvironmentInfo[$SpotifyEnv].DefaultScopes
             }
 
@@ -119,9 +119,9 @@ Function Initialize-SpotifyAuthorizationCodeFlow {
             $spotifyAuthUrl += "?client_id=$($script:SpotifyEnvironmentInfo[$SpotifyEnv].ClientId)"
             $spotifyAuthUrl += '&response_type=code'
             $spotifyAuthUrl += "&redirect_uri=$([System.Uri]::EscapeDataString($CallbackUrl))"
-            If ($Scopes.Count -gt 0) { $spotifyAuthUrl += "&scope=$($Scopes -join ' ')" }
-            If ($State.Length -gt 0) { $spotifyAuthUrl += "&state=$State" }
-            If ($ShowDialog) { $spotifyAuthUrl += '&show_dialog=true' }
+            if ($Scopes.Count -gt 0) { $spotifyAuthUrl += "&scope=$($Scopes -join ' ')" }
+            if ($State.Length -gt 0) { $spotifyAuthUrl += "&state=$State" }
+            if ($ShowDialog) { $spotifyAuthUrl += '&show_dialog=true' }
 
             Write-Verbose 'Opening browser window for user authorization request...'
 
@@ -131,7 +131,7 @@ Function Initialize-SpotifyAuthorizationCodeFlow {
             $listener = New-Object System.Net.HttpListener
             $listener.Prefixes.Add($CallbackUrl)
 
-            Try {
+            try {
 
                 Write-Verbose "Listening for authorization response on URL : $CallbackUrl"
 
@@ -141,7 +141,7 @@ Function Initialize-SpotifyAuthorizationCodeFlow {
                 Write-Warning "`n"
 
                 $listener.Start()
-                If ($listener.IsListening) {
+                if ($listener.IsListening) {
 
                     # Process received request.
                     $context = $listener.GetContext()
@@ -151,30 +151,30 @@ Function Initialize-SpotifyAuthorizationCodeFlow {
                     # Prepare response.
                     $responseBody = ''
 
-                    If ($Request.QueryString['Exit'] -ne $null) {
+                    if ($Request.QueryString['Exit'] -ne $null) {
                         $responseBody = '<html><h1>Bad Request</h1></html>'
                         $Response.StatusCode = 400
                         Write-Error 'Bad Request : Listener exit requested.'
                     }
 
                     # If needed check the state code to ensure everything is on the up and up.
-                    ElseIf (($State.Length -gt 0) -and ($Request.QueryString['state'] -ne $State)) {
+                    elseif (($State.Length -gt 0) -and ($Request.QueryString['state'] -ne $State)) {
                         $responseBody = '<html><h1>Bad Request</h1></html>'
                         $Response.StatusCode = 400
                         Write-Error 'Bad Request : State does not match.'
                     }
 
                     # If there was an error, report it.
-                    ElseIf ($Request.QueryString['error'].Length -gt 0) {
+                    elseif ($Request.QueryString['error'].Length -gt 0) {
                         $responseBody = '<html><h1>Unauthorized</h1></html>'
                         $Response.StatusCode = 401
                         Write-Error "Authorization Error : $($Request.QueryString['error'])"
                     }
 
                     # No errors so far...grab the access code if present.
-                    ElseIf ($Request.QueryString['code'].Length -gt 0) {
+                    elseif ($Request.QueryString['code'].Length -gt 0) {
                         $AuthCode = $Request.QueryString['code']
-                        If (($DebugPreference -eq 'Continue') -or ($DebugPreference -eq 'Inquire')) {
+                        if (($DebugPreference -eq 'Continue') -or ($DebugPreference -eq 'Inquire')) {
                             $responseBody = @"
 <html>
     <h1>Application Registered</h1>
@@ -184,11 +184,11 @@ State : $State
     </pre>
 </html>
 "@
-                        } Else { $responseBody = '<html><h1>Application Registered</h1></html>' }
+                        } else { $responseBody = '<html><h1>Application Registered</h1></html>' }
                     }
 
                     # Throw error if no code exist.
-                    Else {
+                    else {
                         $responseBody = '<html><h1>Bad Request</h1></html>'
                         $Response.StatusCode = 400
                         Write-Error 'Bad Request : No access code found.'
@@ -200,7 +200,7 @@ State : $State
                     $Response.OutputStream.Write($buffer, 0, $buffer.length)
                     $Response.Close()
                 }
-            } Finally {
+            } finally {
                 $listener.Stop()
             }
 
@@ -208,7 +208,7 @@ State : $State
 
             #region Get Access Token
 
-            If ($AuthCode -eq $null) { Throw 'No authorization code found in request.' }
+            if ($AuthCode -eq $null) { throw 'No authorization code found in request.' }
 
             $params = @{
                 code = $AuthCode
@@ -224,7 +224,7 @@ State : $State
         }
 
         # If we have a Refresh Token we should be able to get a new Access Token without user interaction.
-        ElseIf ($PSCmdlet.ParameterSetName -eq 'RefreshToken') {
+        elseif ($PSCmdlet.ParameterSetName -eq 'RefreshToken') {
 
             #region Get Access Token
 
@@ -243,7 +243,7 @@ State : $State
 
         }
 
-        Return $AuthObj
+        return $AuthObj
 
     }
 }

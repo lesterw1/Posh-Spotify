@@ -14,7 +14,7 @@
 #region Import Object Model
 
 # Since you can't unload a type from the console you must catch errors about adding the type when it already exists in the console.
-Try {
+try {
     Add-Type -ErrorAction Stop -Path @(
         "$PSScriptRoot\Artist.cs",
         "$PSScriptRoot\Album.cs",
@@ -31,9 +31,9 @@ Try {
         "$PSScriptRoot\Track.cs",
         "$PSScriptRoot\User.cs"
     )
-} Catch {
-    If ($_.Exception.Message -match "Cannot add type. The type name '.*?' already exists.") { }  # Do nothing.
-    Else { Throw }  # Rethrow the error.
+} catch {
+    if ($_.Exception.Message -match "Cannot add type. The type name '.*?' already exists.") { }  # Do nothing.
+    else { throw }  # Rethrow the error.
 }
 
 #endregion Import Object Model

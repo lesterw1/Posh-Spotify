@@ -19,7 +19,7 @@
 
 #region Get-SpotifyPlaylist
 
-Function Get-SpotifyPlaylist {
+function Get-SpotifyPlaylist {
 
     <#
 
@@ -88,7 +88,7 @@ Function Get-SpotifyPlaylist {
     [CmdletBinding()]
     [OutputType('NewGuy.PoshSpotify.Playlist[]')]
 
-    Param([Parameter(ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias('Username')] [string]$Id,
+    param([Parameter(ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias('Username')] [string]$Id,
           [switch]$PageResults,
           [int]$Limit = 20,
           [int]$Offset = 0,
@@ -96,24 +96,24 @@ Function Get-SpotifyPlaylist {
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
           [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
 
-    Begin {
+    begin {
 
         $PlaylistList = @()
 
     }
 
-    Process {
+    process {
 
         $path = '/v1/me/playlists'
 
-        If ($Username.Length -gt 0) { $path = "/v1/users/$Username/playlists" }
+        if ($Username.Length -gt 0) { $path = "/v1/users/$Username/playlists" }
 
         $splat = @{ Path = $path }
 
-        If ($PageResults) {
+        if ($PageResults) {
             $splat.Limit = $Limit
             $splat.Offset = $Offset
-        } Else {
+        } else {
             $splat.Limit = 50
             $splat.Offset = 0
         }
@@ -121,15 +121,15 @@ Function Get-SpotifyPlaylist {
         $pagingObject = New-SpotifyPage @splat
 
         # Get requested playlists.
-        If ($PageResults) {
+        if ($PageResults) {
             $PlaylistList += (Get-SpotifyPage -PagingInfo $pagingObject -RetrieveMode NextPage -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv).Items
-        } Else {
+        } else {
             $PlaylistList += (Get-SpotifyPage -PagingInfo $pagingObject -RetrieveMode AllPages -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv).Items
         }
 
         # Get all Tracks if not otherwise requested.
-        If (-not $SkipTrackRetrieval) {
-            Foreach ($playlist In $PlaylistList) {
+        if (-not $SkipTrackRetrieval) {
+            foreach ($playlist in $PlaylistList) {
                 $newPageInfo = Get-SpotifyPage -PagingInfo $playlist.TrackPagingInfo -RetrieveMode AllPages -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv
                 $newPageInfo.Items | ForEach-Object { $playlist.Tracks.Add($_) }
             }
@@ -137,9 +137,9 @@ Function Get-SpotifyPlaylist {
 
     }
 
-    End {
+    end {
 
-        Return $PlaylistList
+        return $PlaylistList
 
     }
 

@@ -19,7 +19,7 @@
 
 #region Get-SpotifyArtist
 
-Function Get-SpotifyArtist {
+function Get-SpotifyArtist {
 
     <#
 
@@ -62,20 +62,20 @@ Function Get-SpotifyArtist {
     [CmdletBinding()]
     [OutputType('NewGuy.PoshSpotify.Artist[]')]
 
-    Param([Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)] [string[]]$Id,
+    param([Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)] [string[]]$Id,
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
           [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
 
-    Begin {
+    begin {
 
         $ArtistList = @()
 
     }
 
-    Process {
+    process {
 
         # Maximum of 50 artists per request.
-        If ($Id.Count -gt 50) { Throw "Only 50 artists per request allowed." }
+        if ($Id.Count -gt 50) { throw "Only 50 artists per request allowed." }
 
         $params = @{
             ids = $Id -join ','
@@ -83,15 +83,15 @@ Function Get-SpotifyArtist {
 
         $result = Invoke-SpotifyRequest -Method 'GET' -Path '/v1/artists' -AccessToken $AccessToken -QueryParameters $params -SpotifyEnv $SpotifyEnv
 
-        Foreach ($artist In $result.artists) {
+        foreach ($artist in $result.artists) {
             $ArtistList += [NewGuy.PoshSpotify.Artist]::new($artist)
         }
 
     }
 
-    End {
+    end {
 
-        Return $ArtistList
+        return $ArtistList
 
     }
 

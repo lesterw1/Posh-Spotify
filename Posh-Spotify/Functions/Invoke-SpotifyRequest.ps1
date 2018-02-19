@@ -12,7 +12,7 @@
 
 #region Invoke-SpotifyRequest
 
-Function Invoke-SpotifyRequest {
+function Invoke-SpotifyRequest {
 
     <#
 
@@ -97,7 +97,7 @@ Function Invoke-SpotifyRequest {
 
     [CmdletBinding()]
 
-    Param([Parameter(Mandatory)] [string]$Path,
+    param([Parameter(Mandatory)] [string]$Path,
           [Parameter(Mandatory)] [ValidateSet('GET', 'POST', 'PUT', 'DELETE')] [string]$Method,
           [hashtable]$QueryParameters,
           [hashtable]$RequestBodyParameters,
@@ -111,7 +111,7 @@ Function Invoke-SpotifyRequest {
 
     # Setup the query string if needed.
     $queryStr = ''
-    If ($QueryParameters.Count -gt 0) {
+    if ($QueryParameters.Count -gt 0) {
             # URL encode requested parameters.
             $queryParams = Get-SpotifyEncodedParameter -RequestParameters $QueryParameters -Encoding UrlEncoding
             $queryStr = '?' + $queryParams
@@ -122,19 +122,19 @@ Function Invoke-SpotifyRequest {
     $Path = $Path.Replace(('https://' + $script:SpotifyAccountsApiHostname), '')
 
     # Add a leading slash to the path if not present unless it's full URL.
-    If (($Path -notmatch '^/') -and ($Path -notmatch '^https?://')) { $Path = '/' + $Path }
+    if (($Path -notmatch '^/') -and ($Path -notmatch '^https?://')) { $Path = '/' + $Path }
 
     # Build the URI.
-    If ($RequestType -eq 'WebAPI') { $uri = 'https://' + $script:SpotifyWebApiHostname + $Path + $queryStr }
-    ElseIf ($RequestType -eq 'AccountsAPI') { $uri = 'https://' + $script:SpotifyAccountsApiHostname + $Path + $queryStr }
+    if ($RequestType -eq 'WebAPI') { $uri = 'https://' + $script:SpotifyWebApiHostname + $Path + $queryStr }
+    elseif ($RequestType -eq 'AccountsAPI') { $uri = 'https://' + $script:SpotifyAccountsApiHostname + $Path + $queryStr }
 
     # Build the request.
-    Try {
+    try {
 
         # Create HTTP request and set its method.
         $request = [System.Net.HttpWebRequest]::CreateHttp($uri)
-        If ($request) { $request.Method = $Method }
-        Else { Throw "Error creating HTTP request for URI: $uri" }
+        if ($request) { $request.Method = $Method }
+        else { throw "Error creating HTTP request for URI: $uri" }
 
         Write-Verbose ('[' + $request.Method + ' ' + $request.RequestUri + ']')
         Write-Debug ('[' + $request.Method + ' ' + $request.RequestUri + ']')
@@ -153,7 +153,7 @@ Function Invoke-SpotifyRequest {
         Set-SpotifyRequestProxy -Request $request -SpotifyEnv $SpotifyEnv
 
         # If sending request body parameters, convert to JSON and write out the bytes to the request object.
-        If ($RequestBodyParameters.Count -gt 0) {
+        if ($RequestBodyParameters.Count -gt 0) {
 
             $bodyParams = Get-SpotifyEncodedParameter -RequestParameters $RequestBodyParameters -Encoding $Encoding
 
@@ -181,10 +181,10 @@ Function Invoke-SpotifyRequest {
         Write-Verbose 'Response received. Processing...'
 
         # Process the response.
-        If ($response -eq $null) { Throw "Error retrieving response from URI: $uri" }
+        if ($response -eq $null) { throw "Error retrieving response from URI: $uri" }
 
         # Check for common response codes needing action.
-        If ($response.StatusCode -eq '202') {
+        if ($response.StatusCode -eq '202') {
 
             # TODO
 
@@ -194,7 +194,7 @@ Function Invoke-SpotifyRequest {
 
         }
 
-        If ($response.StatusCode -eq '204') {
+        if ($response.StatusCode -eq '204') {
 
             # TODO
 
@@ -205,7 +205,7 @@ Function Invoke-SpotifyRequest {
         }
 
         # Return just the raw bytes of the response body.
-        If ($ReturnRawBytes) {
+        if ($ReturnRawBytes) {
 
             # To get the bytes only we have to work directly with the response stream.
             $respStream = $response.GetResponseStream()
@@ -215,42 +215,42 @@ Function Invoke-SpotifyRequest {
 
             $bytesRead = 0
             [byte[]]$respBodyBytes = @()
-            While (($bytesRead = $respStream.Read($buffer, 0, $buffer.Length)) -gt 0) {
+            while (($bytesRead = $respStream.Read($buffer, 0, $buffer.Length)) -gt 0) {
                 $respBodyBytes += $buffer[0..($bytesRead - 1)]
             }
 
             # Return raw response body as bytes.
-            Return $respBodyBytes
+            return $respBodyBytes
 
         # Convert the JSON response body to a PSObject if requested.
-        } Else {
+        } else {
 
             # Get the response body.
             $respStreamReader = New-Object System.IO.StreamReader($response.GetResponseStream())
             $respBody = $respStreamReader.ReadToEnd()
             $respStreamReader.Close()
 
-            Try {
+            try {
                 $respBodyObj = ConvertFrom-Json -InputObject $respBody
-            } Catch {
+            } catch {
                 Write-Warning "Response body could not be converted from JSON:`n$respBody"
                 Write-Warning "JSON Conversion Exception: $($_.Exception.Message)"
             }
 
             # Return JSON converted response body.
-            Return $respBodyObj
+            return $respBodyObj
 
         }
 
     # Handle Web Request errors.
-    } Catch [Net.WebException] {
+    } catch [Net.WebException] {
 
         # Get the error from the response body if one exists and use it as a message in the error we are about to throw.
-        If ($_.Exception.Response -ne $null) {
+        if ($_.Exception.Response -ne $null) {
 
             [System.Net.HttpWebResponse]$response = $_.Exception.Response
 
-            If ($response.StatusCode -eq '429') {
+            if ($response.StatusCode -eq '429') {
 
                 # TODO
 
@@ -259,7 +259,7 @@ Function Invoke-SpotifyRequest {
                 # There should be a 'Retry-After' header containing the number of seconds you must wait before the next request can be made.
                 # Need to make a decision as to whether to wait and try again or just return rate limiting error to user (or a switch for the option).
 
-            } ElseIf ($response.StatusCode -match '^[45]\d\d$') {
+            } elseif ($response.StatusCode -match '^[45]\d\d$') {
 
                 # TODO
 
@@ -270,27 +270,27 @@ Function Invoke-SpotifyRequest {
                 # do we want to silently return a converted Spotify Error object (possibly unexpected by the caller). The wrapper functions would
                 # have to check for this if necessary.
 
-            } Else {
+            } else {
                 # <The Error Code Below>
             }
 
             $respStreamReader = New-Object System.IO.StreamReader($response.GetResponseStream())
             $respBody = $respStreamReader.ReadToEnd()
             $respStreamReader.Close()
-            Throw "Status Code : $([int]($response.StatusCode))`nStatus Description : $($response.StatusDescription)`nResponse Body :`n$respBody"
-        } Else {
-            Throw  # No response body so just rethrow the exception as is.
+            throw "Status Code : $([int]($response.StatusCode))`nStatus Description : $($response.StatusDescription)`nResponse Body :`n$respBody"
+        } else {
+            throw  # No response body so just rethrow the exception as is.
         }
 
     # Handle any other errors.
-    } Catch {
+    } catch {
 
-        Throw  # Rethrow exception.
+        throw  # Rethrow exception.
 
     # Clean up.
-    } Finally {
+    } finally {
 
-        If ($response) {
+        if ($response) {
 
             $response.Close()
             $response.Dispose()
@@ -322,7 +322,7 @@ Export-ModuleMember -Function 'Invoke-SpotifyRequest'
 
 # This function is called by the public command Invoke-SpotifyRequest to build the Authorization header.
 
-Function Get-SpotifyAuthorizationHeader {
+function Get-SpotifyAuthorizationHeader {
 
     <#
 
@@ -353,19 +353,19 @@ Function Get-SpotifyAuthorizationHeader {
 
     [CmdletBinding()]
 
-    Param([string]$AccessToken,
+    param([string]$AccessToken,
           [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
 
-    If ($AccessToken) { $header = "Bearer $AccessToken" }
-    Else {
+    if ($AccessToken) { $header = "Bearer $AccessToken" }
+    else {
 
-        If ($script:SpotifyEnvironmentInfo[$SpotifyEnv].SecretKeyEncrypted) {
-            Try {
+        if ($script:SpotifyEnvironmentInfo[$SpotifyEnv].SecretKeyEncrypted) {
+            try {
                 $secureSecretKey = ConvertTo-SecureString -String $script:SpotifyEnvironmentInfo[$SpotifyEnv].SecretKeyEncrypted -ErrorAction Stop
                 $secretKey = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($secureSecretKey))
-            } Catch { Throw "Invalid Encrypted Secret Key : $($_.Exception.Message)" }
+            } catch { throw "Invalid Encrypted Secret Key : $($_.Exception.Message)" }
             $authStr = $script:SpotifyEnvironmentInfo[$SpotifyEnv].ClientId + ':' + $secretKey
-        } Else {
+        } else {
             $authStr = $script:SpotifyEnvironmentInfo[$SpotifyEnv].ClientId + ':' + $script:SpotifyEnvironmentInfo[$SpotifyEnv].SecretKey
         }
         $basicAuthStr = Get-SpotifyEncode64 -PlainText $authStr
@@ -375,7 +375,7 @@ Function Get-SpotifyAuthorizationHeader {
 
     Write-Debug "Get-SpotifyAuthorizationHeader : `n$header"
 
-    Return $header
+    return $header
 
 }
 
@@ -390,7 +390,7 @@ Function Get-SpotifyAuthorizationHeader {
 
 # This function is called by the public command Invoke-SpotifyRequest to encode the request parameters.
 
-Function Get-SpotifyEncodedParameter {
+function Get-SpotifyEncodedParameter {
 
     <#
 
@@ -432,16 +432,16 @@ Function Get-SpotifyEncodedParameter {
 
     [CmdletBinding()]
 
-    Param([hashtable]$RequestParameters,
+    param([hashtable]$RequestParameters,
           [ValidateSet('UrlEncoding','JSON')] [string]$Encoding = 'UrlEncoding')
 
-    If ($RequestParameters.Count -gt 0) {
+    if ($RequestParameters.Count -gt 0) {
 
         $paramLines = @()
 
-        If ($Encoding -eq 'UrlEncoding') {
+        if ($Encoding -eq 'UrlEncoding') {
 
-            Foreach ($key In $RequestParameters.keys) {
+            foreach ($key in $RequestParameters.keys) {
 
                 # URL encode the the parameters.
                 $param = [System.Web.HttpUtility]::UrlEncode($key) + '=' + [System.Web.HttpUtility]::UrlEncode($RequestParameters[$key])
@@ -454,18 +454,18 @@ Function Get-SpotifyEncodedParameter {
             # Put parameters into one query string.
             $encodedParameters = $paramLines -join '&'
 
-        } Else {
+        } else {
             # JSON converted object.
             $encodedParameters = ConvertTo-Json $RequestParameters
         }
 
-    } Else {
+    } else {
         $encodedParameters = ''
     }
 
     Write-Debug "Get-SpotifyEncodedParameter : `n$encodedParameters"
 
-    Return $encodedParameters
+    return $encodedParameters
 }
 
 #endregion Get-SpotifyEncodedParameter
@@ -488,13 +488,13 @@ Function Get-SpotifyEncodedParameter {
 #region Get-SpotifyEncode64
 
 # Returns a Base64 encoded version of provided $Plaintext.
-Function Get-SpotifyEncode64 {
+function Get-SpotifyEncode64 {
 
     Param ($PlainText)
 
     [byte[]]$plainTextBytes = [System.Text.Encoding]::ASCII.GetBytes($PlainText)
 
-    Return [System.Convert]::ToBase64String($plainTextBytes)
+    return [System.Convert]::ToBase64String($plainTextBytes)
 
 }
 
@@ -508,61 +508,61 @@ Function Get-SpotifyEncode64 {
 #region Set-SpotifyRequestProxy
 
 # Sets the proxy server for the given request using the provided Spotify environment info.
-Function Set-SpotifyRequestProxy {
+function Set-SpotifyRequestProxy {
 
     [CmdletBinding()]
 
-    Param([Parameter(Mandatory)] [System.Net.HttpWebRequest]$Request,
+    param([Parameter(Mandatory)] [System.Net.HttpWebRequest]$Request,
           [string]$SpotifyEnv = $script:SpotifyDefaultEnv)
 
     # Check if a proxy server has been given and set it up if so.
-    If ($script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyServer) {
+    if ($script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyServer) {
 
         # Create the proxy object.
         $webProxy = New-Object System.Net.WebProxy
-        If ($webProxy -eq $null) { Throw 'Error creating web proxy object' }
+        if ($webProxy -eq $null) { throw 'Error creating web proxy object' }
 
         # Set the proxy server and port. Make sure we are using HTTP as that is all the System.Net.WebRequest class supports.
         # HTTPS proxy addresses should not ever be needed. See below.
         # https://blogs.msdn.microsoft.com/jpsanders/2007/04/25/the-servicepointmanager-does-not-support-proxies-of-https-scheme-net-1-1-sp1/
         $proxyServer = $script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyServer
-        If ($proxyServer -notmatch '^http') { $proxyServer = "http://$proxyServer" }
-        Else { $proxyServer = $proxyServer -replace '^https://', 'http://' }
-        If ($script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyPort) { $proxyServer += ':' + $script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyPort }
+        if ($proxyServer -notmatch '^http') { $proxyServer = "http://$proxyServer" }
+        else { $proxyServer = $proxyServer -replace '^https://', 'http://' }
+        if ($script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyPort) { $proxyServer += ':' + $script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyPort }
         $webProxy.Address = $proxyServer
 
         # Set the bypass list if available. Make sure each URI starts with a ';'.
-        If ($script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyBypassList) {
-            $bypassList = $script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyBypassList | ForEach-Object { If ($_ -match '^;') { $_ } Else { ';' + $_ } }
-            Try { $webProxy.BypassList = $bypassList }
-            Catch { Throw "Invalid proxy bypass list.`n$($_.Exception.Message)" }
+        if ($script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyBypassList) {
+            $bypassList = $script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyBypassList | ForEach-Object { if ($_ -match '^;') { $_ } else { ';' + $_ } }
+            try { $webProxy.BypassList = $bypassList }
+            catch { throw "Invalid proxy bypass list.`n$($_.Exception.Message)" }
         }
 
         # Set bypass on local setting if needed.
-        If ($script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyBypassOnLocal) {
+        if ($script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyBypassOnLocal) {
             $webProxy.BypassProxyOnLocal = $true
         }
 
         # Set credentials if needed.
-        If ($script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyUseDefaultCredentials) {
+        if ($script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyUseDefaultCredentials) {
             $webProxy.UseDefaultCredentials = $true
-        } ElseIf ($script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyUsername) {
-            If ($script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyPasswordEncrypted) {
+        } elseif ($script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyUsername) {
+            if ($script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyPasswordEncrypted) {
                 $secPassword = $script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyPasswordEncrypted
-            } ElseIf ($script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyPassword) {
+            } elseif ($script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyPassword) {
                 $secPassword = ConvertTo-SecureString $script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyPassword -AsPlainText -Force
             }
-            Try {
+            try {
                 $creds = New-Object System.Management.Automation.PSCredential ($script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyUsername, $secPassword)
                 $webProxy.Credentials = $creds
-            } Catch { Throw "Error setting proxy server credentials.`n$($_.Exception.Message)" }
+            } catch { throw "Error setting proxy server credentials.`n$($_.Exception.Message)" }
         }
 
         Write-Debug "Set-SpotifyRequestProxy : Proxy Setup : $($webProxy | Out-String)"
 
         # Add the proxy to the web request.
-        Try { $Request.Proxy = $webProxy }
-        Catch { Throw "Error setting proxy server on web request: `n$($_.Exception.Message)" }
+        try { $Request.Proxy = $webProxy }
+        catch { throw "Error setting proxy server on web request: `n$($_.Exception.Message)" }
 
     }
 }

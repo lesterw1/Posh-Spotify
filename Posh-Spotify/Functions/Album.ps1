@@ -19,7 +19,7 @@
 
 #region Get-SpotifyAlbum
 
-Function Get-SpotifyAlbum {
+function Get-SpotifyAlbum {
 
     <#
 
@@ -62,39 +62,39 @@ Function Get-SpotifyAlbum {
     [CmdletBinding()]
     [OutputType('NewGuy.PoshSpotify.Album[]')]
 
-    Param([Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)] [string[]]$Id,
+    param([Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)] [string[]]$Id,
           [Alias('Country')] [string]$Market,
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
           [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
 
-    Begin {
+    begin {
 
         $AlbumList = @()
 
     }
 
-    Process {
+    process {
 
         # Maximum of 20 albums per request.
-        If ($Id.Count -gt 20) { Throw "Only 20 albums per request allowed." }
+        if ($Id.Count -gt 20) { throw "Only 20 albums per request allowed." }
 
         $params = @{
             ids = $Id -join ','
         }
 
-        If ($Market) { $params['market'] = $Market }
+        if ($Market) { $params['market'] = $Market }
 
         $result = Invoke-SpotifyRequest -Method 'GET' -Path '/v1/albums' -AccessToken $AccessToken -QueryParameters $params -SpotifyEnv $SpotifyEnv
 
-        Foreach ($album In $result.albums) {
+        foreach ($album in $result.albums) {
             $AlbumList += [NewGuy.PoshSpotify.Album]::new($album)
         }
 
     }
 
-    End {
+    end {
 
-        Return $AlbumList
+        return $AlbumList
 
     }
 

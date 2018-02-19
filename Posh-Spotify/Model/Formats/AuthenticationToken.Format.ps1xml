@@ -12,11 +12,11 @@
                         <ListItems>
                             <ListItem>
                                 <Label>AccessToken</Label>
-                                <ScriptBlock>If ($_.AccessToken.Length -gt 75) { ($_.AccessToken[0..75] -join '') + '...' } Else { $_.AccessToken }</ScriptBlock>
+                                <ScriptBlock>if ($_.AccessToken.Length -gt 75) { ($_.AccessToken[0..75] -join '') + '...' } else { $_.AccessToken }</ScriptBlock>
                             </ListItem>
                             <ListItem>
                                 <Label>RefreshToken</Label>
-                                <ScriptBlock>If ($_.RefreshToken.Length -gt 75) { ($_.RefreshToken[0..75] -join '') + '...' } Else { $_.RefreshToken }</ScriptBlock>
+                                <ScriptBlock>if ($_.RefreshToken.Length -gt 75) { ($_.RefreshToken[0..75] -join '') + '...' } else { $_.RefreshToken }</ScriptBlock>
                             </ListItem>
                             <ListItem>
                                 <PropertyName>HasExpired</PropertyName>

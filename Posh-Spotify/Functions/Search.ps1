@@ -19,7 +19,7 @@
 
 #region Get-SpotifySearch
 
-Function Get-SpotifySearch {
+function Get-SpotifySearch {
 
     <#
 
@@ -133,7 +133,7 @@ Function Get-SpotifySearch {
     [CmdletBinding()]
     [OutputType('NewGuy.PoshSpotify.Search[]')]
 
-    Param([Parameter(Mandatory, ValueFromPipeline)][ValidateNotNullOrEmpty()] [string]$Query,
+    param([Parameter(Mandatory, ValueFromPipeline)][ValidateNotNullOrEmpty()] [string]$Query,
           [ValidateSet('Album', 'Artist', 'Playlist', 'Track')] [string[]]$Type = 'Track',
           [Alias('Country')] [string]$Market,
           [int]$Limit = 50,
@@ -141,35 +141,35 @@ Function Get-SpotifySearch {
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
           [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
 
-    Begin {
+    begin {
 
         $SearchList = @()
 
     }
 
-    Process {
+    process {
 
         $params = @{
             q = $Query
             type = ($Type -join ',').ToLower()
         }
 
-        If ($PSBoundParameters.Keys -contains 'Limit') { $params['limit'] = $Limit }
-        If ($PSBoundParameters.Keys -contains 'Offset') { $params['offset'] = $Offset }
-        If ($Market) { $params['market'] = $Market }
+        if ($PSBoundParameters.Keys -contains 'Limit') { $params['limit'] = $Limit }
+        if ($PSBoundParameters.Keys -contains 'Offset') { $params['offset'] = $Offset }
+        if ($Market) { $params['market'] = $Market }
 
         $result = Invoke-SpotifyRequest -Method 'GET' -Path '/v1/search' -AccessToken $AccessToken -QueryParameters $params -SpotifyEnv $SpotifyEnv
 
         # Go through each type list found and pull out the PagingInfo object.
-        Foreach ($itemListType In ($result | Get-Member | Where-Object { $_.MemberType -eq 'NoteProperty' } | Select-Object -ExpandProperty Name)) {
+        foreach ($itemListType in ($result | Get-Member | Where-Object { $_.MemberType -eq 'NoteProperty' } | Select-Object -ExpandProperty Name)) {
             $SearchList += [NewGuy.PoshSpotify.PagingInfo]::new($result.$itemListType)
         }
 
     }
 
-    End {
+    end {
 
-        Return $SearchList
+        return $SearchList
 
     }
 

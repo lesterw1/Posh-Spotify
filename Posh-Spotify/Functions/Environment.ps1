@@ -19,7 +19,7 @@
 
 #region Get-SpotifyEnvironmentInfo
 
-Function Get-SpotifyEnvironmentInfo {
+function Get-SpotifyEnvironmentInfo {
 
     <#
 
@@ -38,12 +38,12 @@ Function Get-SpotifyEnvironmentInfo {
     [CmdletBinding()]
     [OutputType('hashtable')]
 
-    Param()
+    param()
 
     # Hashtables pass by reference. So we have to recreate/clone them to prevent the user from modifying the hashtable they are getting
     # and in turn modifying the hashtable stored in this module without a proper validation test being performed on it.
     $userEnvironmentInfo = Copy-SpotifyEnvInfo -SpotifyEnvInfo $SpotifyEnvironmentInfo
-    Return $userEnvironmentInfo
+    return $userEnvironmentInfo
 
 }
 
@@ -58,7 +58,7 @@ Export-ModuleMember -Function 'Get-SpotifyEnvironmentInfo'
 
 #region Set-SpotifyEnvironmentInfo
 
-Function Set-SpotifyEnvironmentInfo {
+function Set-SpotifyEnvironmentInfo {
 
     <#
 
@@ -86,7 +86,7 @@ Function Set-SpotifyEnvironmentInfo {
 
     [CmdletBinding()]
 
-    Param([Parameter(Mandatory)] [hashtable]$SpotifyEnvironmentInfo,
+    param([Parameter(Mandatory)] [hashtable]$SpotifyEnvironmentInfo,
           [Parameter(Mandatory)] [string]$SpotifyDefaultEnv)
 
     # Save the old info in case we have to restore it.
@@ -101,13 +101,13 @@ Function Set-SpotifyEnvironmentInfo {
     $script:SpotifyDefaultEnv = $SpotifyDefaultEnv
 
     # Verify the info is correct.
-    Try {
+    try {
         Test-SpotifyEnvInfoFormat | Out-Null
-    } Catch {
+    } catch {
         # Something is wrong with the hashtable format or default environment. Restoring old values.
         $script:SpotifyEnvironmentInfo = $oldInfo
         $script:SpotifyDefaultEnv = $oldDefault
-        Throw  # Retrhow error.
+        throw  # Retrhow error.
     }
 
 }
@@ -123,7 +123,7 @@ Export-ModuleMember -Function 'Set-SpotifyEnvironmentInfo'
 
 #region Save-SpotifyEnvironmentInfo
 
-Function Save-SpotifyEnvironmentInfo {
+function Save-SpotifyEnvironmentInfo {
 
     <#
 
@@ -148,10 +148,10 @@ Function Save-SpotifyEnvironmentInfo {
 
     [CmdletBinding()]
 
-    Param([string]$FilePath = ($script:SpotifyDefaultEnvironmentInfoSaveLocation + '\' + $script:SpotifyDefaultEnvironmentInfoSaveFilename),
+    param([string]$FilePath = ($script:SpotifyDefaultEnvironmentInfoSaveLocation + '\' + $script:SpotifyDefaultEnvironmentInfoSaveFilename),
           [switch]$NoTimestampAppend)
 
-        If (-not $NoTimestampAppend) {
+        if (-not $NoTimestampAppend) {
             $ext = [IO.Path]::GetExtension($FilePath)
             $FilePath = $FilePath -replace "$ext$","_$(Get-Date -Format 'yyyy.MM.dd_HH.mm.ss')$ext"
         }
@@ -173,7 +173,7 @@ Export-ModuleMember -Function 'Save-SpotifyEnvironmentInfo'
 
 #region Import-SpotifyEnvironmentInfo
 
-Function Import-SpotifyEnvironmentInfo {
+function Import-SpotifyEnvironmentInfo {
 
     <#
 
@@ -194,14 +194,14 @@ Function Import-SpotifyEnvironmentInfo {
     [CmdletBinding()]
     [OutputType('hashtable')]
 
-    Param([string]$FilePath)
+    param([string]$FilePath)
 
     # Throw all errors to stop the script.
     $ErrorActionPreference = 'Stop'
 
     # If FilePath was not provided build a default one. This only works if it was saved with default path and appended timestamp.
     # An * will be added as a wildcard for the date/time part of the filename.
-    If (($FilePath -eq $null) -or ($FilePath -eq '')) {
+    if (($FilePath -eq $null) -or ($FilePath -eq '')) {
         $FilePath = ($script:SpotifyDefaultEnvironmentInfoSaveLocation + '\' + $script:SpotifyDefaultEnvironmentInfoSaveFilename)
         $ext = [IO.Path]::GetExtension($FilePath)
         $FilePath = $FilePath -replace "$ext$","_*$ext"
@@ -209,7 +209,7 @@ Function Import-SpotifyEnvironmentInfo {
     }
 
     # Verify we have a valid file now.
-    If (-not (Test-Path $FilePath)) { Throw "Invalid file path : $FilePath" }
+    if (-not (Test-Path $FilePath)) { throw "Invalid file path : $FilePath" }
 
     # If there are multiple matches on FilePath, sort by name and pick the last one.
     # Assuming the files end in a date, it should be the newest file. If not then who knows what the user is looking for.
@@ -219,7 +219,7 @@ Function Import-SpotifyEnvironmentInfo {
     $jsonObjs = (Get-Content $file | ConvertFrom-Json)
 
     # Make sure we got something back. Should be an array.
-    If (($null -eq $jsonObjs) -or ($jsonObjs.Count -eq 0)) { Throw "Failed to retrieve information from provided file path : $FilePath" }
+    if (($null -eq $jsonObjs) -or ($jsonObjs.Count -eq 0)) { throw "Failed to retrieve information from provided file path : $FilePath" }
 
     # First object should be a string representing the default environment info.
     $defaultEnvInfo = $jsonObjs[0]
@@ -228,21 +228,21 @@ Function Import-SpotifyEnvironmentInfo {
     # Though ConvertFrom-Json returns PSCustomObject. Need to convert to hashtables.
     $envInfoObj = $jsonObjs[1]
     $envInfoHT = @{}
-    Foreach ($env In ($envInfoObj | Get-Member -MemberType NoteProperty)) {
+    foreach ($env in ($envInfoObj | Get-Member -MemberType NoteProperty)) {
         $envInfoHT.($env.Name) = @{}
-        Foreach ($setting In ($envInfoObj.($env.Name) | Get-Member -MemberType NoteProperty)) {
+        foreach ($setting in ($envInfoObj.($env.Name) | Get-Member -MemberType NoteProperty)) {
             $envInfoHT.($env.Name).($setting.Name) = $envInfoObj.($env.Name).($setting.Name)
         }
     }
 
     # Need to convert any UserSessions into actual AuthenticationToken objects.
-    Foreach ($env In $envInfoHT.Keys) {
-        If ($envInfoHT.$env.UserSessions -is [array]) {
+    foreach ($env in $envInfoHT.Keys) {
+        if ($envInfoHT.$env.UserSessions -is [array]) {
 
             # New array containing only converted AuthenticationToken objects.
             $newUserSessionsArray = @()
 
-            Foreach ($sess In $envInfoHT.$env.UserSessions) {
+            foreach ($sess in $envInfoHT.$env.UserSessions) {
 
                 # Calculate the remaining time left on the access token.
                 $expiresOn = $sess.ExpiresOn.ToLocalTime()
@@ -250,8 +250,8 @@ Function Import-SpotifyEnvironmentInfo {
 
                 # Create object and set optional properties.
                 $newSess = [NewGuy.PoshSpotify.AuthenticationToken]::new($sess.AccessToken, $sess.TokenType, $expiresInSec)
-                If ($sess.RefreshToken) { $newSess.RefreshToken = $sess.RefreshToken }
-                If ($sess.Scopes) { $newSess.Scopes = $sess.Scopes }
+                if ($sess.RefreshToken) { $newSess.RefreshToken = $sess.RefreshToken }
+                if ($sess.Scopes) { $newSess.Scopes = $sess.Scopes }
 
                 # Add new Authentication Token to new UserSessions array.
                 $newUserSessionsArray += $newSess
@@ -266,7 +266,7 @@ Function Import-SpotifyEnvironmentInfo {
 
     Set-SpotifyEnvironmentInfo -SpotifyEnvironmentInfo $envInfoHT -SpotifyDefaultEnv $defaultEnvInfo
 
-    Return Get-SpotifyEnvironmentInfo
+    return Get-SpotifyEnvironmentInfo
 
 }
 
@@ -281,7 +281,7 @@ Export-ModuleMember -Function 'Import-SpotifyEnvironmentInfo'
 
 #region Set-SpotifyEnvironmentProxy
 
-Function Set-SpotifyEnvironmentProxy {
+function Set-SpotifyEnvironmentProxy {
 
     <#
 
@@ -347,7 +347,7 @@ Function Set-SpotifyEnvironmentProxy {
 
     [CmdletBinding()]
 
-    Param([Parameter(Mandatory, ParameterSetName = 'UseSystemSettings')] [switch]$UseSystemSettings,
+    param([Parameter(Mandatory, ParameterSetName = 'UseSystemSettings')] [switch]$UseSystemSettings,
           [Parameter(Mandatory, ParameterSetName = 'ManualEntry')] [string]$Server,
           [Parameter(ParameterSetName = 'ManualEntry')] [int]$Port,
           [Parameter(ParameterSetName = 'ManualEntry')] [array]$BypassList,
@@ -359,33 +359,33 @@ Function Set-SpotifyEnvironmentProxy {
     # Save the old info in case we have to restore it.
     $oldEnvInfo = $script:SpotifyEnvironmentInfo[$SpotifyEnv]
 
-    If ($PSCmdlet.ParameterSetName -eq 'UseSystemSettings') {
+    if ($PSCmdlet.ParameterSetName -eq 'UseSystemSettings') {
         $systemProxy = Get-SpotifySystemProxy
 
-        If (($systemProxy -ne $null) -and ($systemProxy.ProxyEnabled)) {
+        if (($systemProxy -ne $null) -and ($systemProxy.ProxyEnabled)) {
             $script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyServer = ($systemProxy.ProxyServer -split ':')[0]
-            If (($systemProxy.ProxyServer -split ':')[1] -ne $null) { $script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyPort = ($systemProxy.ProxyServer -split ':')[1] }
-            If ($systemProxy.BypassList -match '<local>') { $script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyBypassOnLocal = $true }
-            If ($systemProxy.BypassList.Length -gt 0) { $script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyBypassList = ($systemProxy.BypassList -replace '<local>;','') -split ';' }
-            If ($PSBoundParameters.Keys -contains 'Credentials') { $script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyUsername = $Credentials.UserName; $script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyPasswordEncrypted = ConvertFrom-SecureString -SecureString $Credentials.Password }
-            If ($PSBoundParameters.Keys -contains 'UseDefaultCredentials') { $script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyUseDefaultCredentials = [bool]$UseDefaultCredentials }
+            if (($systemProxy.ProxyServer -split ':')[1] -ne $null) { $script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyPort = ($systemProxy.ProxyServer -split ':')[1] }
+            if ($systemProxy.BypassList -match '<local>') { $script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyBypassOnLocal = $true }
+            if ($systemProxy.BypassList.Length -gt 0) { $script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyBypassList = ($systemProxy.BypassList -replace '<local>;','') -split ';' }
+            if ($PSBoundParameters.Keys -contains 'Credentials') { $script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyUsername = $Credentials.UserName; $script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyPasswordEncrypted = ConvertFrom-SecureString -SecureString $Credentials.Password }
+            if ($PSBoundParameters.Keys -contains 'UseDefaultCredentials') { $script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyUseDefaultCredentials = [bool]$UseDefaultCredentials }
         }
-    } ElseIf ($PSCmdlet.ParameterSetName -eq 'ManualEntry') {
+    } elseif ($PSCmdlet.ParameterSetName -eq 'ManualEntry') {
 
         $script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyServer = $Server
-        If ($PSBoundParameters.Keys -contains 'Port') { $script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyPort = $Port }
-        If ($PSBoundParameters.Keys -contains 'BypassList') { $script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyBypassList = $BypassList }
-        If ($PSBoundParameters.Keys -contains 'BypassOnLocal') { $script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyBypassOnLocal = [bool]$BypassOnLocal }
-        If ($PSBoundParameters.Keys -contains 'Credentials') { $script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyUsername = $Credentials.UserName; $script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyPasswordEncrypted = ConvertFrom-SecureString -SecureString $Credentials.Password }
-        If ($PSBoundParameters.Keys -contains 'UseDefaultCredentials') { $script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyUseDefaultCredentials = [bool]$UseDefaultCredentials }
+        if ($PSBoundParameters.Keys -contains 'Port') { $script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyPort = $Port }
+        if ($PSBoundParameters.Keys -contains 'BypassList') { $script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyBypassList = $BypassList }
+        if ($PSBoundParameters.Keys -contains 'BypassOnLocal') { $script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyBypassOnLocal = [bool]$BypassOnLocal }
+        if ($PSBoundParameters.Keys -contains 'Credentials') { $script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyUsername = $Credentials.UserName; $script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyPasswordEncrypted = ConvertFrom-SecureString -SecureString $Credentials.Password }
+        if ($PSBoundParameters.Keys -contains 'UseDefaultCredentials') { $script:SpotifyEnvironmentInfo[$SpotifyEnv].ProxyUseDefaultCredentials = [bool]$UseDefaultCredentials }
 
         # Verify the info is in a correct format.
-        Try {
+        try {
             Test-SpotifyEnvInfoFormat | Out-Null
-        } Catch {
+        } catch {
             # Something is wrong with the hashtable format or default environment. Restoring old values.
             $script:SpotifyEnvironmentInfo[$SpotifyEnv] = $oldEnvInfo
-            Throw  # Retrhow error.
+            throw  # Retrhow error.
         }
 
     }
@@ -415,7 +415,7 @@ Export-ModuleMember -Function 'Set-SpotifyEnvironmentProxy'
 
 # Make a copy of the provided Spotify environment configuration hashtable. This hashtable may have come from the user and may be invalid.
 # However, we don't care about validation, that will be done later. We will just clone the primitives and manually clone the known complex objects.
-Function Copy-SpotifyEnvInfo {
+function Copy-SpotifyEnvInfo {
 
     Param ([Parameter(Mandatory)] [hashtable]$SpotifyEnvInfo)
 
@@ -423,14 +423,14 @@ Function Copy-SpotifyEnvInfo {
     $SpotifyEnvInfo.Keys | ForEach-Object { $userEnvironmentInfo[$_] = $SpotifyEnvInfo[$_].Clone() }
 
     # UserSessions should be an array containing AuthenticationTokens. If it doesn't, who cares, it will be caught later.
-    Foreach ($env In $userEnvironmentInfo.Keys) {
-        If (($userEnvironmentInfo.$env.Keys -contains 'UserSessions') -and ($userEnvironmentInfo.$env.UserSessions -is [array])) {
+    foreach ($env in $userEnvironmentInfo.Keys) {
+        if (($userEnvironmentInfo.$env.Keys -contains 'UserSessions') -and ($userEnvironmentInfo.$env.UserSessions -is [array])) {
 
             # New array containing only converted AuthenticationToken objects.
             $newUserSessionsArray = @()
 
-            Foreach ($sess In $userEnvironmentInfo.$env.UserSessions) {
-                If ($sess -is [NewGuy.PoshSpotify.AuthenticationToken]) {
+            foreach ($sess in $userEnvironmentInfo.$env.UserSessions) {
+                if ($sess -is [NewGuy.PoshSpotify.AuthenticationToken]) {
 
                     # Calculate the remaining time left on the access token.
                     $expiresOn = $sess.ExpiresOn
@@ -438,13 +438,13 @@ Function Copy-SpotifyEnvInfo {
 
                     # Create object and set optional properties.
                     $newSess = [NewGuy.PoshSpotify.AuthenticationToken]::new($sess.AccessToken, $sess.TokenType, $expiresInSec)
-                    If ($sess.RefreshToken) { $newSess.RefreshToken = $sess.RefreshToken }
-                    If ($sess.Scopes) { $newSess.Scopes = $sess.Scopes }
+                    if ($sess.RefreshToken) { $newSess.RefreshToken = $sess.RefreshToken }
+                    if ($sess.Scopes) { $newSess.Scopes = $sess.Scopes }
 
                     # Add new Authentication Token to new UserSessions array.
                     $newUserSessionsArray += $newSess
 
-                } Else {
+                } else {
                     # Not an AuthenticationToken? Whatever, invalid data will be handled later.
                     $newUserSessionsArray = $sess
                 }
@@ -456,7 +456,7 @@ Function Copy-SpotifyEnvInfo {
         }
     }
 
-    Return $userEnvironmentInfo
+    return $userEnvironmentInfo
 
 }
 
@@ -470,12 +470,12 @@ Function Copy-SpotifyEnvInfo {
 #region Test-SpotifyEnv
 
 # Test to ensure the provided Spotify environment exists within the current Spotify evironment configuration hashtable.
-Function Test-SpotifyEnv {
+function Test-SpotifyEnv {
 
     Param ([Parameter(Mandatory)] [string]$SpotifyEnv)
 
-    If ($script:SpotifyEnvironmentInfo[$SpotifyEnv]) { Return $true }
-    Else { Throw ("The $SpotifyEnv key is not found in the SpotifyEnvironmentInfo hashtable. See https://github.com/The-New-Guy/Posh-Spotify for details:`nKeys:$($script:SpotifyEnvironmentInfo.Keys)") }
+    if ($script:SpotifyEnvironmentInfo[$SpotifyEnv]) { return $true }
+    else { throw ("The $SpotifyEnv key is not found in the SpotifyEnvironmentInfo hashtable. See https://github.com/The-New-Guy/Posh-Spotify for details:`nKeys:$($script:SpotifyEnvironmentInfo.Keys)") }
 
 }
 
@@ -488,7 +488,7 @@ Function Test-SpotifyEnv {
 
 #region Test-SpotifyEnvInfoFormat
 
-Function Test-SpotifyEnvInfoFormat {
+function Test-SpotifyEnvInfoFormat {
 
     <#
 
@@ -632,156 +632,156 @@ Function Test-SpotifyEnvInfoFormat {
 
     [CmdletBinding()]
 
-    Param()
+    param()
 
     Write-Debug "Environment Count : $($script:SpotifyEnvironmentInfo.Count)"
     Write-Debug "Environment Keys : `n$($script:SpotifyEnvironmentInfo.Keys | Out-String)"
     Write-Debug "Environment Settings : `n$(($script:SpotifyEnvironmentInfo.Keys | ForEach-Object { "$_ = @{`n" + ($script:SpotifyEnvironmentInfo[$_] | Out-String) + "}`n" }) -join "`n")"
 
     # Verify the whole thing is a non-empty hashtable.
-    If (($script:SpotifyEnvironmentInfo -ne $null) -and ($script:SpotifyEnvironmentInfo -is [hashtable]) -and ($script:SpotifyEnvironmentInfo.Count -gt 0)) {
+    if (($script:SpotifyEnvironmentInfo -ne $null) -and ($script:SpotifyEnvironmentInfo -is [hashtable]) -and ($script:SpotifyEnvironmentInfo.Count -gt 0)) {
 
         # Verify that the Default Spotify Env is contianed within this hashtable.
-        If (-not $script:SpotifyEnvironmentInfo.Contains($script:SpotifyDefaultEnv)) {
-            Throw "The DefaultSpotifyEnv could not be found as a key to the SpotifyEnvironmentInfo hashtable:`nDefaultSpotifyEnv = $($script:SpotifyDefaultEnv)`nSpotifyEnvironmentIfno = $($script:SpotifyEnvironmentInfo | Out-String)"
+        if (-not $script:SpotifyEnvironmentInfo.Contains($script:SpotifyDefaultEnv)) {
+            throw "The DefaultSpotifyEnv could not be found as a key to the SpotifyEnvironmentInfo hashtable:`nDefaultSpotifyEnv = $($script:SpotifyDefaultEnv)`nSpotifyEnvironmentIfno = $($script:SpotifyEnvironmentInfo | Out-String)"
         }
 
         # Verify each key is associated with another hashtable with the proper format.
-        Foreach ($env In $script:SpotifyEnvironmentInfo.Keys) {
+        foreach ($env in $script:SpotifyEnvironmentInfo.Keys) {
 
             ## Check required keys. ##
 
             # Verify the inner hashtables are in fact hashtables.
-            If (($script:SpotifyEnvironmentInfo[$env] -eq $null) -or ($script:SpotifyEnvironmentInfo[$env] -isnot [hashtable])) {
-                Throw "The $env key in the SpotifyEnvironmentInfo hashtable is not in the proper format. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
+            if (($script:SpotifyEnvironmentInfo[$env] -eq $null) -or ($script:SpotifyEnvironmentInfo[$env] -isnot [hashtable])) {
+                throw "The $env key in the SpotifyEnvironmentInfo hashtable is not in the proper format. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
             }
 
             # The 'ClientId' should contain the Spotify API Integration Key.
-            If (($script:SpotifyEnvironmentInfo[$env].ClientId -eq $null) -or
+            if (($script:SpotifyEnvironmentInfo[$env].ClientId -eq $null) -or
                 ($script:SpotifyEnvironmentInfo[$env].ClientId -isnot [string]) -or
                 ($script:SpotifyEnvironmentInfo[$env].ClientId.Length -eq 0)) {
-                Throw "The $env key in the SpotifyEnvironmentInfo hashtable is missing the ClientId key or it is in the wrong format. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
+                throw "The $env key in the SpotifyEnvironmentInfo hashtable is missing the ClientId key or it is in the wrong format. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
             }
 
             # The final required key must be one of the following.
             # 1. The 'SecretKey' should contain the Spotify API Application Secret Key in plain text.
             # 2. The 'SecretKeyEncrypted' should contain the Spotify API Application Secret Key as a string representation of a SecureString.
-            If ((($script:SpotifyEnvironmentInfo[$env].SecretKey -eq $null) -or
+            if ((($script:SpotifyEnvironmentInfo[$env].SecretKey -eq $null) -or
                  ($script:SpotifyEnvironmentInfo[$env].SecretKey -isnot [string]) -or
                  ($script:SpotifyEnvironmentInfo[$env].SecretKey.Length -eq 0)) -and
                 (($script:SpotifyEnvironmentInfo[$env].SecretKeyEncrypted -eq $null) -or
                  ($script:SpotifyEnvironmentInfo[$env].SecretKeyEncrypted -isnot [string]) -or
                  ($script:SpotifyEnvironmentInfo[$env].SecretKeyEncrypted.Length -eq 0))) {
-                Throw "The $env key in the SpotifyEnvironmentInfo hashtable is missing the SecretKey/SecretKeyEncrypted key or it is in the wrong format. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
+                throw "The $env key in the SpotifyEnvironmentInfo hashtable is missing the SecretKey/SecretKeyEncrypted key or it is in the wrong format. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
             }
 
             # The above check does not account for the case where SecretKey is valid but SecretKeyEncrypted is invalid.
             # Since SecretKeyEncrypted is used by default when both keys are given we will do a second check on SecretKeyEncrypted.
-            If (($script:SpotifyEnvironmentInfo[$env].SecretKeyEncrypted -ne $null) -and
+            if (($script:SpotifyEnvironmentInfo[$env].SecretKeyEncrypted -ne $null) -and
                 (($script:SpotifyEnvironmentInfo[$env].SecretKeyEncrypted -isnot [string]) -or
                  ($script:SpotifyEnvironmentInfo[$env].SecretKeyEncrypted.Length -eq 0))) {
-                Throw "The $env key in the SpotifyEnvironmentInfo hashtable has a SecretKeyEncrypted key in the wrong format. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
+                throw "The $env key in the SpotifyEnvironmentInfo hashtable has a SecretKeyEncrypted key in the wrong format. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
             }
 
             ## Check optional CallbackUrl and DefaultScopes keys. ##
 
             # The 'CallbackUrl' should contain the callback URL registered with Spotify and will be used to redirect users to after authentication.
-            If (($script:SpotifyEnvironmentInfo[$env].CallbackUrl -ne $null) -and
+            if (($script:SpotifyEnvironmentInfo[$env].CallbackUrl -ne $null) -and
                 (($script:SpotifyEnvironmentInfo[$env].CallbackUrl -isnot [string]) -or
                  ($script:SpotifyEnvironmentInfo[$env].CallbackUrl.Length -eq 0))) {
-                Throw "The $env key in the SpotifyEnvironmentInfo hashtable has a CallbackUrl key in the wrong format. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
+                throw "The $env key in the SpotifyEnvironmentInfo hashtable has a CallbackUrl key in the wrong format. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
             }
 
             # The 'DefaultScopes' should contain a list of strings that representing the permission scopes you are requesting access for during authentication.
-            If (($script:SpotifyEnvironmentInfo[$env].DefaultScopes -ne $null) -and ($script:SpotifyEnvironmentInfo[$env].DefaultScopes -isnot [array])) {
-                Throw "The $env key in the SpotifyEnvironmentInfo hashtable has a DefaultScopes key in the wrong format. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
+            if (($script:SpotifyEnvironmentInfo[$env].DefaultScopes -ne $null) -and ($script:SpotifyEnvironmentInfo[$env].DefaultScopes -isnot [array])) {
+                throw "The $env key in the SpotifyEnvironmentInfo hashtable has a DefaultScopes key in the wrong format. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
             }
 
             ## Check optional proxy keys. ##
 
             # Only bother check if the ProxyServer key exists to begin with.
-            If ($script:SpotifyEnvironmentInfo[$env].ProxyServer -ne $null) {
+            if ($script:SpotifyEnvironmentInfo[$env].ProxyServer -ne $null) {
 
                 # The 'ProxyServer' should contain the hostname of the proxy server to use.
-                If (($script:SpotifyEnvironmentInfo[$env].ProxyServer -isnot [string]) -or ($script:SpotifyEnvironmentInfo[$env].ProxyServer.Length -eq 0)) {
-                    Throw "The $env key in the SpotifyEnvironmentInfo hashtable contains an improperly formatted ProxyServer key. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
+                if (($script:SpotifyEnvironmentInfo[$env].ProxyServer -isnot [string]) -or ($script:SpotifyEnvironmentInfo[$env].ProxyServer.Length -eq 0)) {
+                    throw "The $env key in the SpotifyEnvironmentInfo hashtable contains an improperly formatted ProxyServer key. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
                 }
 
                 # Each of the additional proxy keys below should either not exist OR match the requirements below.
 
                 # The 'ProxyPort' should contain the port use to connect to the proxy server.
-                If (($script:SpotifyEnvironmentInfo[$env].ProxyPort -ne $null) -and
+                if (($script:SpotifyEnvironmentInfo[$env].ProxyPort -ne $null) -and
                     ((($script:SpotifyEnvironmentInfo[$env].ProxyPort -isnot [int]) -and ($script:SpotifyEnvironmentInfo[$env].ProxyPort -isnot [string])) -or
                      (($script:SpotifyEnvironmentInfo[$env].ProxyPort -as [int]) -le 0))) {
-                    Throw "The $env key in the SpotifyEnvironmentInfo hashtable contains an improperly formatted ProxyPort key. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
+                    throw "The $env key in the SpotifyEnvironmentInfo hashtable contains an improperly formatted ProxyPort key. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
                 }
 
                 # The 'ProxyBypassList' should contain an array of URIs that will not use the proxy server.
-                If (($script:SpotifyEnvironmentInfo[$env].ProxyBypassList -ne $null) -and ($script:SpotifyEnvironmentInfo[$env].ProxyBypassList -isnot [array])) {
-                    Throw "The $env key in the SpotifyEnvironmentInfo hashtable contains an improperly formatted ProxyBypassList key. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
+                if (($script:SpotifyEnvironmentInfo[$env].ProxyBypassList -ne $null) -and ($script:SpotifyEnvironmentInfo[$env].ProxyBypassList -isnot [array])) {
+                    throw "The $env key in the SpotifyEnvironmentInfo hashtable contains an improperly formatted ProxyBypassList key. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
                 }
 
                 # The 'ProxyBypassOnLocal' switch should be a bool or a switch.
-                If (($script:SpotifyEnvironmentInfo[$env].ProxyBypassOnLocal -ne $null) -and ($script:SpotifyEnvironmentInfo[$env].ProxyBypassOnLocal -isnot [bool])) {
-                    Throw "The $env key in the SpotifyEnvironmentInfo hashtable contains an improperly formatted ProxyBypassOnLocal key. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
+                if (($script:SpotifyEnvironmentInfo[$env].ProxyBypassOnLocal -ne $null) -and ($script:SpotifyEnvironmentInfo[$env].ProxyBypassOnLocal -isnot [bool])) {
+                    throw "The $env key in the SpotifyEnvironmentInfo hashtable contains an improperly formatted ProxyBypassOnLocal key. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
                 }
 
                 # The 'ProxyUsername' should contain the username of the account needed to authenticate to the proxy server.
-                If (($script:SpotifyEnvironmentInfo[$env].ProxyUsername -ne $null) -and
+                if (($script:SpotifyEnvironmentInfo[$env].ProxyUsername -ne $null) -and
                     (($script:SpotifyEnvironmentInfo[$env].ProxyUsername -isnot [string]) -or ($script:SpotifyEnvironmentInfo[$env].ProxyUsername.Length -eq 0))) {
-                    Throw "The $env key in the SpotifyEnvironmentInfo hashtable contains an improperly formatted ProxyUsername key. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
+                    throw "The $env key in the SpotifyEnvironmentInfo hashtable contains an improperly formatted ProxyUsername key. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
                 }
 
                 # The 'ProxyUseDefaultCredentials' switch should be a bool or a switch.
-                If (($script:SpotifyEnvironmentInfo[$env].ProxyUseDefaultCredentials -ne $null) -and ($script:SpotifyEnvironmentInfo[$env].ProxyUseDefaultCredentials -isnot [bool])) {
-                    Throw "The $env key in the SpotifyEnvironmentInfo hashtable contains an improperly formatted ProxyUseDefaultCredentials key. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
+                if (($script:SpotifyEnvironmentInfo[$env].ProxyUseDefaultCredentials -ne $null) -and ($script:SpotifyEnvironmentInfo[$env].ProxyUseDefaultCredentials -isnot [bool])) {
+                    throw "The $env key in the SpotifyEnvironmentInfo hashtable contains an improperly formatted ProxyUseDefaultCredentials key. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
                 }
 
                 # The proxy password keys must be one of the following.
                 # 1. The 'ProxyPassword' should contain the proxy password in plain text.
                 # 2. The 'ProxyPasswordEncrypted' should contain the proxy password as a string representation of a SecureString.
-                If (($script:SpotifyEnvironmentInfo[$env].ProxyUsername -ne $null) -and ($script:SpotifyEnvironmentInfo[$env].ProxyPassword -eq $null) -and ($script:SpotifyEnvironmentInfo[$env].ProxyPasswordEncrypted -eq $null)) {
-                    Throw "The $env key in the SpotifyEnvironmentInfo hashtable contains an ProxyUsername key but does not contain a ProxyPassword or ProxyPasswordEncrypted key. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
+                if (($script:SpotifyEnvironmentInfo[$env].ProxyUsername -ne $null) -and ($script:SpotifyEnvironmentInfo[$env].ProxyPassword -eq $null) -and ($script:SpotifyEnvironmentInfo[$env].ProxyPasswordEncrypted -eq $null)) {
+                    throw "The $env key in the SpotifyEnvironmentInfo hashtable contains an ProxyUsername key but does not contain a ProxyPassword or ProxyPasswordEncrypted key. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
                 }
 
-                If (($script:SpotifyEnvironmentInfo[$env].ProxyUsername -ne $null) -and
+                if (($script:SpotifyEnvironmentInfo[$env].ProxyUsername -ne $null) -and
                     ((($script:SpotifyEnvironmentInfo[$env].ProxyPassword -eq $null) -or
                       ($script:SpotifyEnvironmentInfo[$env].ProxyPassword -isnot [string]) -or
                       ($script:SpotifyEnvironmentInfo[$env].ProxyPassword.Length -eq 0)) -and
                      (($script:SpotifyEnvironmentInfo[$env].ProxyPasswordEncrypted -eq $null) -or
                       ($script:SpotifyEnvironmentInfo[$env].ProxyPasswordEncrypted -isnot [string]) -or
                       ($script:SpotifyEnvironmentInfo[$env].ProxyPasswordEncrypted.Length -eq 0)))) {
-                    Throw "The $env key in the SpotifyEnvironmentInfo hashtable contains an improperly formatted ProxyPassword or ProxyPasswordEncrypted key. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
+                    throw "The $env key in the SpotifyEnvironmentInfo hashtable contains an improperly formatted ProxyPassword or ProxyPasswordEncrypted key. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
                 }
 
                 # The above check does not account for the case where ProxyPassword is valid but ProxyPasswordEncrypted is invalid.
                 # Since ProxyPasswordEncrypted is used by default when both keys are given we will do a second check on ProxyPasswordEncrypted.
-                If (($script:SpotifyEnvironmentInfo[$env].ProxyUsername -ne $null) -and
+                if (($script:SpotifyEnvironmentInfo[$env].ProxyUsername -ne $null) -and
                     ($script:SpotifyEnvironmentInfo[$env].ProxyPasswordEncrypted -ne $null) -and
                     (($script:SpotifyEnvironmentInfo[$env].ProxyPasswordEncrypted -isnot [string]) -or
                      ($script:SpotifyEnvironmentInfo[$env].ProxyPasswordEncrypted.Length -eq 0))) {
-                        Throw "The $env key in the SpotifyEnvironmentInfo hashtable has a ProxyPasswordEncrypted key in the wrong format. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
+                        throw "The $env key in the SpotifyEnvironmentInfo hashtable has a ProxyPasswordEncrypted key in the wrong format. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
                 }
             }
 
             ## Check system keys. ##
 
             # If the UserSessions key exists, make sure it is an array containing only AuthenticationToken objects.
-            If ($script:SpotifyEnvironmentInfo[$env].UserSessions -ne $null) {
-                If (($script:SpotifyEnvironmentInfo[$env].UserSessions -isnot [array]) -or
+            if ($script:SpotifyEnvironmentInfo[$env].UserSessions -ne $null) {
+                if (($script:SpotifyEnvironmentInfo[$env].UserSessions -isnot [array]) -or
                     ($script:SpotifyEnvironmentInfo[$env].UserSessions | ForEach-Object -Begin { $NotValid = $false } `
-                                                                                        -Process { If ($_ -isnot [NewGuy.PoshSpotify.AuthenticationToken]) { $NotValid = $true } } `
-                                                                                        -End { Return $NotValid })) {
-                    Throw "The $env key in the SpotifyEnvironmentInfo hashtable contains an improperly formatted UserSessions key. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
+                                                                                        -Process { if ($_ -isnot [NewGuy.PoshSpotify.AuthenticationToken]) { $NotValid = $true } } `
+                                                                                        -End { return $NotValid })) {
+                    throw "The $env key in the SpotifyEnvironmentInfo hashtable contains an improperly formatted UserSessions key. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo[$env] | Out-String)"
                 }
             }
         }
-    } Else {
-        Throw "The SpotifyEnvironmentInfo hashtable is not defined or is not in the proper format. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo | Out-String)"
+    } else {
+        throw "The SpotifyEnvironmentInfo hashtable is not defined or is not in the proper format. See https://github.com/The-New-Guy/Posh-Spotify for details:`n$($script:SpotifyEnvironmentInfo | Out-String)"
     }
 
     # If we made it this far then I call that a success.
-    Return $true
+    return $true
 
 }
 
@@ -795,13 +795,13 @@ Function Test-SpotifyEnvInfoFormat {
 #region Get-SpotifySystemProxy
 
 # Returns an object with the system proxy settings.
-Function Get-SpotifySystemProxy {
+function Get-SpotifySystemProxy {
 
     [CmdletBinding()]
 
-    Param()
+    param()
 
-    Begin {
+    begin {
 
         # Result proxy settings object.
         $ProxySettings = New-Object PSCustomObject -Property @{
@@ -812,11 +812,11 @@ Function Get-SpotifySystemProxy {
 
     }
 
-    Process {
+    process {
 
         # Retrieve the binary proxy setting data.
         $regVal = (Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\Connections" -Name WinHttpSettings -ErrorAction SilentlyContinue).WinHttPSettings
-        If ($regVal -eq $null) { Return }
+        if ($regVal -eq $null) { return }
 
         # The first part of this binary data appears to be some static information followed by an Int32 that is either 1 for proxy cleared or 3 for proxy set.
         $headerLength = 12 - 1  # 8 bytes static info + 4 bytes Int32 = 12 bytes (starting at zero so minus one).
@@ -829,7 +829,7 @@ Function Get-SpotifySystemProxy {
         $proxyLengthByteStop = $proxyLengthByteStart + $Int32ByteStop
         $proxyLength = [System.BitConverter]::ToInt32($regVal[$proxyLengthByteStart..$proxyLengthByteStop], 0)
 
-        If ($proxyLength -gt 0) {
+        if ($proxyLength -gt 0) {
 
             # Get the proxy servername string.
             $proxyByteStart = $proxyLengthByteStop + 1
@@ -841,14 +841,14 @@ Function Get-SpotifySystemProxy {
             $bypassLengthByteStop = $bypassLengthByteStart + $Int32ByteStop
             $bypassLength = [System.BitConverter]::ToInt32($regVal[$bypassLengthByteStart..$bypassLengthByteStop], 0)
 
-            If ($bypassLength -gt 0) {
+            if ($bypassLength -gt 0) {
 
                 # Get the bypass list string.
                 $bypassByteStart = $bypassLengthByteStop + 1
                 $bypassByteStop = $bypassByteStart + ($bypassLength - 1)
                 $bypassList = -join ($regVal[$bypassByteStart..$bypassByteStop] | ForEach-Object { [char]$_ })
 
-            } Else {
+            } else {
                 $bypasslist = ''
             }
 
@@ -859,9 +859,9 @@ Function Get-SpotifySystemProxy {
         }
     }
 
-    End {
+    end {
 
-        Return $ProxySettings
+        return $ProxySettings
     }
 
 }

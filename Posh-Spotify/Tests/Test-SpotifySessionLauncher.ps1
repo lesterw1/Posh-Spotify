@@ -5,7 +5,7 @@
 #>
 
 # If the parameter below is not provided default locations will be used. See the module documentation for details.
-Param([string]$EnvironmentInfoFilePath)
+param([string]$EnvironmentInfoFilePath)
 
 # Remove any pre-existing or already loaded version of the module.
 Get-Module Posh-Spotify | Remove-Module
@@ -13,11 +13,11 @@ Get-Module Posh-Spotify | Remove-Module
 # Import the module to be tested (up one folder).
 Import-Module "$PSScriptRoot\..\Posh-Spotify.psd1"
 
-Try {
+try {
 
     Import-SpotifyEnvironmentInfo -FilePath $EnvironmentInfoFilePath | Out-Null
 
-} Catch {
+} catch {
 
     $errMsg = @"
 Could not load Spotify session and environment info.
@@ -30,7 +30,7 @@ To run these tests ensure that there is a valid Spotify environment configuratio
     Invoke-Pester -Script @{ Path = '.\*'; Parameters = @{ EnvironmentInfoFilePath = <EnvironmentInfoPath> } }
 "@
 
-    Throw $errMsg
+    throw $errMsg
 
 }
 

@@ -5,7 +5,7 @@
 #>
 
 # If the parameter below is not provided a default location will be used. See the module documentation for details.
-Param([string]$EnvironmentInfoFilePath)
+param([string]$EnvironmentInfoFilePath)
 
 # Initialize Spotify API session and environment info.
 . "$PSScriptRoot\..\Test-SpotifySessionLauncher.ps1" -EnvironmentInfoFilePath $EnvironmentInfoFilePath

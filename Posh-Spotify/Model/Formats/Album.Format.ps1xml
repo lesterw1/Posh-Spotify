@@ -18,7 +18,7 @@
                                     <ScriptBlock> $_.Artists -ne $null </ScriptBlock>
                                 </ItemSelectionCondition>
                                 <Label>Artists</Label>
-                                <ScriptBlock> If ($_.Artists.Count -gt 5) { ($_.Artists | Select-Object Name -First 5) + ' ...' } Else { $_.Artists }</ScriptBlock>
+                                <ScriptBlock> if ($_.Artists.Count -gt 5) { ($_.Artists | Select-Object Name -First 5) + ' ...' } else { $_.Artists }</ScriptBlock>
                             </ListItem>
                             <ListItem>
                                 <PropertyName>Id</PropertyName>
@@ -47,7 +47,7 @@
                                     <ScriptBlock> $_.Tracks -ne $null </ScriptBlock>
                                 </ItemSelectionCondition>
                                 <Label>Tracks</Label>
-                                <ScriptBlock> If ($_.Tracks.Count -gt 5) { ($_.Tracks | Select-Object -First 5) + ' ...' } Else { $_.Tracks }</ScriptBlock>
+                                <ScriptBlock> if ($_.Tracks.Count -gt 5) { ($_.Tracks | Select-Object -First 5) + ' ...' } else { $_.Tracks }</ScriptBlock>
                             </ListItem>
                         </ListItems>
                     </ListEntry>

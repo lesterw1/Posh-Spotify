@@ -21,7 +21,7 @@
 
 #region Get-SpotifyDevice
 
-Function Get-SpotifyDevice {
+function Get-SpotifyDevice {
 
     <#
 
@@ -55,18 +55,18 @@ Function Get-SpotifyDevice {
     [CmdletBinding()]
     [OutputType('NewGuy.PoshSpotify.Device')]
 
-    Param([ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
+    param([ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
           [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
 
     $Devices = @()
 
     $result = Invoke-SpotifyRequest -Method 'GET' -Path '/v1/me/player/devices' -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv
 
-    Foreach ($device In $result.devices) {
+    foreach ($device in $result.devices) {
         $Devices += [NewGuy.PoshSpotify.Device]::new($device)
     }
 
-    Return $Devices
+    return $Devices
 
 }
 
@@ -81,7 +81,7 @@ Export-ModuleMember -Function 'Get-SpotifyDevice'
 
 #region Get-SpotifyPlayer
 
-Function Get-SpotifyPlayer {
+function Get-SpotifyPlayer {
 
     <#
 
@@ -123,7 +123,7 @@ Function Get-SpotifyPlayer {
     [CmdletBinding()]
     [OutputType('NewGuy.PoshSpotify.Player')]
 
-    Param([string]$Market,
+    param([string]$Market,
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
           [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
 
@@ -134,13 +134,13 @@ Function Get-SpotifyPlayer {
         SpotifyEnv = $SpotifyEnv
     }
 
-    If ($Market) { $splat['QueryParameters'] = @{ market = $Market } }
+    if ($Market) { $splat['QueryParameters'] = @{ market = $Market } }
 
     $result = Invoke-SpotifyRequest @splat
 
     $player = [NewGuy.PoshSpotify.Player]::new($result)
 
-    Return $player
+    return $player
 
 }
 
@@ -155,7 +155,7 @@ Export-ModuleMember -Function 'Get-SpotifyPlayer'
 
 #region Get-SpotifyCurrentPlayerContext
 
-Function Get-SpotifyCurrentPlayerContext {
+function Get-SpotifyCurrentPlayerContext {
 
     <#
 
@@ -200,7 +200,7 @@ Function Get-SpotifyCurrentPlayerContext {
     [CmdletBinding()]
     [OutputType('NewGuy.PoshSpotify.PlayerContext')]
 
-    Param([string]$Market,
+    param([string]$Market,
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
           [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
 
@@ -211,13 +211,13 @@ Function Get-SpotifyCurrentPlayerContext {
         SpotifyEnv = $SpotifyEnv
     }
 
-    If ($Market) { $splat['QueryParameters'] = @{ market = $Market } }
+    if ($Market) { $splat['QueryParameters'] = @{ market = $Market } }
 
     $result = Invoke-SpotifyRequest @splat
 
     $currPlaying = [NewGuy.PoshSpotify.PlayerContext]::new($result)
 
-    Return $currPlaying
+    return $currPlaying
 
 }
 
@@ -232,7 +232,7 @@ Export-ModuleMember -Function 'Get-SpotifyCurrentPlayerContext'
 
 #region Set-SpotifyPlayer
 
-Function Set-SpotifyPlayer {
+function Set-SpotifyPlayer {
 
     <#
 
@@ -282,15 +282,15 @@ Function Set-SpotifyPlayer {
 
     [CmdletBinding()]
 
-    Param([switch]$Play,
+    param([switch]$Play,
           [Parameter(Mandatory, ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
           [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'DeviceObj')] [NewGuy.PoshSpotify.Device[]]$Device,
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
           [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
 
-    Process {
+    process {
 
-        If ($PSCmdlet.ParameterSetName -eq 'DeviceObj') { $DeviceId = $Device.Id }
+        if ($PSCmdlet.ParameterSetName -eq 'DeviceObj') { $DeviceId = $Device.Id }
 
         $params = @{
             device_ids = $DeviceId
@@ -308,7 +308,7 @@ Function Set-SpotifyPlayer {
 
         $result = Invoke-SpotifyRequest @splat
 
-        Return $result
+        return $result
 
     }
 
@@ -325,7 +325,7 @@ Export-ModuleMember -Function 'Set-SpotifyPlayer'
 
 #region Start-SpotifyPlayback
 
-Function Start-SpotifyPlayback {
+function Start-SpotifyPlayback {
 
     <#
 
@@ -400,7 +400,7 @@ Function Start-SpotifyPlayback {
 
     [CmdletBinding(DefaultParameterSetName = 'CurrentActiveDevice')]
 
-    Param([string]$ContextUri,
+    param([string]$ContextUri,
           [string[]]$Tracks,
           [string]$Offset,
           [Parameter(ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
@@ -408,21 +408,21 @@ Function Start-SpotifyPlayback {
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
           [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
 
-    Process {
+    process {
 
-        If ($PSCmdlet.ParameterSetName -eq 'DeviceObj') { $DeviceId = $Device.Id }
+        if ($PSCmdlet.ParameterSetName -eq 'DeviceObj') { $DeviceId = $Device.Id }
 
         $bodyParams = $null
 
-        If ($ContextUri -and $Tracks) { Throw 'Spotify does not support both ContextUri and Tracks parameter on the same request.' }
-        ElseIf ($ContextUri) { $bodyParams = @{ 'context_uri' = $ContextUri } }
-        ElseIf ($Tracks) { $bodyParams = @{ 'uris' = $Tracks } }
+        if ($ContextUri -and $Tracks) { throw 'Spotify does not support both ContextUri and Tracks parameter on the same request.' }
+        elseif ($ContextUri) { $bodyParams = @{ 'context_uri' = $ContextUri } }
+        elseif ($Tracks) { $bodyParams = @{ 'uris' = $Tracks } }
 
-        If ($Offset -and ($ContextUri -or $Tracks)) {
+        if ($Offset -and ($ContextUri -or $Tracks)) {
             $parsedOffset = $null
-            If ([int]::TryParse($Offset, [ref]$parsedOffset)) {
+            if ([int]::TryParse($Offset, [ref]$parsedOffset)) {
                 $bodyParams['offset'] = @{ position = $parsedOffset }
-            } Else {
+            } else {
                 $bodyParams['offset'] = @{ uri = $Offset }
             }
         }
@@ -435,12 +435,12 @@ Function Start-SpotifyPlayback {
             SpotifyEnv = $SpotifyEnv
         }
 
-        If ($DeviceId) { $splat['QueryParameters'] = @{ device_id = $DeviceId } }
-        If ($bodyParams) { $splat['RequestBodyParameters'] = $bodyParams }
+        if ($DeviceId) { $splat['QueryParameters'] = @{ device_id = $DeviceId } }
+        if ($bodyParams) { $splat['RequestBodyParameters'] = $bodyParams }
 
         $result = Invoke-SpotifyRequest @splat
 
-        Return $result
+        return $result
 
     }
 
@@ -457,7 +457,7 @@ Export-ModuleMember -Function 'Start-SpotifyPlayback'
 
 #region Stop-SpotifyPlayback
 
-Function Stop-SpotifyPlayback {
+function Stop-SpotifyPlayback {
 
     <#
 
@@ -505,14 +505,14 @@ Function Stop-SpotifyPlayback {
 
     [CmdletBinding(DefaultParameterSetName = 'CurrentActiveDevice')]
 
-    Param([Parameter(ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
+    param([Parameter(ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
           [Parameter(ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'DeviceObj')] [NewGuy.PoshSpotify.Device[]]$Device,
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
           [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
 
-    Process {
+    process {
 
-        If ($PSCmdlet.ParameterSetName -eq 'DeviceObj') { $DeviceId = $Device.Id }
+        if ($PSCmdlet.ParameterSetName -eq 'DeviceObj') { $DeviceId = $Device.Id }
 
         $splat = @{
             Method = 'PUT'
@@ -521,11 +521,11 @@ Function Stop-SpotifyPlayback {
             SpotifyEnv = $SpotifyEnv
         }
 
-        If ($DeviceId) { $splat['QueryParameters'] = @{ device_id = $DeviceId } }
+        if ($DeviceId) { $splat['QueryParameters'] = @{ device_id = $DeviceId } }
 
         $result = Invoke-SpotifyRequest @splat
 
-        Return $result
+        return $result
 
     }
 
@@ -542,7 +542,7 @@ Export-ModuleMember -Function 'Stop-SpotifyPlayback'
 
 #region Skip-SpotifyNextTrack
 
-Function Skip-SpotifyNextTrack {
+function Skip-SpotifyNextTrack {
 
     <#
 
@@ -590,14 +590,14 @@ Function Skip-SpotifyNextTrack {
 
     [CmdletBinding(DefaultParameterSetName = 'CurrentActiveDevice')]
 
-    Param([Parameter(ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
+    param([Parameter(ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
           [Parameter(ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'DeviceObj')] [NewGuy.PoshSpotify.Device[]]$Device,
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
           [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
 
-    Process {
+    process {
 
-        If ($PSCmdlet.ParameterSetName -eq 'DeviceObj') { $DeviceId = $Device.Id }
+        if ($PSCmdlet.ParameterSetName -eq 'DeviceObj') { $DeviceId = $Device.Id }
 
         $splat = @{
             Method = 'POST'
@@ -606,11 +606,11 @@ Function Skip-SpotifyNextTrack {
             SpotifyEnv = $SpotifyEnv
         }
 
-        If ($DeviceId) { $splat['QueryParameters'] = @{ device_id = $DeviceId } }
+        if ($DeviceId) { $splat['QueryParameters'] = @{ device_id = $DeviceId } }
 
         $result = Invoke-SpotifyRequest @splat
 
-        Return $result
+        return $result
 
     }
 
@@ -627,7 +627,7 @@ Export-ModuleMember -Function 'Skip-SpotifyNextTrack'
 
 #region Skip-SpotifyPreviousTrack
 
-Function Skip-SpotifyPreviousTrack {
+function Skip-SpotifyPreviousTrack {
 
     <#
 
@@ -678,14 +678,14 @@ Function Skip-SpotifyPreviousTrack {
 
     [CmdletBinding(DefaultParameterSetName = 'CurrentActiveDevice')]
 
-    Param([Parameter(ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
+    param([Parameter(ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
           [Parameter(ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'DeviceObj')] [NewGuy.PoshSpotify.Device[]]$Device,
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
           [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
 
-    Process {
+    process {
 
-        If ($PSCmdlet.ParameterSetName -eq 'DeviceObj') { $DeviceId = $Device.Id }
+        if ($PSCmdlet.ParameterSetName -eq 'DeviceObj') { $DeviceId = $Device.Id }
 
         $splat = @{
             Method = 'POST'
@@ -694,11 +694,11 @@ Function Skip-SpotifyPreviousTrack {
             SpotifyEnv = $SpotifyEnv
         }
 
-        If ($DeviceId) { $splat['QueryParameters'] = @{ device_id = $DeviceId } }
+        if ($DeviceId) { $splat['QueryParameters'] = @{ device_id = $DeviceId } }
 
         $result = Invoke-SpotifyRequest @splat
 
-        Return $result
+        return $result
 
     }
 
@@ -715,7 +715,7 @@ Export-ModuleMember -Function 'Skip-SpotifyPreviousTrack'
 
 #region Set-SpotifyTrackSeek
 
-Function Set-SpotifyTrackSeek {
+function Set-SpotifyTrackSeek {
 
     <#
 
@@ -788,7 +788,7 @@ Function Set-SpotifyTrackSeek {
 
     [CmdletBinding(DefaultParameterSetName = 'CurrentActiveDevice')]
 
-    Param([int]$Minutes = 0,
+    param([int]$Minutes = 0,
           [int]$Seconds = 0,
           [int]$Milliseconds = 0,
           [Parameter(ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
@@ -796,9 +796,9 @@ Function Set-SpotifyTrackSeek {
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
           [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
 
-    Process {
+    process {
 
-        If ($PSCmdlet.ParameterSetName -eq 'DeviceObj') { $DeviceId = $Device.Id }
+        if ($PSCmdlet.ParameterSetName -eq 'DeviceObj') { $DeviceId = $Device.Id }
 
         $total = 0
         $total += $Minutes * 60 * 1000
@@ -806,7 +806,7 @@ Function Set-SpotifyTrackSeek {
         $total += $Milliseconds
 
         # Seek 10s by default.
-        If ($total -eq 0) { $total = 10000 }
+        if ($total -eq 0) { $total = 10000 }
 
         $splat = @{
             Method = 'PUT'
@@ -816,11 +816,11 @@ Function Set-SpotifyTrackSeek {
             SpotifyEnv = $SpotifyEnv
         }
 
-        If ($DeviceId) { $splat['QueryParameters']['device_id'] = $DeviceId }
+        if ($DeviceId) { $splat['QueryParameters']['device_id'] = $DeviceId }
 
         $result = Invoke-SpotifyRequest @splat
 
-        Return $result
+        return $result
 
     }
 
@@ -837,7 +837,7 @@ Export-ModuleMember -Function 'Set-SpotifyTrackSeek'
 
 #region Set-SpotifyPlayerVolume
 
-Function Set-SpotifyPlayerVolume {
+function Set-SpotifyPlayerVolume {
 
     <#
 
@@ -891,15 +891,15 @@ Function Set-SpotifyPlayerVolume {
 
     [CmdletBinding(DefaultParameterSetName = 'CurrentActiveDevice')]
 
-    Param([Parameter(Mandatory)] [ValidateScript({ ($_ -ge 0) -and ($_ -le 100) })] [int]$Volume,
+    param([Parameter(Mandatory)] [ValidateScript({ ($_ -ge 0) -and ($_ -le 100) })] [int]$Volume,
           [Parameter(ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
           [Parameter(ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'DeviceObj')] [NewGuy.PoshSpotify.Device[]]$Device,
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
           [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
 
-    Process {
+    process {
 
-        If ($PSCmdlet.ParameterSetName -eq 'DeviceObj') { $DeviceId = $Device.Id }
+        if ($PSCmdlet.ParameterSetName -eq 'DeviceObj') { $DeviceId = $Device.Id }
 
         $splat = @{
             Method = 'PUT'
@@ -909,13 +909,13 @@ Function Set-SpotifyPlayerVolume {
             SpotifyEnv = $SpotifyEnv
         }
 
-        If ($DeviceId) { $splat['QueryParameters']['device_id'] = $DeviceId }
+        if ($DeviceId) { $splat['QueryParameters']['device_id'] = $DeviceId }
 
         $result = Invoke-SpotifyRequest @splat
 
         # TODO : Maybe use the Write-Progress command to animate the turning up of the volume.
 
-        Return $result
+        return $result
 
     }
 
@@ -932,7 +932,7 @@ Export-ModuleMember -Function 'Set-SpotifyPlayerVolume'
 
 #region Set-SpotifyPlayerRepeatMode
 
-Function Set-SpotifyPlayerRepeatMode {
+function Set-SpotifyPlayerRepeatMode {
 
     <#
 
@@ -992,15 +992,15 @@ Function Set-SpotifyPlayerRepeatMode {
 
     [CmdletBinding(DefaultParameterSetName = 'CurrentActiveDevice')]
 
-    Param([Parameter(Mandatory)] [ValidateSet('Track', 'Context', 'Off')] [string]$State = 'Track',
+    param([Parameter(Mandatory)] [ValidateSet('Track', 'Context', 'Off')] [string]$State = 'Track',
           [Parameter(ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
           [Parameter(ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'DeviceObj')] [NewGuy.PoshSpotify.Device[]]$Device,
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
           [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
 
-    Process {
+    process {
 
-        If ($PSCmdlet.ParameterSetName -eq 'DeviceObj') { $DeviceId = $Device.Id }
+        if ($PSCmdlet.ParameterSetName -eq 'DeviceObj') { $DeviceId = $Device.Id }
 
         $splat = @{
             Method = 'PUT'
@@ -1010,11 +1010,11 @@ Function Set-SpotifyPlayerRepeatMode {
             SpotifyEnv = $SpotifyEnv
         }
 
-        If ($DeviceId) { $splat['QueryParameters']['device_id'] = $DeviceId }
+        if ($DeviceId) { $splat['QueryParameters']['device_id'] = $DeviceId }
 
         $result = Invoke-SpotifyRequest @splat
 
-        Return $result
+        return $result
 
     }
 
@@ -1031,7 +1031,7 @@ Export-ModuleMember -Function 'Set-SpotifyPlayerRepeatMode'
 
 #region Set-SpotifyPlayerShuffleMode
 
-Function Set-SpotifyPlayerShuffleMode {
+function Set-SpotifyPlayerShuffleMode {
 
     <#
 
@@ -1090,29 +1090,29 @@ Function Set-SpotifyPlayerShuffleMode {
 
     [CmdletBinding(DefaultParameterSetName = 'CurrentActiveDevice')]
 
-    Param([Parameter(Mandatory)] [ValidateSet('Enabled', 'Disabled')] [string]$State = 'Enabled',
+    param([Parameter(Mandatory)] [ValidateSet('Enabled', 'Disabled')] [string]$State = 'Enabled',
           [Parameter(ValueFromPipeline, ParameterSetName = 'DeviceId')] [string[]]$DeviceId,
           [Parameter(ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'DeviceObj')] [NewGuy.PoshSpotify.Device[]]$Device,
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
           [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
 
-    Process {
+    process {
 
-        If ($PSCmdlet.ParameterSetName -eq 'DeviceObj') { $DeviceId = $Device.Id }
+        if ($PSCmdlet.ParameterSetName -eq 'DeviceObj') { $DeviceId = $Device.Id }
 
         $splat = @{
             Method = 'PUT'
             Path = '/v1/me/player/shuffle'
             AccessToken = $AccessToken
-            QueryParameters = @{ state = $(If ($State -eq 'Enabled') { 'true' } Else { 'false' }) }
+            QueryParameters = @{ state = $(if ($State -eq 'Enabled') { 'true' } else { 'false' }) }
             SpotifyEnv = $SpotifyEnv
         }
 
-        If ($DeviceId) { $splat['QueryParameters']['device_id'] = $DeviceId }
+        if ($DeviceId) { $splat['QueryParameters']['device_id'] = $DeviceId }
 
         $result = Invoke-SpotifyRequest @splat
 
-        Return $result
+        return $result
 
     }
 
