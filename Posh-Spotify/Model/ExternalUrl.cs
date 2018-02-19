@@ -6,7 +6,7 @@
 
     NOTE: The above documentation describes this as a list yet the JSON object that is returned is never a list from what I have seen, just another
     object. So in cases where another object has an ExternalUrl field I will treat it as one item instead of as a list. Also note, the documentation
-    uses a Key/Value pairing for the data and only mentions 1 possible key as an exampe but doesn't mention whether there are more than 1 possible
+    uses a Key/Value pairing for the data and only mentions 1 possible key as an example but doesn't mention whether there are more than 1 possible
     key. For now I am just going to check for the existence of that 1 possible key and set it accordingly. If there are other keys they will be
     ignored.
 

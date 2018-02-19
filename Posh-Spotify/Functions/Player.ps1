@@ -101,7 +101,7 @@ function Get-SpotifyPlayer {
         .PARAMETER Market
 
             An ISO 3166-1 alpha-2 country code. Provide this parameter if you want to apply Track Relinking. Use "from_token" to specify the country
-            code of the user associated with the gieven Access Token.
+            code of the user associated with the given Access Token.
 
             https://developer.spotify.com/web-api/track-relinking-guide/
 
@@ -177,7 +177,7 @@ function Get-SpotifyCurrentPlayerContext {
         .PARAMETER Market
 
             An ISO 3166-1 alpha-2 country code. Provide this parameter if you want to apply Track Relinking. Use "from_token" to specify the country
-            code of the user associated with the gieven Access Token.
+            code of the user associated with the given Access Token.
 
             https://developer.spotify.com/web-api/track-relinking-guide/
 
@@ -358,9 +358,9 @@ function Start-SpotifyPlayback {
             Indicates from where in the context playback should start. Only available when ContextUri corresponds to an album or playlist object, or
             when the Tracks parameter is used.
 
-            Provide either a postive integer to specify a "position" within the context or use a Spotify resource uri to specify the iten to start at.
+            Provide either a positive integer to specify a "position" within the context or use a Spotify resource uri to specify the item to start at.
 
-            Example 1: Start at 5th item of play context (album, playlist, etc). Use this when using the ContextUri parameter.
+            Example 1: Start at 5th item of play context (album, playlist, etc.). Use this when using the ContextUri parameter.
 
                 -Offset 5
 

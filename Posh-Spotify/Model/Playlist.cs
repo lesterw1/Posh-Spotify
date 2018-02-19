@@ -37,7 +37,7 @@ namespace NewGuy.PoshSpotify {
         public string Description { get; set; }
         public FollowerInfo Followers { get; set; }
 
-        // Custom properities.
+        // Custom properties.
 
         public PagingInfo TrackPagingInfo { get; set; }
         public int TrackCount { get { return this.TrackPagingInfo.Total; } }

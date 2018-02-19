@@ -4,7 +4,7 @@
 
     Context object used as a base class for most objects. Objects such as Artist, Album, Track, etc. all contain four main properties:
 
-        ExtnernalUrl
+        ExternalUrl
         FullDetailUri
         Type
         Uri

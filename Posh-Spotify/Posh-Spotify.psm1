@@ -1,6 +1,6 @@
 #Requires -Version 3.0
 
-# This is the module script file that will be executed first upon importing this module. For simplicity this file should reamin
+# This is the module script file that will be executed first upon importing this module. For simplicity this file should remain
 # fairly minimalistic and should mostly just dot source other files to bring in definitions for this module.
 
 #==================================================================================================================================

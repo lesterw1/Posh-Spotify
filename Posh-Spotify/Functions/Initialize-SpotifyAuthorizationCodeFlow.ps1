@@ -45,7 +45,7 @@ function Initialize-SpotifyAuthorizationCodeFlow {
             of some client state (e.g., a cookie) in this state variable, you can validate the response to additionally ensure that the request and
             response originated in the same browser. This provides protection against attacks such as cross-site request forgery. See RFC-6749.
 
-            By default, this command will genearte a new GUID and use that as the state. If you wish no state parameter be sent to the Spotify API,
+            By default, this command will generate a new GUID and use that as the state. If you wish no state parameter be sent to the Spotify API,
             use null or an empty string to disable the feature.
 
         .PARAMETER Scopes

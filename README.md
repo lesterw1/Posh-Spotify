@@ -4,7 +4,7 @@ This is a PowerShell module that contains a set of wrapper functions for retriev
 
 This module also provides a number of commands used to automatically keep track of your current application's credentials, your current Access Token and associated Refresh Token, as well as several commands for initiating authentication and acquiring these tokens. Once the module is configured with these parameters the configurations can be exported to disk in a secure manner allowing you to easily re-import them between PowerShell sessions. See the [Optional Profile Configuration](#Profile) section below for details.
 
-The bulk of the commands provided by this module are wrappers around the individual Spotify Web API endpoints and all use the **Invoke-SpotifyRequest** command mentioned above. Some of the features these additional commands provide are listed below. There are plans to add many more featues later (ex. Playlist Modification, Search Features, etc.). In the meantime any feature this module does not have a command for should be possible via the **Invoke-SpotifyRequest** command and the appropriate Spotify Web API endpoint.
+The bulk of the commands provided by this module are wrappers around the individual Spotify Web API endpoints and all use the **Invoke-SpotifyRequest** command mentioned above. Some of the features these additional commands provide are listed below. There are plans to add many more features later (ex. Playlist Modification, Search Features, etc.). In the meantime any feature this module does not have a command for should be possible via the **Invoke-SpotifyRequest** command and the appropriate Spotify Web API endpoint.
 
 Current Command Support
 
@@ -69,7 +69,7 @@ Once you have registered with Spotify you can install the module. If you have no
 
 ### <a name="Quick"></a> Quick Start
 
-This module has two required pramaters needed for configuration and several optional parameters. There are a few different methods in which these parameters can be configured but the quick start instructions are below. Note that [registration](#Register) of your application is still required.
+This module has two required parameters needed for configuration and several optional parameters. There are a few different methods in which these parameters can be configured but the quick start instructions are below. Note that [registration](#Register) of your application is still required.
 
 1. Import the module and configure your ClientId and SecretKey.
 
@@ -144,7 +144,7 @@ This is just the quick start to getting a personal environment setup and configu
 
 ### <a name="ConfigSyntax"></a>Environment Configuration Syntax
 
-In order to make Spotify API requests this module will need on each request an *Access Token*. This *Access Token* lasts for only a short time (usually 1hr) at which point a new *Access Token* must be acquired by either re-authenticating or by using a *Refresh Token*. The *Spotify Authorization Code Flow* method of login is the only authentication method that returns along with the *Access Token*, a *Refresh Token* that can be used to retrieve unlimited *Access Tokens* without additional authentication requests. The *Refresh Token* never expires and can be used between PowerShell sessions to retrieve a new *Access Token* without loging into Spotify each time. Therefore we must keep track of the *Refresh Token* for each user session. Regardless of which authentication method is used, we will also need to keep track of the *Client ID* and *Secret Key* that was acquired after registring your application with Spotify Developer. If you do not have a Spotify Client ID and Secret Key please refer the previous section, [Register With Spotify](#Register), for details.
+In order to make Spotify API requests this module will need on each request an *Access Token*. This *Access Token* lasts for only a short time (usually 1hr) at which point a new *Access Token* must be acquired by either re-authenticating or by using a *Refresh Token*. The *Spotify Authorization Code Flow* method of login is the only authentication method that returns along with the *Access Token*, a *Refresh Token* that can be used to retrieve unlimited *Access Tokens* without additional authentication requests. The *Refresh Token* never expires and can be used between PowerShell sessions to retrieve a new *Access Token* without logging into Spotify each time. Therefore we must keep track of the *Refresh Token* for each user session. Regardless of which authentication method is used, we will also need to keep track of the *Client ID* and *Secret Key* that was acquired after registering your application with Spotify Developer. If you do not have a Spotify Client ID and Secret Key please refer the previous section, [Register With Spotify](#Register), for details.
 
 To aid in keeping track of these parameters the module will use an internal hashtable that can contain multiple environment configurations and each environment can contain multiple user sessions. This hashtable can be retrieved (**Get-SpotifyEnvironmentInfo**), modified and submitted back to the module (**Set-SpotifyEnvironmentInfo**) to make changes. There are also commands for exporting (**Save-SpotifyEnvironmentInfo**) and importing (**Import-SpotifyEnvironmentInfo**) the hashtable, making it possible to easily save and reload configurations including *Refresh Tokens* between PowerShell sessions.
 
@@ -268,12 +268,12 @@ SpotifyEnvironmentInfo = @{
 
 4. The inner environment hashtable can optionally have the following keys:
 
-    1. **CallbackUrl** - The callback url setup during registration. If not prsent the default will be `http://localhost:8080/callback/`.
+    1. **CallbackUrl** - The callback url setup during registration. If not present the default will be `http://localhost:8080/callback/`.
     2. **DefaultScopes** - The default set of user permission scopes that should be requested anytime a full authentication is required. The user must authorize the use of these scopes to obtain access to the commands that use them.
     3. **ProxyServer** - The hostname of the proxy server used to connect to Spotify if a proxy server is required. All other proxy related keys will be ignored if this key is not present.
     4. **ProxyPort** - The port to use when connecting through the specified proxy server. Port 80 will be chosen if this key is not present.
     5. **ProxyBypassList** - The list of URIs that will not use the proxy. No bypass list will be used if this key is not present.
-    6. **ProxyBypassOnLocal** - The switch to indicate whether shortname hosts will bypass the proxy. By default this will be set to false.
+    6. **ProxyBypassOnLocal** - The switch to indicate whether short name hosts will bypass the proxy. By default this will be set to false.
     7. **ProxyUsername** - The username used to authenticate to the specified proxy server. By default anonymous authentication is used.
     8. **ProxyPassword/ProxyPasswordEncrypted** - The password used to authenticate to the specified proxy server. If the **ProxyPassword** key is used then the password is in plain text. If the **ProxyPasswordEncrypted** key is used then the password is a string representation of a standard *SecureString*. If both keys are used only the **ProxyPasswordEncrypted** key will be used.
     9. **ProxyUseDefaultCredentials** - The switch to indicate whether or not to use Windows default credentials when authenticating to the specified proxy server. If this switch is given then the **ProxyUsername** and **ProxyPassword/ProxyPasswordEncrypted** keys are ignored. By default anonymous authentication is used.
@@ -288,7 +288,7 @@ The Spotify application environment details can be provided in one of the follow
 
 - [SpotifyEnvironmentInfo.ps1 File](#SpotifyEnvFile) - Provide environment configuration prior to importing the module. This is the only method that will persist in new PowerShell sessions without need to import configurations. However, this requires updating a file within the module itself making it possible to lose settings if the module is updated.
 - [Set-SpotifyEnvironmentInfo](#SpotifyEnvArgumentList) - Provide environment configuration after the module has been imported. This can be done by creating the hashtable mentioned above by hand or by importing it from a json file.
-- [Proxy Configuration](#Proxy) - Provide proxy server conifguration after the environment configuration has already be configured.
+- [Proxy Configuration](#Proxy) - Provide proxy server configuration after the environment configuration has already be configured.
 
 #### <a name="SpotifyEnvFile"></a> Configure SpotifyEnvironmentInfo.ps1 File
 
@@ -350,15 +350,15 @@ As briefly described in the above section, [Environment Configuration Syntax](#C
 
 #### Authentication
 
-To acquire *Access Tokens* you must first authenticate to Spotify. Once authenticated you will be provided with an *Access Token* from Spotify. This *Access Token* lasts for only a short time (usually 1hr) at which point a new *Access Token* must be acquired by either re-authenticating or by using a *Refresh Token*. The *Authorization Code* authentication workflow is the only workflow that returns along with the *Access Token*, a *Refresh Token* that can be used to retrieve unlimited *Access Tokens* without additional authentication requests. The *Refresh Token* never expires and can be used between PowerShell sessions to retrieve a new *Access Token* without loging into Spotify each time. All other methods of authentication to Spotify require re-authentication for each new *Access Token* requested.
+To acquire *Access Tokens* you must first authenticate to Spotify. Once authenticated you will be provided with an *Access Token* from Spotify. This *Access Token* lasts for only a short time (usually 1hr) at which point a new *Access Token* must be acquired by either re-authenticating or by using a *Refresh Token*. The *Authorization Code* authentication workflow is the only workflow that returns along with the *Access Token*, a *Refresh Token* that can be used to retrieve unlimited *Access Tokens* without additional authentication requests. The *Refresh Token* never expires and can be used between PowerShell sessions to retrieve a new *Access Token* without logging into Spotify each time. All other methods of authentication to Spotify require re-authentication for each new *Access Token* requested.
 
 Both the *Authorization Code* and *Implicit Grant* authentication workflows require a interactive user login to Spotify. This means the user's browser must be directed away to the Spotify login page. If the user's browser is already logged into Spotify it will skip that login page and go directly to the application authorization page where the user must authorize your access to their account. If the user has previously authorized your application for the requested scopes they will be automatically redirected back to your *CallbackUrl* (more on scopes later). The *CallbackUrl* should be registered with your application on Spotify Developer and should point to an http service that can accept the user's browser redirect to your *CallbackUrl*. The *CallbackUrl* must match exactly (case, trailing slashes, etc.). This redirect will contain in the query string either the *Access Token* (for *Implicit Grant*) or the authorization code needed to acquire the final *Access Token* and *Refresh Token* (for *Authorization Code*). By default the authorization commands provided with this module will handle the process of starting up an http listener and acquiring the *Access Tokens*. The default *CallbackUrl* this module listens on is `http://localhost:8080/callback/`.
 
 For more details on Spotify authentication workflows see the following: https://developer.spotify.com/web-api/authorization-guide/
 
-Currently this module supports the following authentication workflows. If a workflow is not present here it can still be acomplished with **Invoke-SpotifyRequest**. Note that the **Initialize-SpotifySession** uses the *Authorization Code* workflow and automatically adds the acquired user session to the environment configuration's `UserSessions` array if not already.
+Currently this module supports the following authentication workflows. If a workflow is not present here it can still be accomplished with **Invoke-SpotifyRequest**. Note that the **Initialize-SpotifySession** uses the *Authorization Code* workflow and automatically adds the acquired user session to the environment configuration's `UserSessions` array if not already.
 
-##### Authroziation Code Flow
+##### Authorization Code Flow
 
 ```powershell
 # Authenticate and request authorization for the default callback url and scopes.
@@ -400,9 +400,9 @@ $userSession | Add-SpotifyUserSession
 
 #### Scopes
 
-In order to access any data on a user account that is not public you must request specific user permission *Scopes* during the authentication process. The *Access Token* provided will only be able to access resources that full under those *Scopes*. For instance, in order to check a user's player state (including your own), your authentication request must have at some point requested (and been authorized by the user), the `user-read-playback-state` *Scope*. Each Spotify API endpoint that requires a sepcific *Scope* should state which *Scope* to use on their documentation page.
+In order to access any data on a user account that is not public you must request specific user permission *Scopes* during the authentication process. The *Access Token* provided will only be able to access resources that full under those *Scopes*. For instance, in order to check a user's player state (including your own), your authentication request must have at some point requested (and been authorized by the user), the `user-read-playback-state` *Scope*. Each Spotify API endpoint that requires a specific *Scope* should state which *Scope* to use on their documentation page.
 
-The *SpotifyEnvironmentInfo.ps1* file loaded with this module by default contains a list of recommended scopes for full functionaility of this module's provided commands. If you load an environment configuration that does not have a *Scopes* member, it will overwrite these defaults and *Scopes* will have to be explicitly requested during the authentication process.
+The *SpotifyEnvironmentInfo.ps1* file loaded with this module by default contains a list of recommended scopes for full functionality of this module's provided commands. If you load an environment configuration that does not have a *Scopes* member, it will overwrite these defaults and *Scopes* will have to be explicitly requested during the authentication process.
 
 For more details and a partial list of available scopes please see the following: https://developer.spotify.com/web-api/using-scopes/
 
@@ -411,7 +411,7 @@ For more details and a partial list of available scopes please see the following
 To aid in loading this module on each PowerShell session you may want to configure you PowerShell session to automatically load the module and import your saved configuration file. Possibly load the command aliases as well if desired. An example of one possible profile configuration is detailed below. Please note this example assumes you have previously configured the module as detailed in the [Spotify Environment Configuration](#SpotifyEnvConfig) section above, authenticated with Spotify at least once saving the user session to the default environment (i.e. use **Initialize-SpotifySession**) and that you have saved that environment configuration to a file using **Save-SpotifyEnvironmentInfo**. For a quick start on getting to that point please see the above section [Quick Start](#Quick).
 
 ```powershell
-# Set a custom path to where you configs get saved by default.
+# Set a custom path to where your configurations get saved by default.
 # A timestamp will be appended by default when saving. So we will use '*' for importing.
 # If the import path matches multiple files it will sort them alphabetically and pick the top one (in this case the latest saved copy).
 # Remove these two lines if you want to use default save\import locations.

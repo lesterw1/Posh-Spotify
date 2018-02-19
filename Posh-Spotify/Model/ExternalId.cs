@@ -6,7 +6,7 @@
 
     NOTE: The above documentation describes this as a list yet the JSON object that is returned is never a list from what I have seen, just another
     object. So in cases where another object has an ExternalId field I will treat it as one item instead of as a list. Also note, the documentation
-    uses a Key/Value pairing for the data and only mentions 3 possible keys as an exampe but doesn't mention whether there are more than 3 possible
+    uses a Key/Value pairing for the data and only mentions 3 possible keys as an example but doesn't mention whether there are more than 3 possible
     keys. For now I am just going to check for the existence of those 3 possible keys and set it accordingly. If there are other keys they will be
     ignored.
 

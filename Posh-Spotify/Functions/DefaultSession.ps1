@@ -106,13 +106,13 @@ function Add-SpotifyUserSession {
             Each Spotify environment configuration can contain an array of user sessions. The first user session in the array is used by default
             when its associated environment configuration is being used to make API requests. You can manage the user session array in each
             environment configuration by retrieving, modifying and setting back the current environment configuration. However, most will only ever
-            want to add user sessions so this command will simplfy that process.
+            want to add user sessions so this command will simplify that process.
 
             For details on environment configurations please see https://github.com/The-New-Guy/Posh-Spotify.
 
         .PARAMETER RefreshToken
 
-            The Refresh Token used to retrive new Access Tokens. Refresh Tokens can be retrieved using the Initialize-SpotifyAuthorizationCodeFlow
+            The Refresh Token used to retrieve new Access Tokens. Refresh Tokens can be retrieved using the Initialize-SpotifyAuthorizationCodeFlow
             command.
 
         .PARAMETER ExpiresOn
@@ -125,7 +125,7 @@ function Add-SpotifyUserSession {
 
         .PARAMETER AuthenticationToken
 
-            An AuthenticationToken object. AuthenthicationTokens can be retrieved using one of the authentication commands such as the
+            An AuthenticationToken object. AuthenticationTokens can be retrieved using one of the authentication commands such as the
             Initialize-SpotifyAuthorizationCodeFlow command.
 
         .PARAMETER MakeDefault
@@ -143,7 +143,7 @@ function Add-SpotifyUserSession {
 
             This command merely adds the provided data to the Spotify environment configuration. Modifying the properties will not have an effect on
             any Spotify process. For example, setting the ExpiresOn property of a user session to a future date will not un-expire the AccessToken and
-            a new AccessToken will still need to be retrieved if it was expired. Modifying the properies of a user session given from Spotify may
+            a new AccessToken will still need to be retrieved if it was expired. Modifying the properties of a user session given from Spotify may
             result in unexpected behavior.
 
     #>
@@ -239,13 +239,13 @@ function Initialize-SpotifySession {
                   scopes configured through the environment configuration will be presented to the user for approval. If the user has already accepted
                   your application and the requested scopes previously, the user will be immediately redirected to your CallbackUrl.
 
-                - After authroziation, the user will be directed to your CallbackUrl configured through the environment configuration.
+                - After authorization, the user will be directed to your CallbackUrl configured through the environment configuration.
 
-            For details on Spotfy authentication please see https://github.com/The-New-Guy/Posh-Spotify.
+            For details on Spotify authentication please see https://github.com/The-New-Guy/Posh-Spotify.
 
         .PARAMETER AuthenticationToken
 
-            An AuthenticationToken object. AuthenthicationTokens, which represent user sessions, can be retrieved using one of the authentication
+            An AuthenticationToken object. AuthenticationTokens, which represent user sessions, can be retrieved using one of the authentication
             commands such as the Initialize-SpotifyAuthorizationCodeFlow command.
 
         .PARAMETER ForceRefresh

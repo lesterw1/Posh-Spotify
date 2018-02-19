@@ -42,7 +42,7 @@ function Get-SpotifyTrack {
         .PARAMETER Market
 
             An ISO 3166-1 alpha-2 country code. Provide this parameter if you want to apply Track Relinking. Use "from_token" to specify the country
-            code of the user associated with the gieven Access Token.
+            code of the user associated with the given Access Token.
 
             https://developer.spotify.com/web-api/track-relinking-guide/
 

@@ -47,7 +47,7 @@ namespace NewGuy.PoshSpotify {
         public DateTime ReleaseDate { get; set; }
         public string ReleaseDatePrecision { get; set; }
 
-        // Custom properities.
+        // Custom properties.
 
         public PagingInfo TrackPagingInfo { get; set; }
         public int TrackCount { get { return this.TrackPagingInfo.Total; } }

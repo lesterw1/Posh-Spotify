@@ -199,7 +199,7 @@ function Invoke-SpotifyRequest {
             # TODO
 
             # 204 NO CONTENT
-            # Request succeded but there was no body content in the response.
+            # Request succeeded but there was no body content in the response.
             # If this occurs then the code below is not needed.
 
         }
@@ -279,13 +279,13 @@ function Invoke-SpotifyRequest {
             $respStreamReader.Close()
             throw "Status Code : $([int]($response.StatusCode))`nStatus Description : $($response.StatusDescription)`nResponse Body :`n$respBody"
         } else {
-            throw  # No response body so just rethrow the exception as is.
+            throw  # No response body so just re-throw the exception as is.
         }
 
     # Handle any other errors.
     } catch {
 
-        throw  # Rethrow exception.
+        throw  # Re-throw exception.
 
     # Clean up.
     } finally {
@@ -328,11 +328,11 @@ function Get-SpotifyAuthorizationHeader {
 
         .SYNOPSIS
 
-            Generates the Authroization header of the API call in a format required by the Spotify API.
+            Generates the Authorization header of the API call in a format required by the Spotify API.
 
         .DESCRIPTION
 
-            Generates the Authroization header of the API call in a format required by the Spotify API. This format depends on whether the API call
+            Generates the Authorization header of the API call in a format required by the Spotify API. This format depends on whether the API call
             is using the client id and client secret for "Basic" authorization or the access token for "Bearer" authorization.
 
             This function is intended for internal use by this module only.

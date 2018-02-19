@@ -107,7 +107,7 @@ function Set-SpotifyEnvironmentInfo {
         # Something is wrong with the hashtable format or default environment. Restoring old values.
         $script:SpotifyEnvironmentInfo = $oldInfo
         $script:SpotifyDefaultEnv = $oldDefault
-        throw  # Retrhow error.
+        throw  # Re-throw error.
     }
 
 }
@@ -321,7 +321,7 @@ function Set-SpotifyEnvironmentProxy {
 
         .PARAMETER BypassOnLocal
 
-            The switch to indicate whether shortname hosts will bypass the proxy. By default this will be set to false.
+            The switch to indicate whether short name hosts will bypass the proxy. By default this will be set to false.
 
             This setting will be assigned to the specified Spotify environment configuration.
 
@@ -385,7 +385,7 @@ function Set-SpotifyEnvironmentProxy {
         } catch {
             # Something is wrong with the hashtable format or default environment. Restoring old values.
             $script:SpotifyEnvironmentInfo[$SpotifyEnv] = $oldEnvInfo
-            throw  # Retrhow error.
+            throw  # Re-throw error.
         }
 
     }
@@ -469,7 +469,7 @@ function Copy-SpotifyEnvInfo {
 
 #region Test-SpotifyEnv
 
-# Test to ensure the provided Spotify environment exists within the current Spotify evironment configuration hashtable.
+# Test to ensure the provided Spotify environment exists within the current Spotify environment configuration hashtable.
 function Test-SpotifyEnv {
 
     Param ([Parameter(Mandatory)] [string]$SpotifyEnv)
@@ -641,7 +641,7 @@ function Test-SpotifyEnvInfoFormat {
     # Verify the whole thing is a non-empty hashtable.
     if (($script:SpotifyEnvironmentInfo -ne $null) -and ($script:SpotifyEnvironmentInfo -is [hashtable]) -and ($script:SpotifyEnvironmentInfo.Count -gt 0)) {
 
-        # Verify that the Default Spotify Env is contianed within this hashtable.
+        # Verify that the Default Spotify Env is contained within this hashtable.
         if (-not $script:SpotifyEnvironmentInfo.Contains($script:SpotifyDefaultEnv)) {
             throw "The DefaultSpotifyEnv could not be found as a key to the SpotifyEnvironmentInfo hashtable:`nDefaultSpotifyEnv = $($script:SpotifyDefaultEnv)`nSpotifyEnvironmentIfno = $($script:SpotifyEnvironmentInfo | Out-String)"
         }
@@ -831,7 +831,7 @@ function Get-SpotifySystemProxy {
 
         if ($proxyLength -gt 0) {
 
-            # Get the proxy servername string.
+            # Get the proxy server name string.
             $proxyByteStart = $proxyLengthByteStop + 1
             $proxyByteStop = $proxyByteStart + ($proxyLength - 1)
             $proxy = -join ($regVal[$proxyByteStart..$proxyByteStop] | ForEach-Object { [char]$_ })

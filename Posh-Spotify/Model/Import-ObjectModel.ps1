@@ -33,7 +33,7 @@ try {
     )
 } catch {
     if ($_.Exception.Message -match "Cannot add type. The type name '.*?' already exists.") { }  # Do nothing.
-    else { throw }  # Rethrow the error.
+    else { throw }  # Re-throw the error.
 }
 
 #endregion Import Object Model
