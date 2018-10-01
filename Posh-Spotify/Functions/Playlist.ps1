@@ -39,6 +39,10 @@ function Get-SpotifyPlaylist {
 
         .PARAMETER Id
 
+            The Spotify ID for the requested playlist. If one is not provided, all playlists will be returned.
+
+        .PARAMETER UserId
+
             The user's Spotify Id used to retrieve playlist information. If none is provided the current user will be used.
 
         .PARAMETER PageResults
@@ -85,10 +89,11 @@ function Get-SpotifyPlaylist {
 
     #>
 
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = 'UserId')]
     [OutputType('NewGuy.PoshSpotify.Playlist[]')]
 
-    param([Parameter(ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias('Username')] [string]$Id,
+    param([Parameter(ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'Id')][Alias('Playlist')] [string]$Id,
+          [Parameter(ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'UserId')][Alias('Username')] [string]$UserId,
           [switch]$PageResults,
           [int]$Limit = 20,
           [int]$Offset = 0,
@@ -104,9 +109,14 @@ function Get-SpotifyPlaylist {
 
     process {
 
+        # Assume we are getting all playlists for the current user.
         $path = '/v1/me/playlists'
 
-        if ($Username.Length -gt 0) { $path = "/v1/users/$Username/playlists" }
+        # If we were given a UserId then get all playlists for that user.
+        if ($UserId.Length -gt 0) { $path = "/v1/users/$Username/playlists" }
+
+        # If we get a playlist ID then just get that one playlist.
+        if ($Id.Length -gt 0) { $path = "/v1/playlists/$Id" }
 
         $splat = @{ Path = $path }
 
@@ -148,6 +158,88 @@ function Get-SpotifyPlaylist {
 Export-ModuleMember -Function 'Get-SpotifyPlaylist'
 
 #endregion Get-SpotifyPlaylist
+
+#====================================================================================================================================================
+##############################
+## Add-SpotifyPlaylistTrack ##
+##############################
+
+#region Add-SpotifyPlaylistTrack
+
+function Add-SpotifyPlaylistTrack {
+
+    <#
+
+        .SYNOPSIS
+
+            Add a track to the provided playlist.
+
+        .DESCRIPTION
+
+            Add a track to the provided playlist.
+
+            For details on this Spotify API endpoint and its response format please review the Spotify documentation found at the following locations.
+
+                Spotify Web API : https://developer.spotify.com/documentation/web-api/reference/playlists/add-tracks-to-playlist/
+
+        .PARAMETER TackId
+
+            The Spotify ID for the requested track.
+
+        .PARAMETER PlaylistId
+
+            The Spotify ID for the playlist the provided track will be added to.
+
+        .PARAMETER Position
+
+            The position to insert the tracks, a zero-based index. For example, to insert the tracks in the first position specify 0 To insert the
+            tracks in the third position specify 2. If omitted, the tracks will be appended to the playlist. Tracks are added in the order they are
+            listed in the array provided to this command.
+
+        .PARAMETER SpotifyEnv
+
+            A string matching a key in the Spotify environment configuration hashtable to be used when making Spotify API calls. If this parameter is
+            not specified it will use the current default environment configuration.
+
+            For details on environment configurations please see https://github.com/The-New-Guy/Posh-Spotify.
+
+        .PARAMETER AccessToken
+
+            The Access Token provided during the authorization process.
+
+            The Access Token must have the "playlist-modify-public" and "playlist-modify-private" scope authorized in order to add tracks.
+
+    #>
+
+    [CmdletBinding()]
+
+    param([Parameter(ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias('Track')] [string[]]$TrackId,
+          [Parameter(ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias('Playlist')] [string]$PlaylistId,
+          [int]$Position,
+          [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
+          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
+
+    end {
+
+        $path = "/v1/playlists/$PlaylistId/tracks"
+
+        $body = @{ uris = $TrackId }
+
+        if ($PSBoundParameters.Keys.Contains('Position')) {
+            $body.position = $Position
+        }
+
+        $playlistSnapshot = Invoke-SpotifyRequest -Method 'POST' -Path $path -RequestBodyParameters $body -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv
+
+        return $playlistSnapshot
+
+    }
+
+}
+
+# Export-ModuleMember -Function 'Add-SpotifyPlaylistTrack'
+
+#endregion Add-SpotifyPlaylistTrack
 
 #endregion Spotify Playlist API Functions
 
