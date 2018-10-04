@@ -53,7 +53,7 @@ function Get-SpotifyDevice {
     #>
 
     [CmdletBinding()]
-    [OutputType('NewGuy.PoshSpotify.Device')]
+    [OutputType('NewGuy.PoshSpotify.Device[]')]
 
     param([ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
           [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
@@ -66,7 +66,7 @@ function Get-SpotifyDevice {
         $Devices += [NewGuy.PoshSpotify.Device]::new($device)
     }
 
-    return $Devices
+    return [NewGuy.PoshSpotify.Device[]]$Devices
 
 }
 

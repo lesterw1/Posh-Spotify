@@ -94,7 +94,7 @@ function Get-SpotifyTrack {
 
     end {
 
-        return $TrackList
+        return [NewGuy.PoshSpotify.Track[]]$TrackList
 
     }
 

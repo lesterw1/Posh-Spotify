@@ -94,7 +94,7 @@ function Get-SpotifyAlbum {
 
     end {
 
-        return $AlbumList
+        return [NewGuy.PoshSpotify.Album[]]$AlbumList
 
     }
 

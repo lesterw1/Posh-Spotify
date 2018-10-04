@@ -131,7 +131,7 @@ function Get-SpotifySearch {
     #>
 
     [CmdletBinding()]
-    [OutputType('NewGuy.PoshSpotify.Search[]')]
+    [OutputType('NewGuy.PoshSpotify.Context[]')]
 
     param([Parameter(Mandatory, ValueFromPipeline)][ValidateNotNullOrEmpty()] [string]$Query,
           [ValidateSet('Album', 'Artist', 'Playlist', 'Track')] [string[]]$Type = 'Track',
@@ -169,7 +169,7 @@ function Get-SpotifySearch {
 
     end {
 
-        return $SearchList
+        return [NewGuy.PoshSpotify.Context[]]$SearchList
 
     }
 
