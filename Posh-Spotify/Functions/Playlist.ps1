@@ -118,24 +118,29 @@ function Get-SpotifyPlaylist {
         # If we get a playlist ID then just get that one playlist.
         if ($Id.Length -gt 0) { $path = "/v1/playlists/$Id" }
 
-        $splat = @{ Path = $path }
+        $params = @{}
 
         if ($PageResults) {
-            $splat.Limit = $Limit
-            $splat.Offset = $Offset
+            $params.limit = $Limit
+            $params.offset = $Offset
         } else {
-            $splat.Limit = 50
-            $splat.Offset = 0
+            $params.limit = 50
+            $params.offset = 0
         }
-
-        $pagingObject = New-SpotifyPage @splat
 
         # Get requested playlists.
-        if ($PageResults) {
-            $PlaylistList += (Get-SpotifyPage -PagingInfo $pagingObject -RetrieveMode NextPage -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv).Items
-        } else {
-            $PlaylistList += (Get-SpotifyPage -PagingInfo $pagingObject -RetrieveMode AllPages -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv).Items
-        }
+        $result = Invoke-SpotifyRequest -Method 'GET' -Path $path -QueryParameters $params -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv
+
+        # We either got back a single playlist or we got back several wrapped in a paging object.
+        if ($result.type -eq 'playlist') { $PlaylistList += [NewGuy.PoshSpotify.Playlist]::new($result) }
+        elseif ($result.items.Count -gt 0) { $PlaylistList += ([NewGuy.PoshSpotify.PagingInfo]::new($result)).Items }
+
+        # # Get requested playlists.
+        # if ($PageResults) {
+        #     $pageOrPlaylist = Get-SpotifyPage -PagingInfo $pagingObject -RetrieveMode NextPage -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv
+        # } else {
+        #     $pageOrPlaylist = Get-SpotifyPage -PagingInfo $pagingObject -RetrieveMode AllPages -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv
+        # }
 
         # Get all Tracks if not otherwise requested.
         if (-not $SkipTrackRetrieval) {
