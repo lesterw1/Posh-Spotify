@@ -2,8 +2,8 @@
 
     User Object Model
 
-    https://developer.spotify.com/web-api/object-model/#user-object-private
-    https://developer.spotify.com/web-api/object-model/#user-object-public
+    https://developer.spotify.com/documentation/web-api/reference/object-model/#user-object-private
+    https://developer.spotify.com/documentation/web-api/reference/object-model/#user-object-public
 
 */
 

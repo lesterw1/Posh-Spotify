@@ -33,7 +33,7 @@ function Get-SpotifyArtist {
 
             For details on this Spotify API endpoint and its response format please review the Spotify documentation found at the following locations.
 
-                Spotify Web API : https://developer.spotify.com/web-api/get-several-artists/
+                Spotify Web API : https://developer.spotify.com/documentation/web-api/reference/artists/get-several-artists/
 
         .PARAMETER Id
 
@@ -44,7 +44,7 @@ function Get-SpotifyArtist {
             An ISO 3166-1 alpha-2 country code. Provide this parameter if you want to apply Track Relinking. Use "from_token" to specify the country
             code of the user associated with the given Access Token.
 
-            https://developer.spotify.com/web-api/track-relinking-guide/
+            https://developer.spotify.com/documentation/general/guides/track-relinking-guide/
 
         .PARAMETER SpotifyEnv
 

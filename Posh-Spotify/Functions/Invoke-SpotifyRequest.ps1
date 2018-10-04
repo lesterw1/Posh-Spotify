@@ -25,7 +25,7 @@ function Invoke-SpotifyRequest {
             Generates and sends a new Spotify API request based on the provided parameters. For details on what calls can be made please review the
             Spotify documentation found at the following locations.
 
-                Spotify API : https://developer.spotify.com/web-api
+                Spotify API : https://developer.spotify.com/documentation/web-api/
 
         .PARAMETER Path
 

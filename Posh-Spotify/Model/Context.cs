@@ -9,7 +9,7 @@
         Type
         Uri
 
-    https://developer.spotify.com/web-api/object-model/#context-object
+    https://developer.spotify.com/documentation/web-api/reference/object-model/#context-object
 
 */
 

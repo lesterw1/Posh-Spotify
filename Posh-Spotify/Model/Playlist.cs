@@ -2,8 +2,8 @@
 
     Playlist Object Model
 
-    https://developer.spotify.com/web-api/object-model/#playlist-object-full
-    https://developer.spotify.com/web-api/object-model/#playlist-object-simplified
+    https://developer.spotify.com/documentation/web-api/reference/object-model/#playlist-object-full
+    https://developer.spotify.com/documentation/web-api/reference/object-model/#playlist-object-simplified
 
 */
 

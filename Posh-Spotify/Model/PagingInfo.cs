@@ -2,7 +2,7 @@
 
     PagingInfo Object Model
 
-    https://developer.spotify.com/web-api/object-model/#paging-object
+    https://developer.spotify.com/documentation/web-api/reference/object-model/#paging-object
 
 */
 

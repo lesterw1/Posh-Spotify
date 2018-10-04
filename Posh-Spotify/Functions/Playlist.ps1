@@ -34,8 +34,8 @@ function Get-SpotifyPlaylist {
 
             For details on this Spotify API endpoint and its response format please review the Spotify documentation found at the following locations.
 
-                Spotify Web API : https://developer.spotify.com/web-api/get-a-list-of-current-users-playlists/
-                                  https://developer.spotify.com/web-api/get-list-users-playlists/
+                Spotify Web API : https://developer.spotify.com/documentation/web-api/reference/playlists/get-a-list-of-current-users-playlists/
+                                  https://developer.spotify.com/documentation/web-api/reference/playlists/get-list-users-playlists/
 
         .PARAMETER Id
 
@@ -53,7 +53,7 @@ function Get-SpotifyPlaylist {
             that can be made in a short period of time. By default this command will retrieve all items available which may result in multiple
             requests to the Spotify API. Spotify API rate limits may apply. For more details see the following:
 
-                https://developer.spotify.com/web-api/user-guide/#rate-limiting
+                https://developer.spotify.com/documentation/web-api/#rate-limiting
 
         .PARAMETER Limit
 
@@ -72,7 +72,7 @@ function Get-SpotifyPlaylist {
             that can be made in a short period of time. By default this command will retrieve all items available which may result in multiple
             requests to the Spotify API. Spotify API rate limits may apply. For more details see the following:
 
-                https://developer.spotify.com/web-api/user-guide/#rate-limiting
+                https://developer.spotify.com/documentation/web-api/#rate-limiting
 
         .PARAMETER SpotifyEnv
 

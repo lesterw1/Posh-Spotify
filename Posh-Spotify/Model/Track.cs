@@ -2,8 +2,8 @@
 
     Track Object Model
 
-    https://developer.spotify.com/web-api/object-model/#track-object-full
-    https://developer.spotify.com/web-api/object-model/#track-object-simplified
+    https://developer.spotify.com/documentation/web-api/reference/object-model/#track-object-full
+    https://developer.spotify.com/documentation/web-api/reference/object-model/#track-object-simplified
 
 */
 
@@ -110,7 +110,7 @@ namespace NewGuy.PoshSpotify {
     /*== TrackLink Object ==*/
     /*======================*/
 
-    // TrackLink object used by the track to locate the original track in case of Track Relinking : https://developer.spotify.com/web-api/track-relinking-guide/
+    // TrackLink object used by the track to locate the original track in case of Track Relinking : https://developer.spotify.com/documentation/general/guides/track-relinking-guide/
 
     public class TrackLink : Context {
 

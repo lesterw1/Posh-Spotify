@@ -36,7 +36,7 @@ function Get-SpotifyPage {
 
             For details on this Spotify API endpoint and its response format please review the Spotify documentation found at the following locations.
 
-                Spotify Web API : https://developer.spotify.com/web-api/object-model/#paging-object
+                Spotify Web API : https://developer.spotify.com/documentation/web-api/reference/object-model/#paging-object
 
         .PARAMETER PagingInfo
 
@@ -154,7 +154,7 @@ function New-SpotifyPage {
 
             For details on this Spotify API endpoint and its response format please review the Spotify documentation found at the following locations.
 
-                Spotify Web API : https://developer.spotify.com/web-api/object-model/#paging-object
+                Spotify Web API : https://developer.spotify.com/documentation/web-api/reference/object-model/#paging-object
 
         .PARAMETER PagingInfo
 

@@ -2,8 +2,8 @@
 
     Album Object Model
 
-    https://developer.spotify.com/web-api/object-model/#album-object-full
-    https://developer.spotify.com/web-api/object-model/#album-object-simplified
+    https://developer.spotify.com/documentation/web-api/reference/object-model/#album-object-full
+    https://developer.spotify.com/documentation/web-api/reference/object-model/#album-object-simplified
 
 */
 

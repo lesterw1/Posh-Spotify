@@ -2,7 +2,7 @@
 
     Copyright Object Model
 
-    https://developer.spotify.com/web-api/object-model/#copyright-object
+    https://developer.spotify.com/documentation/web-api/reference/object-model/#copyright-object
 
 */
 
