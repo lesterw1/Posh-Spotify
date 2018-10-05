@@ -2,7 +2,7 @@
 
     AuthenticationToken Model
 
-    https://developer.spotify.com/web-api/authorization-guide/
+    https://developer.spotify.com/documentation/general/guides/authorization-guide/#authorization-code-flow
 
 */
 

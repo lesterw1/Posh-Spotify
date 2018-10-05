@@ -2,8 +2,8 @@
 
     Artist Object Model
 
-    https://developer.spotify.com/web-api/object-model/#artist-object-full
-    https://developer.spotify.com/web-api/object-model/#artist-object-simplified
+    https://developer.spotify.com/documentation/web-api/reference/object-model/#artist-object-full
+    https://developer.spotify.com/documentation/web-api/reference/object-model/#artist-object-simplified
 
 */
 

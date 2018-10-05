@@ -2,7 +2,7 @@
 
     ExternalUrl Object Model
 
-    https://developer.spotify.com/web-api/object-model/#external-url-object
+    https://developer.spotify.com/documentation/web-api/reference/object-model/#external-url-object
 
     NOTE: The above documentation describes this as a list yet the JSON object that is returned is never a list from what I have seen, just another
     object. So in cases where another object has an ExternalUrl field I will treat it as one item instead of as a list. Also note, the documentation

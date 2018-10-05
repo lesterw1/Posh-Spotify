@@ -36,7 +36,7 @@ function Get-SpotifySearch {
 
             For details on this Spotify API endpoint and its response format please review the Spotify documentation found at the following locations.
 
-                Spotify Web API : https://developer.spotify.com/web-api/search-item/
+                Spotify Web API : https://developer.spotify.com/documentation/web-api/reference/search/search/
 
         .PARAMETER Query
 
@@ -131,7 +131,7 @@ function Get-SpotifySearch {
     #>
 
     [CmdletBinding()]
-    [OutputType('NewGuy.PoshSpotify.Search[]')]
+    [OutputType('NewGuy.PoshSpotify.Context[]')]
 
     param([Parameter(Mandatory, ValueFromPipeline)][ValidateNotNullOrEmpty()] [string]$Query,
           [ValidateSet('Album', 'Artist', 'Playlist', 'Track')] [string[]]$Type = 'Track',

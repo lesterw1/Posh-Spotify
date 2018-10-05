@@ -2,8 +2,8 @@
 
     Album Object Model
 
-    https://developer.spotify.com/web-api/object-model/#album-object-full
-    https://developer.spotify.com/web-api/object-model/#album-object-simplified
+    https://developer.spotify.com/documentation/web-api/reference/object-model/#album-object-full
+    https://developer.spotify.com/documentation/web-api/reference/object-model/#album-object-simplified
 
 */
 
@@ -93,7 +93,7 @@ namespace NewGuy.PoshSpotify {
                 this.Name = Object.Properties["name"] != null ? (string)Object.Properties["name"].Value : "";
                 this.Popularity = (Object.Properties["popularity"] != null && Object.Properties["popularity"].Value is int) ? (int)Object.Properties["popularity"].Value : 0;
 
-                if (Object.Properties["release_date"] != null) {
+                if ((Object.Properties["release_date"] != null) && (Object.Properties["release_date"].Value != null)) {
                     List<int> ls = ((string)Object.Properties["release_date"].Value).Split('-').Select(i => Int32.Parse(i)).ToList();
                     if (ls.Count == 3) { this.ReleaseDate = new DateTime(ls[0], ls[1], ls[2]); }
                     else if (ls.Count == 2) { this.ReleaseDate = new DateTime(ls[0], ls[1], 1); }

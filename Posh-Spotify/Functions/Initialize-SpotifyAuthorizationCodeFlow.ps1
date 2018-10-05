@@ -30,7 +30,7 @@ function Initialize-SpotifyAuthorizationCodeFlow {
 
             For details on the Authorization Code Flow see the following for details.
 
-                https://developer.spotify.com/web-api/authorization-guide/#authorization-code-flow
+                https://developer.spotify.com/documentation/general/guides/authorization-guide/#authorization-code-flow
 
         .PARAMETER CallbackUrl
 
@@ -52,7 +52,7 @@ function Initialize-SpotifyAuthorizationCodeFlow {
 
             A list of scopes for which authorization is being requested.
 
-            See the Spotify documentation for details: https://developer.spotify.com/web-api/using-scopes/
+            See the Spotify documentation for details: https://developer.spotify.com/documentation/general/guides/authorization-guide/#list-of-scopes
 
         .PARAMETER ShowDialog
 

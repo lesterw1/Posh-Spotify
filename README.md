@@ -18,7 +18,7 @@ Documentation on Spotify Web API can be found at the following locations:
 
 - Spotify API - https://developer.spotify.com/web-api/
 - Spotify Authorization - https://developer.spotify.com/web-api/authorization-guide/
-- Spotify Scopes - https://developer.spotify.com/web-api/using-scopes/
+- Spotify Scopes - https://developer.spotify.com/documentation/general/guides/authorization-guide/#list-of-scopes
 
 For details on installing and using this module please refer to the following sections:
 
@@ -404,7 +404,7 @@ In order to access any data on a user account that is not public you must reques
 
 The *SpotifyEnvironmentInfo.ps1* file loaded with this module by default contains a list of recommended scopes for full functionality of this module's provided commands. If you load an environment configuration that does not have a *Scopes* member, it will overwrite these defaults and *Scopes* will have to be explicitly requested during the authentication process.
 
-For more details and a partial list of available scopes please see the following: https://developer.spotify.com/web-api/using-scopes/
+For more details and a partial list of available scopes please see the following: https://developer.spotify.com/documentation/general/guides/authorization-guide/#list-of-scopes
 
 ## <a name="Profile"></a> Optional Profile Configuration
 
