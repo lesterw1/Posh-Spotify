@@ -66,7 +66,7 @@ function Get-SpotifyDevice {
         $Devices += [NewGuy.PoshSpotify.Device]::new($device)
     }
 
-    return [NewGuy.PoshSpotify.Device[]]$Devices
+    return $Devices
 
 }
 

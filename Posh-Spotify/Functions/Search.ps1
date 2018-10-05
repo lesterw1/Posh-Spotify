@@ -169,7 +169,7 @@ function Get-SpotifySearch {
 
     end {
 
-        return [NewGuy.PoshSpotify.Context[]]$SearchList
+        return $SearchList
 
     }
 

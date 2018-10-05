@@ -154,7 +154,7 @@ function Get-SpotifyPlaylist {
 
     end {
 
-        return [NewGuy.PoshSpotify.Playlist[]]$PlaylistList
+        return $PlaylistList
 
     }
 

@@ -91,7 +91,7 @@ function Get-SpotifyArtist {
 
     end {
 
-        return [NewGuy.PoshSpotify.Artist[]]$ArtistList
+        return $ArtistList
 
     }
 
