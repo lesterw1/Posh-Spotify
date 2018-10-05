@@ -89,10 +89,10 @@ function Get-SpotifyPlaylist {
 
     #>
 
-    [CmdletBinding(DefaultParameterSetName = 'UserId')]
+    [CmdletBinding(DefaultParameterSetName = 'CurrentUser')]
     [OutputType('NewGuy.PoshSpotify.Playlist[]')]
 
-    param([Parameter(ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'Id')][Alias('Playlist')] [string]$Id,
+    param([Parameter(ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'PlaylistId')][Alias('Playlist')] [string]$Id,
           [Parameter(ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'UserId')][Alias('Username')] [string]$UserId,
           [switch]$PageResults,
           [int]$Limit = 20,
@@ -109,38 +109,48 @@ function Get-SpotifyPlaylist {
 
     process {
 
-        # Assume we are getting all playlists for the current user.
-        $path = '/v1/me/playlists'
+        # Retrieving only a single playlist.
+        if ($PSCmdlet.ParameterSetName -eq 'PlaylistId') {
 
-        # If we were given a UserId then get all playlists for that user.
-        if ($UserId.Length -gt 0) { $path = "/v1/users/$Username/playlists" }
+            $path = "/v1/playlists/$Id"
 
-        # If we get a playlist ID then just get that one playlist.
-        if ($Id.Length -gt 0) { $path = "/v1/playlists/$Id" }
+            # Get requested playlist.
+            $result = Invoke-SpotifyRequest -Method 'GET' -Path $path -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv
 
-        $params = @{}
+            # We should have gotten back a single playlist.
+            if ($result.type -eq 'playlist') { $PlaylistList += [NewGuy.PoshSpotify.Playlist]::new($result) }
 
-        if ($PageResults) {
-            $params.limit = $Limit
-            $params.offset = $Offset
-        } else {
-            $params.limit = 50
-            $params.offset = 0
         }
 
-        # Get requested playlists.
-        $result = Invoke-SpotifyRequest -Method 'GET' -Path $path -QueryParameters $params -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv
+        # Retrieving multiple playlists wrapped in a paging info object.
+        else {
 
-        # We either got back a single playlist or we got back several wrapped in a paging object.
-        if ($result.type -eq 'playlist') { $PlaylistList += [NewGuy.PoshSpotify.Playlist]::new($result) }
-        elseif ($result.items.Count -gt 0) { $PlaylistList += ([NewGuy.PoshSpotify.PagingInfo]::new($result)).Items }
+            # Assume we are getting all playlists for the current user.
+            $path = '/v1/me/playlists'
 
-        # # Get requested playlists.
-        # if ($PageResults) {
-        #     $pageOrPlaylist = Get-SpotifyPage -PagingInfo $pagingObject -RetrieveMode NextPage -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv
-        # } else {
-        #     $pageOrPlaylist = Get-SpotifyPage -PagingInfo $pagingObject -RetrieveMode AllPages -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv
-        # }
+            # If we were given a UserId then get all playlists for that user.
+            if ($PSCmdlet.ParameterSetName -eq 'UserId') { $path = "/v1/users/$Username/playlists" }
+
+            $splat = @{ Path = $path }
+
+            if ($PageResults) {
+                $splat.Limit = $Limit
+                $splat.Offset = $Offset
+            } else {
+                $splat.Limit = 50
+                $splat.Offset = 0
+            }
+
+            $pagingObject = New-SpotifyPage @splat
+
+            # Get requested playlists.
+            if ($PageResults) {
+                $PlaylistList += (Get-SpotifyPage -PagingInfo $pagingObject -RetrieveMode NextPage -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv).Items
+            } else {
+                $PlaylistList += (Get-SpotifyPage -PagingInfo $pagingObject -RetrieveMode AllPages -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv).Items
+            }
+
+        }
 
         # Get all Tracks if not otherwise requested.
         if (-not $SkipTrackRetrieval) {
