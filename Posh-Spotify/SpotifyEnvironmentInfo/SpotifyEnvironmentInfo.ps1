@@ -23,23 +23,51 @@ $script:SpotifyEnvironmentInfo = @{
 
         CallbackUrl = 'http://localhost:8080/callback/'
         DefaultScopes = @(
-            'playlist-read-private',
-            'playlist-read-collaborative',
-            'playlist-modify-public',
-            'playlist-modify-private',
-            'ugc-image-upload',
+
+            # Playback
+            # Note : These playback scopes only work with the SDKs and not the Web API. They are commented here for reference.
+
+            #'streaming',
+            #'app-remote-control',
+
+            # Follow
+
             'user-follow-modify',
             'user-follow-read',
-            'user-library-read',
-            'user-library-modify',
+
+            # Playlists
+
+            'playlist-read-private',
+            'playlist-modify-private',
+            'playlist-read-collaborative',
+            'playlist-modify-public',
+
+            # Spotify Connect - (Client Playback)
+
+            'user-modify-playback-state',
+            'user-read-playback-state',
+            'user-read-currently-playing',
+
+            # Users
             'user-read-private',
             'user-read-birthdate',
             'user-read-email',
+
+            # Library
+
+            'user-library-read',
+            'user-library-modify',
+
+            # Listening History
+
             'user-top-read',
-            'user-read-playback-state',
-            'user-modify-playback-state',
-            'user-read-currently-playing',
-            'user-read-recently-played'
+            'user-read-recently-played',
+
+            # Miscellaneous
+
+            #~~ Image Upload ~~#
+            'ugc-image-upload'
+
         )  # Basically all scopes possible.
 
         # ProxyServer = 'your-proxy-01.domain.local'

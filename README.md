@@ -88,7 +88,7 @@ $EnvInfo = Get-SpotifyEnvironmentInfo
 $EnvInfo.Home.ClientId = $ClientId
 $EnvInfo.Home.SecretKeyEncrypted = $SecretKeyEncrypted
 
-# Either remove the other example environments are configure them like above.
+# Either remove the other example environments or configure them like above.
 # Or do neither, they won't be used by default so they will be ignored unless explicitly used.
 $EnvInfo.Remove('Work')
 $EnvInfo.Remove('Test')  # Test example has no scopes configured.
@@ -366,35 +366,70 @@ $userSession = Initialize-SpotifyAuthorizationCodeFlow
 
 # The user's default browser gets directed to Spotify login page.
 
-# The above command will block the prompt until authentication is complete and the user successfully redirected back to the CallbackUrl.
+# The above command will block the prompt until authentication is complete and the user successfully
+# redirected back to the CallbackUrl.
 
 # Add this session to the default environment as the new default user session.
 $userSession | Add-SpotifyUserSession -MakeDefault
 
-# Authenticate and request authorization for the custom callback url and scopes.
-# This command will block the prompt until authentication is complete and the user successfully redirected back to the CallbackUrl.
+# Define a list of authorization scopes we need when accessing Spotify items and/or private user items.
 $scopes = @(
-    'playlist-read-private',
-    'playlist-read-collaborative',
-    'playlist-modify-public',
-    'playlist-modify-private',
-    'ugc-image-upload',
+
+    # Playback
+    # Note : These playback scopes only work with the SDKs and not the Web API.
+    #        They are commented here merely for reference.
+
+    #'streaming',
+    #'app-remote-control',
+
+    # Follow
+
     'user-follow-modify',
     'user-follow-read',
-    'user-library-read',
-    'user-library-modify',
+
+    # Playlists
+
+    'playlist-read-private',
+    'playlist-modify-private',
+    'playlist-read-collaborative',
+    'playlist-modify-public',
+
+    # Spotify Connect - (Client Playback)
+
+    'user-modify-playback-state',
+    'user-read-playback-state',
+    'user-read-currently-playing',
+
+    # Users
     'user-read-private',
     'user-read-birthdate',
     'user-read-email',
-    'user-top-read',
-    'user-read-playback-state',
-    'user-modify-playback-state',
-    'user-read-currently-playing',
-    'user-read-recently-played'
-)
-$userSession = Initialize-SpotifyAuthorizationCodeFlow -CallbackUrl 'http://localhost/myCustomCallbackUrl/' -Scopes $scopes
 
-# Add this session to the default environment. It will not be the default user session unless it is the only user session.
+    # Library
+
+    'user-library-read',
+    'user-library-modify',
+
+    # Listening History
+
+    'user-top-read',
+    'user-read-recently-played',
+
+    # Miscellaneous
+
+    #~~ Image Upload ~~#
+    'ugc-image-upload'
+
+)
+
+# Authenticate and request authorization for the custom callback url and scopes.
+# This command will block the prompt until authentication is complete and the user successfully
+# redirected back to the CallbackUrl.
+$callbackUrl = 'http://localhost/myCustomCallbackUrl/'
+$userSession = Initialize-SpotifyAuthorizationCodeFlow -Scopes $scopes -CallbackUrl $callbackUrl
+
+# Add this session to the default environment. It will not be the default user session unless
+# it is the only user session.
 $userSession | Add-SpotifyUserSession
 ```
 
