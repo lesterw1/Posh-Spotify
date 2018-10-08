@@ -361,6 +361,8 @@ Currently this module supports the following authentication workflows. If a work
 ##### Authorization Code Flow
 
 ```powershell
+#~~~ Create First Session With Default Callback Url and Scopes ~~~#
+
 # Authenticate and request authorization for the default callback url and scopes.
 $userSession = Initialize-SpotifyAuthorizationCodeFlow
 
@@ -371,6 +373,8 @@ $userSession = Initialize-SpotifyAuthorizationCodeFlow
 
 # Add this session to the default environment as the new default user session.
 $userSession | Add-SpotifyUserSession -MakeDefault
+
+#~~~ Create Second Session With Custom Callback Url and Scopes ~~~#
 
 # Define a list of authorization scopes we need when accessing Spotify items and/or private user items.
 $scopes = @(
