@@ -42,9 +42,9 @@ InModuleScope Posh-Spotify {
             # Type          : Artist
             # Uri           : spotify:artist:53XhwfbYqKCa1cC15pYq2q
             # Followers     : 5522353
-            # Genres        : {modern rock, pop, vegas indie}
-            # Images        : {https://i.scdn.co/image/de3c2c4f4e822edab6fd8c2103102413502635ea, https://i.scdn.co/image/0242e9f3cdaeb9abd0c9724248213c8e364fc921,
-            #                 https://i.scdn.co/image/affb5c546adf0b6f718282528e56f24854026be1}
+            # Genres        : {modern rock, rock, vegas indie}
+            # Images        : {https://i.scdn.co/image/63eaf58fd171dc297376c7f362c2cdbc0eda70d2, https://i.scdn.co/image/c9d31051d1e820f8874a783bb703eb902fade140,
+            #                 https://i.scdn.co/image/4cb175e3be6d254414c055821da31124f4fe356a}
             # Popularity    : 94
 
             $artists[0].ExternalUrl | Should -BeOfType NewGuy.PoshSpotify.ExternalUrl
@@ -58,12 +58,10 @@ InModuleScope Posh-Spotify {
             $artists[0].Followers | Should -BeOfType NewGuy.PoshSpotify.FollowerInfo
             $artists[0].Followers.TotalFollowers | Should -BeGreaterThan 0
             $artists[0].Genres.Count | Should -Be 3
-            $artists[0].Genres[0] | Should -Be 'modern rock'
-            $artists[0].Genres[1] | Should -Be 'pop'
-            $artists[0].Genres[2] | Should -Be 'vegas indie'
+            @('modern rock', 'rock', 'vegas indie') | Should -BeIn $artists[0].Genres
             $artists[0].Images.Count | Should -Be 3
             $artists[0].Images[0] | Should -BeOfType NewGuy.PoshSpotify.ImageInfo
-            $artists[0].Images[0].Url | Should -Be 'https://i.scdn.co/image/de3c2c4f4e822edab6fd8c2103102413502635ea'
+            $artists[0].Images[0].Url | Should -BeLike 'https://i.scdn.co/image/*'
             $artists[0].Popularity | Should -BeGreaterThan 0
 
             # Florence + The Machine
@@ -75,9 +73,9 @@ InModuleScope Posh-Spotify {
             # Type          : Artist
             # Uri           : spotify:artist:1moxjboGR7GNWYIMWsRjgG
             # Followers     : 3164533
-            # Genres        : {folk-pop, modern rock, pop}
-            # Images        : {https://i.scdn.co/image/fe6148760b68df4c258a5131bd1b7b6f83286540, https://i.scdn.co/image/eaa4ac2fb065699bde532a88473c2dd21285c60c,
-            #                 https://i.scdn.co/image/0c38f1000f44e7da4e3c324804dbf3f8e2d5a5ec, https://i.scdn.co/image/7fca47fff1ab14bb3f0b009d7544d7ab137ab728}
+            # Genres        : {folk-pop, pop}
+            # Images        : {https://i.scdn.co/image/fca10d0cc2eb43803df106f9d58448c31ec4f04e, https://i.scdn.co/image/220b6d876dc81f6084204b6a885cd3a3614ccbe0,
+            #                 https://i.scdn.co/image/b9e12d1aa93b01b17ce710819df65994ff8c382c}
             # Popularity    : 79
 
             $artists[1].ExternalUrl | Should -BeOfType NewGuy.PoshSpotify.ExternalUrl
@@ -90,13 +88,11 @@ InModuleScope Posh-Spotify {
             $artists[1].Uri | Should -Be 'spotify:artist:1moxjboGR7GNWYIMWsRjgG'
             $artists[1].Followers | Should -BeOfType NewGuy.PoshSpotify.FollowerInfo
             $artists[1].Followers.TotalFollowers | Should -BeGreaterThan 0
-            $artists[1].Genres.Count | Should -Be 3
-            $artists[1].Genres[0] | Should -Be 'folk-pop'
-            $artists[1].Genres[1] | Should -Be 'modern rock'
-            $artists[1].Genres[2] | Should -Be 'pop'
-            $artists[1].Images.Count | Should -Be 4
+            $artists[1].Genres.Count | Should -Be 2
+            @('folk-pop', 'pop') | Should -Be $artists[1].Genres
+            $artists[1].Images.Count | Should -Be 3
             $artists[1].Images[0] | Should -BeOfType NewGuy.PoshSpotify.ImageInfo
-            $artists[1].Images[0].Url | Should -Be 'https://i.scdn.co/image/fe6148760b68df4c258a5131bd1b7b6f83286540'
+            $artists[1].Images[0].Url | Should -BeLike 'https://i.scdn.co/image/*'
             $artists[1].Popularity | Should -BeGreaterThan 0
 
         }

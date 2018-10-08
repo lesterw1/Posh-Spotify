@@ -67,7 +67,7 @@ InModuleScope Posh-Spotify {
             $albums[0].Id | Should -Be '3d74p8E8jFhgKogypxpZAd'
             $albums[0].Images.Count | Should -Be 3
             $albums[0].Images[0] | Should -BeOfType NewGuy.PoshSpotify.ImageInfo
-            $albums[0].Images[0].Url | Should -Be 'https://i.scdn.co/image/065e207d9c469de85ab24e2afbb922bcf6afc2e7'
+            $albums[0].Images[0].Url | Should -BeLike 'https://i.scdn.co/image/*'
             $albums[0].Name | Should -Be 'Believer'
             $albums[0].Type | Should -BeOfType NewGuy.PoshSpotify.ItemType
             $albums[0].Type | Should -Be 'Album'
@@ -124,7 +124,7 @@ InModuleScope Posh-Spotify {
             $albums[1].Id | Should -Be '6hs55qjerNNOi4ZT5bOhxV'
             $albums[1].Images.Count | Should -Be 3
             $albums[1].Images[0] | Should -BeOfType NewGuy.PoshSpotify.ImageInfo
-            $albums[1].Images[0].Url | Should -Be 'https://i.scdn.co/image/14ac8eaf3503928373c9902104d0b8815afaeb11'
+            $albums[1].Images[0].Url | Should -BeLike 'https://i.scdn.co/image/*'
             $albums[1].Name | Should -Be 'Lungs'
             $albums[1].Type | Should -BeOfType NewGuy.PoshSpotify.ItemType
             $albums[1].Type | Should -Be 'Album'
@@ -134,7 +134,7 @@ InModuleScope Posh-Spotify {
             $albums[1].ExternalId | Should -BeOfType NewGuy.PoshSpotify.ExternalId
             $albums[1].ExternalId.Id | Should -Be '00602527116761'
             $albums[1].Genres.Count | Should -Be 0
-            $albums[1].Label | Should -Be 'Island Records'
+            $albums[1].Label | Should -BeLike '*Island Records*'
             $albums[1].Popularity | Should -BeGreaterThan 0
             ($albums[1].ReleaseDate - (Get-Date '1/1/2009 12:00:00 AM')).Ticks | Should -Be 0
             $albums[1].ReleaseDatePrecision | Should -Be 'day'
