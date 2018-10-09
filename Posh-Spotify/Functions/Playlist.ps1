@@ -93,7 +93,7 @@ function Get-SpotifyPlaylist {
     [OutputType('NewGuy.PoshSpotify.Playlist[]')]
 
     param([Parameter(ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'PlaylistId')][Alias('Playlist')] [string]$Id,
-          [Parameter(ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'UserId')][Alias('Username')] [string]$UserId,
+          [Parameter(ParameterSetName = 'UserId')][Alias('Username')] [string]$UserId,
           [switch]$PageResults,
           [int]$Limit = 20,
           [int]$Offset = 0,
