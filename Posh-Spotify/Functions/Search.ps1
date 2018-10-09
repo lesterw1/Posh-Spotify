@@ -158,7 +158,7 @@ function Get-SpotifySearch {
         if ($PSBoundParameters.Keys -contains 'Offset') { $params['offset'] = $Offset }
         if ($Market) { $params['market'] = $Market }
 
-        $result = Invoke-SpotifyRequest -Method 'GET' -Path '/v1/search' -AccessToken $AccessToken -QueryParameters $params -SpotifyEnv $SpotifyEnv
+        $result = Invoke-SpotifyRequest -Method GET -Path '/v1/search' -AccessToken $AccessToken -QueryParameters $params -SpotifyEnv $SpotifyEnv
 
         # Go through each type list found and pull out the PagingInfo object.
         foreach ($itemListType in ($result | Get-Member | Where-Object { $_.MemberType -eq 'NoteProperty' } | Select-Object -ExpandProperty Name)) {

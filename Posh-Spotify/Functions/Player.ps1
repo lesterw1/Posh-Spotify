@@ -60,7 +60,7 @@ function Get-SpotifyDevice {
 
     $Devices = @()
 
-    $result = Invoke-SpotifyRequest -Method 'GET' -Path '/v1/me/player/devices' -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv
+    $result = Invoke-SpotifyRequest -Method GET -Path '/v1/me/player/devices' -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv
 
     foreach ($device in $result.devices) {
         $Devices += [NewGuy.PoshSpotify.Device]::new($device)

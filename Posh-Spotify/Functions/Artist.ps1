@@ -81,7 +81,7 @@ function Get-SpotifyArtist {
             ids = $Id -join ','
         }
 
-        $result = Invoke-SpotifyRequest -Method 'GET' -Path '/v1/artists' -AccessToken $AccessToken -QueryParameters $params -SpotifyEnv $SpotifyEnv
+        $result = Invoke-SpotifyRequest -Method GET -Path '/v1/artists' -AccessToken $AccessToken -QueryParameters $params -SpotifyEnv $SpotifyEnv
 
         foreach ($artist in $result.artists) {
             $ArtistList += [NewGuy.PoshSpotify.Artist]::new($artist)

@@ -84,7 +84,7 @@ function Get-SpotifyAlbum {
 
         if ($Market) { $params['market'] = $Market }
 
-        $result = Invoke-SpotifyRequest -Method 'GET' -Path '/v1/albums' -AccessToken $AccessToken -QueryParameters $params -SpotifyEnv $SpotifyEnv
+        $result = Invoke-SpotifyRequest -Method GET -Path '/v1/albums' -AccessToken $AccessToken -QueryParameters $params -SpotifyEnv $SpotifyEnv
 
         foreach ($album in $result.albums) {
             $AlbumList += [NewGuy.PoshSpotify.Album]::new($album)

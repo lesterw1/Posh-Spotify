@@ -84,7 +84,7 @@ function Get-SpotifyTrack {
 
         if ($Market) { $params['market'] = $Market }
 
-        $result = Invoke-SpotifyRequest -Method 'GET' -Path '/v1/tracks' -AccessToken $AccessToken -QueryParameters $params -SpotifyEnv $SpotifyEnv
+        $result = Invoke-SpotifyRequest -Method GET -Path '/v1/tracks' -AccessToken $AccessToken -QueryParameters $params -SpotifyEnv $SpotifyEnv
 
         foreach ($track in $result.tracks) {
             $TrackList += [NewGuy.PoshSpotify.Track]::new($track)

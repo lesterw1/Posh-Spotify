@@ -74,7 +74,7 @@ function Get-SpotifyPage {
             if (($PagingInfo.NextPage -eq '') -or ($PagingInfo.NextPage -eq $null)) { $path = $PagingInfo.FullDetailUri }
             else { $path = $PagingInfo.NextPage }
 
-            $result = Invoke-SpotifyRequest -Method 'GET' -Path $path -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv
+            $result = Invoke-SpotifyRequest -Method GET -Path $path -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv
 
             if (($result.href -ne $null) -and ($result.href -ne '')) {
                 $pagingObject = [NewGuy.PoshSpotify.PagingInfo]::new($result)
@@ -91,7 +91,7 @@ function Get-SpotifyPage {
             if (($PagingInfo.PreviousPage -eq '') -or ($PagingInfo.PreviousPage -eq $null)) { $path = $PagingInfo.FullDetailUri }
             else { $path = $PagingInfo.PreviousPage }
 
-            $result = Invoke-SpotifyRequest -Method 'GET' -Path $path -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv
+            $result = Invoke-SpotifyRequest -Method GET -Path $path -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv
 
             if (($result.href -ne $null) -and ($result.href -ne '')) {
                 $pagingObject = [NewGuy.PoshSpotify.PagingInfo]::new($result)

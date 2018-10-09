@@ -115,7 +115,7 @@ function Get-SpotifyPlaylist {
             $path = "/v1/playlists/$Id"
 
             # Get requested playlist.
-            $result = Invoke-SpotifyRequest -Method 'GET' -Path $path -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv
+            $result = Invoke-SpotifyRequest -Method GET -Path $path -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv
 
             # We should have gotten back a single playlist.
             if ($result.type -eq 'playlist') { $PlaylistList += [NewGuy.PoshSpotify.Playlist]::new($result) }
@@ -244,7 +244,7 @@ function Add-SpotifyPlaylistTrack {
             $body.position = $Position
         }
 
-        $playlistSnapshot = Invoke-SpotifyRequest -Method 'POST' -Path $path -RequestBodyParameters $body -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv
+        $playlistSnapshot = Invoke-SpotifyRequest -Method POST -Path $path -RequestBodyParameters $body -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv
 
         return $playlistSnapshot
 
