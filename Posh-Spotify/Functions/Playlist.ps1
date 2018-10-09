@@ -152,8 +152,8 @@ function Get-SpotifyPlaylist {
 
         }
 
-        # Get all Tracks if not otherwise requested.
-        if (-not $SkipTrackRetrieval) {
+        # Get all Tracks if not otherwise requested or we were retrieving a specific playlist which would already have the tracks.
+        if ((-not $SkipTrackRetrieval) -and ($PSCmdlet.ParameterSetName -ne 'PlaylistId')) {
             foreach ($playlist in $PlaylistList) {
                 $newPageInfo = Get-SpotifyPage -PagingInfo $playlist.TrackPagingInfo -RetrieveMode AllPages -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv
                 $newPageInfo.Items | ForEach-Object { $playlist.Tracks.Add($_) }

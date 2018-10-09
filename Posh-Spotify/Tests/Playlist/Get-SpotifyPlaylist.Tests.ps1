@@ -67,12 +67,73 @@ InModuleScope Posh-Spotify {
             $selectedPlaylist.Public | Should -BeFalse
             $selectedPlaylist.SnapshotId.Length | Should -BeGreaterThan 0
             $selectedPlaylist.Description | Should -BeNullOrEmpty  # This is only available on Full Playlist object.
-            $selectedPlaylist.Followers | Should -BeGreaterOrEqual 0
+            $selectedPlaylist.Followers | Should -BeOfType NewGuy.PoshSpotify.FollowerInfo
             $selectedPlaylist.TrackPagingInfo | Should -BeOfType NewGuy.PoshSpotify.PagingInfo
             $selectedPlaylist.TrackPagingInfo.FullDetailUri.Length | Should -BeGreaterThan 0
             $selectedPlaylist.TrackPagingInfo.Total | Should -Be $selectedPlaylist.TrackCount
             $selectedPlaylist.TrackCount | Should -Be 8
-            $selectedPlaylist.Tracks.Capacity | Should -Be $selectedPlaylist.TrackCount
+            $selectedPlaylist.Tracks.Count | Should -Be $selectedPlaylist.TrackCount
+            $selectedPlaylist.Tracks[0] | Should -BeOfType NewGuy.PoshSpotify.PlaylistTrack
+            $selectedPlaylist.Tracks[0].Track | Should -BeOfType NewGuy.PoshSpotify.Track
+            $selectedPlaylist.Tracks[0].Track.Name | Should -Be 'Que Sera'
+            $selectedPlaylist.ExternalUrl | Should -BeOfType NewGuy.PoshSpotify.ExternalUrl
+            $selectedPlaylist.ExternalUrl.Url | Should -Be 'https://open.spotify.com/playlist/6ePQdv3gJKhHS0HHOcjegE'
+            $selectedPlaylist.FullDetailUri | Should -Be 'https://api.spotify.com/v1/playlists/6ePQdv3gJKhHS0HHOcjegE'
+            $selectedPlaylist.Type | Should -BeOfType NewGuy.PoshSpotify.ItemType
+            $selectedPlaylist.Type | Should -Be 'Playlist'
+            $selectedPlaylist.Uri | Should -Be 'spotify:user:my2eggs:playlist:6ePQdv3gJKhHS0HHOcjegE'
+
+        }
+
+        #========================================================================================================
+
+        ###############################################
+        ### Test Case : Get-SpotifyPlaylist With Id ###
+        ###############################################
+
+        It 'Get specific playlist.' {
+
+            $selectedPlaylist = Get-SpotifyPlaylist -Id 6ePQdv3gJKhHS0HHOcjegE
+
+            # Posh-Spotify Playlist Test by my2eggs
+
+            # Collaborative   : False
+            # Id              : 6ePQdv3gJKhHS0HHOcjegE
+            # Images          : {https://mosaic.scdn.co/640/1a9d8dd58014c1ed46f4fd22613376cf9a65cea6765dd18a89c2dbbb8d548dfb6387001eb362d25c90f62be60c6b902cb7c556c600677e26189d8844e5e617df404d6982f114f5a5d0e3b991a
+            #                   f7e1fac, https://mosaic.scdn.co/300/1a9d8dd58014c1ed46f4fd22613376cf9a65cea6765dd18a89c2dbbb8d548dfb6387001eb362d25c90f62be60c6b902cb7c556c600677e26189d8844e5e617df404d6982f114f5a5d
+            #                   0e3b991af7e1fac, https://mosaic.scdn.co/60/1a9d8dd58014c1ed46f4fd22613376cf9a65cea6765dd18a89c2dbbb8d548dfb6387001eb362d25c90f62be60c6b902cb7c556c600677e26189d8844e5e617df404d6982f1
+            #                   14f5a5d0e3b991af7e1fac}
+            # Name            : Posh-Spotify Playlist Test
+            # Owner           : my2eggs
+            # Public          : False
+            # SnapshotId      : MTAsOTljMDE1NDkzNjAwNTY3YmNmN2FkNzA4N2FkMGQ0ZjBlMDg2YWQxYw==
+            # Description     : A playlist used for the automated testing of Posh-Spotify, a PowerShell API wrapper for the Spotify API.
+            # Followers       : 0
+            # TrackPagingInfo : PagedItems[8/100 of 8]
+            # TrackCount      : 8
+            # Tracks          : {Que Sera, Crystalised, Tessellate, Between Two Points (feat. Swan)...}
+            # ExternalUrl     : https://open.spotify.com/playlist/6ePQdv3gJKhHS0HHOcjegE
+            # FullDetailUri   : https://api.spotify.com/v1/playlists/6ePQdv3gJKhHS0HHOcjegE
+            # Type            : Playlist
+            # Uri             : spotify:user:my2eggs:playlist:6ePQdv3gJKhHS0HHOcjegE
+
+            $selectedPlaylist | Should -BeOfType NewGuy.PoshSpotify.Playlist
+            $selectedPlaylist.Collaborative | Should -BeFalse
+            $selectedPlaylist.Id | Should -Be '6ePQdv3gJKhHS0HHOcjegE'
+            $selectedPlaylist.Images.Count | Should -Be 3
+            $selectedPlaylist.Images[0] | Should -BeOfType NewGuy.PoshSpotify.ImageInfo
+            $selectedPlaylist.Images[0].Url | Should -Match '(^https://i.scdn.co/image/)|(^https://mosaic.scdn.co)'
+            $selectedPlaylist.Name | Should -Be 'Posh-Spotify Playlist Test'
+            $selectedPlaylist.Owner | Should -Be 'my2eggs'
+            $selectedPlaylist.Public | Should -BeFalse
+            $selectedPlaylist.SnapshotId.Length | Should -BeGreaterThan 0
+            $selectedPlaylist.Description | Should -Be 'A playlist used for the automated testing of Posh-Spotify, a PowerShell API wrapper for the Spotify API.'
+            $selectedPlaylist.Followers | Should -BeOfType NewGuy.PoshSpotify.FollowerInfo
+            $selectedPlaylist.TrackPagingInfo | Should -BeOfType NewGuy.PoshSpotify.PagingInfo
+            $selectedPlaylist.TrackPagingInfo.FullDetailUri.Length | Should -BeGreaterThan 0
+            $selectedPlaylist.TrackPagingInfo.Total | Should -Be $selectedPlaylist.TrackCount
+            $selectedPlaylist.TrackCount | Should -Be 8
+            $selectedPlaylist.Tracks.Count | Should -Be $selectedPlaylist.TrackCount
             $selectedPlaylist.Tracks[0] | Should -BeOfType NewGuy.PoshSpotify.PlaylistTrack
             $selectedPlaylist.Tracks[0].Track | Should -BeOfType NewGuy.PoshSpotify.Track
             $selectedPlaylist.Tracks[0].Track.Name | Should -Be 'Que Sera'
