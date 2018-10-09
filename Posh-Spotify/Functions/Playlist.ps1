@@ -85,7 +85,9 @@ function Get-SpotifyPlaylist {
 
             The Access Token provided during the authorization process.
 
-            The Access Token must have the "playlist-read-collaborative" and "playlist-read-private" scope authorized in order to read information.
+            Private playlists are only retrievable for the current user and requires the "playlist-read-private" scope to have been authorized by the
+            user. Note that this scope alone will not return collaborative playlists, even though they are always private. Collaborative playlists are
+            only retrievable for the current user and requires the "playlist-read-collaborative" scope to have been authorized by the user.
 
     #>
 
