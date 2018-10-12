@@ -28,6 +28,7 @@ try {
         "$PSScriptRoot\PagingInfo.cs",
         "$PSScriptRoot\Player.cs",
         "$PSScriptRoot\Playlist.cs",
+        "$PSScriptRoot\Snapshot.cs",
         "$PSScriptRoot\Track.cs",
         "$PSScriptRoot\User.cs"
     )

@@ -135,6 +135,7 @@ FileList = @(
                'Model\PagingInfo.cs',
                'Model\Player.cs',
                'Model\Playlist.cs',
+               'Model\Snapshot.cs',
                'Model\Track.cs',
                'Model\User.cs',
                'SpotifyEnvironmentInfo\SpotifyEnvironmentInfo.ps1',
