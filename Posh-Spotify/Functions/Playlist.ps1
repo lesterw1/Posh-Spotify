@@ -189,23 +189,29 @@ function Add-SpotifyPlaylistTrack {
 
         .SYNOPSIS
 
-            Add a track to the provided playlist.
+            Add tracks to the provided playlist.
 
         .DESCRIPTION
 
-            Add a track to the provided playlist.
+            Add tracks to the provided playlist.
 
             For details on this Spotify API endpoint and its response format please review the Spotify documentation found at the following locations.
 
                 Spotify Web API : https://developer.spotify.com/documentation/web-api/reference/playlists/add-tracks-to-playlist/
 
-        .PARAMETER TackId
+        .PARAMETER Id
 
-            The Spotify ID for the requested track.
+            The Spotify ID for the playlist the provided tracks will be added to.
 
-        .PARAMETER PlaylistId
+        .PARAMETER TackUri
 
-            The Spotify ID for the playlist the provided track will be added to.
+            The Spotify URIs for the tracks to be added to the playlist. Example below:
+
+                spotify:track:5VnDkUNyX6u5Sk0yZiP8XB
+
+        .PARAMETER Tack
+
+            The NewGuy.PoshSpotify.Track objects to be added to the playlist.
 
         .PARAMETER Position
 
@@ -229,32 +235,37 @@ function Add-SpotifyPlaylistTrack {
     #>
 
     [CmdletBinding()]
+    [OutputType('NewGuy.PoshSpotify.Snapshot')]
 
-    param([Parameter(ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias('Track')] [string[]]$TrackId,
-          [Parameter(ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias('Playlist')] [string]$PlaylistId,
+    param([Parameter(Mandatory)][Alias('Playlist')] [string]$Id,
+          [Parameter(Mandatory, ValueFromPipeline, ParameterSetName = 'TrackUri')] [string[]]$TrackUri,
+          [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'TrackObj')] [NewGuy.PoshSpotify.Track[]]$Track,
           [int]$Position,
           [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
           [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
 
-    end {
+    process {
 
-        $path = "/v1/playlists/$PlaylistId/tracks"
+        $path = "/v1/playlists/$Id/tracks"
 
-        $body = @{ uris = $TrackId }
+        if ($PSCmdlet.ParameterSetName -eq 'TrackUri') { $body = @{ uris = [array]($TrackUri) } }
+        elseif ($PSCmdlet.ParameterSetName -eq 'TrackObj') { $body = @{ uris = [array]($Track.Uri) } }
 
         if ($PSBoundParameters.Keys.Contains('Position')) {
             $body.position = $Position
         }
 
-        $playlistSnapshot = Invoke-SpotifyRequest -Method POST -Path $path -RequestBodyParameters $body -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv
+        $playlistSnapshot = Invoke-SpotifyRequest -Method POST -Path $path -RequestBodyParameters $body -Encoding JSON -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv
 
-        return $playlistSnapshot
+        $snapshotObj = [NewGuy.PoshSpotify.Snapshot]::new($playlistSnapshot)
+
+        return $snapshotObj
 
     }
 
 }
 
-# Export-ModuleMember -Function 'Add-SpotifyPlaylistTrack'
+Export-ModuleMember -Function 'Add-SpotifyPlaylistTrack'
 
 #endregion Add-SpotifyPlaylistTrack
 
