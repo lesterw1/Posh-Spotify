@@ -276,6 +276,105 @@ Export-ModuleMember -Function 'New-SpotifyPlaylist'
 #endregion New-SpotifyPlaylist
 
 #====================================================================================================================================================
+#########################
+## Set-SpotifyPlaylist ##
+#########################
+
+#region Set-SpotifyPlaylist
+
+function Set-SpotifyPlaylist {
+
+    <#
+
+        .SYNOPSIS
+
+            Sets a Spotify playlist to the provided settings.
+
+        .DESCRIPTION
+
+            Sets a Spotify playlist to the provided settings.
+
+            For details on this Spotify API endpoint and its response format please review the Spotify documentation found at the following locations.
+
+                Spotify Web API : https://developer.spotify.com/documentation/web-api/reference/playlists/change-playlist-details/
+
+        .PARAMETER Id
+
+            The Spotify ID for the playlist to set.
+
+        .PARAMETER Name
+
+            The name of the playlist to set.
+
+        .PARAMETER Public
+
+            This switch will set the playlist to Public.
+
+        .PARAMETER Private
+
+            This switch will set the playlist to Private.
+
+        .PARAMETER Collaborative
+
+            This switch will set the playlist to Collaborative. Other users who have access to the playlist URI or are following the playlist will be
+            able to make changes to the playlist. A Collaborative playlist is always private. Therefore a playlist cannot be both Public and
+            Collaborative.
+
+        .PARAMETER Description
+
+            A description for the playlist to set.
+
+        .PARAMETER SpotifyEnv
+
+            A string matching a key in the Spotify environment configuration hashtable to be used when making Spotify API calls. If this parameter is
+            not specified it will use the current default environment configuration.
+
+            For details on environment configurations please see https://github.com/The-New-Guy/Posh-Spotify.
+
+        .PARAMETER AccessToken
+
+            The Access Token provided during the authorization process.
+
+            The Access Token must have the "playlist-modify-public" and "playlist-modify-private" scope authorized in order to add tracks.
+
+    #>
+
+    [CmdletBinding(DefaultParameterSetName = 'Default')]
+
+    param([Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias('User')] [string]$Id,
+          [string]$Name,
+          [Parameter(ParameterSetName = 'Public')] [switch]$Public,
+          [Parameter(ParameterSetName = 'Private')] [switch]$Private,
+          [Parameter(ParameterSetName = 'Collaborative')] [switch]$Collaborative,
+          [string]$Description,
+          [ValidateScript({ Test-SpotifyEnv -SpotifyEnv $_ })] [string]$SpotifyEnv = $script:SpotifyDefaultEnv,
+          [ValidateNotNullOrEmpty()] [string]$AccessToken = $(Get-SpotifyDefaultAccessToken -IsRequired -SpotifyEnv $SpotifyEnv))
+
+    end {
+
+        $path = "/v1/playlists/$Id"
+
+        $body = @{}
+
+        if ($Name) { $body['name'] = $Name }
+
+        if ($Public) { $body['public'] = $true }
+        elseif ($Private) { $body['public'] = $false }
+        elseif ($Collaborative) { $body['collaborative'] = $true }
+
+        if ($Description) { $body['description'] = $Description }
+
+        Invoke-SpotifyRequest -Method PUT -Path $path -RequestBodyParameters $body -Encoding JSON -AccessToken $AccessToken -SpotifyEnv $SpotifyEnv
+
+    }
+
+}
+
+Export-ModuleMember -Function 'Set-SpotifyPlaylist'
+
+#endregion Set-SpotifyPlaylist
+
+#====================================================================================================================================================
 ##############################
 ## Add-SpotifyPlaylistTrack ##
 ##############################
